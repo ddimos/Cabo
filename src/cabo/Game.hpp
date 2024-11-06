@@ -1,5 +1,7 @@
 #pragma once
 
+#include "ResourceIds.hpp"
+
 #include <SFML/Graphics/RenderWindow.hpp>
 
 namespace cn
@@ -19,10 +21,13 @@ private:
     void handleEvents();
     void update();
     void fixedUpdate(float _dt);
-    void render();
+    void draw();
 
     sf::RenderWindow m_window;
     sf::Clock m_systemClock;
+
+    TextureHolder m_textureHolder;
+    FontHolder m_fontHolder;
 
     bool m_isRunning = false;
 };

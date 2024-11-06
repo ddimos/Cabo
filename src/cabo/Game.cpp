@@ -38,7 +38,7 @@ void Game::start()
 
         m_window.clear(sf::Color(2, 17, 34));
     
-		render();
+		draw();
 
         m_window.display();
     } 
@@ -46,7 +46,8 @@ void Game::start()
 
 void Game::init()
 {
-
+    m_fontHolder.load(FontIds::Main, "res/fonts/times_new_roman.ttf");
+    // m_textureHolder.load(TextureIds::Background, "res/textures/Background.png");
 }
 
 void Game::handleEvents()
@@ -76,7 +77,7 @@ void Game::fixedUpdate(float _dt)
 {
 }
 
-void Game::render()
+void Game::draw()
 {
 }
 
