@@ -2,6 +2,9 @@
 
 #include <SFML/Graphics/RenderWindow.hpp>
 
+namespace cn
+{
+
 class Game
 {
 public:
@@ -23,3 +26,5 @@ private:
 
     bool m_isRunning = false;
 };
+
+} // namespace cn

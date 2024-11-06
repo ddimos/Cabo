@@ -2,11 +2,13 @@
 
 #include <SFML/Window/Event.hpp>
 
-constexpr unsigned UPDATES_PER_SEC = 60;
-constexpr float DT = 1.f / UPDATES_PER_SEC;
+#include "Constants.hpp"
+
+namespace cn
+{
 
 Game::Game()
-    : m_window(sf::VideoMode(640, 480), "CABOn", sf::Style::Close)
+    : m_window(sf::VideoMode(WINDOWS_WIDTH, WINDOWS_HEIGHT), "CABOn", sf::Style::Close)
 {
 }
 
@@ -28,10 +30,10 @@ void Game::start()
         handleEvents();
 
 		update();
-        while (accumulator >= DT)
+        while (accumulator >= FRAME_TIME)
         {
-		    fixedUpdate(DT);
-            accumulator -= DT;
+		    fixedUpdate(FRAME_TIME);
+            accumulator -= FRAME_TIME;
         }
 
         m_window.clear(sf::Color(2, 17, 34));
@@ -77,3 +79,5 @@ void Game::fixedUpdate(float _dt)
 void Game::render()
 {
 }
+
+} // namespace cn

@@ -2,7 +2,7 @@
 
 int main()
 {
-    Game game;
+    cn::Game game;
     game.start();
 
     return 0;
