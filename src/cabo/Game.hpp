@@ -1,5 +1,6 @@
 #pragma once
 
+#include "state/StateManager.hpp"
 #include "ResourceIds.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -16,11 +17,10 @@ public:
     void start();
 
 private:
-
     void init();
     void handleEvents();
     void update();
-    void fixedUpdate(float _dt);
+    void fixedUpdate(sf::Time _dt);
     void draw();
 
     sf::RenderWindow m_window;
@@ -28,6 +28,8 @@ private:
 
     TextureHolder m_textureHolder;
     FontHolder m_fontHolder;
+
+    state::StateManager m_stateManager;
 
     bool m_isRunning = false;
 };
