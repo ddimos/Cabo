@@ -34,7 +34,7 @@ void ResourceHolder<Resource, Identifier>::load(Identifier _id, const std::strin
     std::unique_ptr<Resource> resource = std::make_unique<Resource>();
     if (!resource->loadFromFile(_path))
     {
-        CN_ASSERT(false, "Failed to load a resource");
+        CN_ASSERT_FRM(false, "Failed to load the resource: {}", _path);
         return;
     }
     insertResource(_id, std::move(resource));
@@ -47,7 +47,7 @@ void ResourceHolder<Resource, Identifier>::load(Identifier _id, const std::strin
     std::unique_ptr<Resource> resource = std::make_unique<Resource>();
     if (!resource->loadFromFile(_path, _secondParam))
     {
-        CN_ASSERT(false, "Failed to load a resource");
+        CN_ASSERT_FRM(false, "Failed to load the resource: {}", _path);
         return;
     }
     insertResource(_id, std::move(resource));
@@ -57,7 +57,7 @@ template <typename Resource, typename Identifier>
 Resource& ResourceHolder<Resource, Identifier>::get(Identifier _id)
 {
     auto resourceIt = m_map.find(_id);
-    CN_ASSERT(resourceIt != m_map.end(), "The resource wasn't found");
+    CN_ASSERT_FRM(resourceIt != m_map.end(), "The resource wasn't found: {}", (int)_id);
     return *resourceIt->second;
 }
 
@@ -65,7 +65,7 @@ template <typename Resource, typename Identifier>
 const Resource& ResourceHolder<Resource, Identifier>::get(Identifier _id) const
 {
     auto resourceIt = m_map.find(_id);
-    CN_ASSERT(resourceIt != m_map.end(), "The resource wasn't found");
+    CN_ASSERT_FRM(resourceIt != m_map.end(), "The resource wasn't found: {}", (int)_id);
     return *resourceIt->second;
 }
 
@@ -73,7 +73,7 @@ template <typename Resource, typename Identifier>
 void ResourceHolder<Resource, Identifier>::insertResource(Identifier _id, std::unique_ptr<Resource> _resource) 
 {
     auto result = m_map.insert_or_assign(_id, std::move(_resource));
-    CN_ASSERT(result.second, "The resource wasn't inserted");
+    CN_ASSERT_FRM(result.second, "The resource wasn't inserted: {}", (int)_id);
 }
 
 } // namespace cn::core

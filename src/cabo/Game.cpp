@@ -1,5 +1,6 @@
 #include "Game.hpp"
 
+#include "core/Log.hpp"
 #include "state/states/TitleState.hpp"
 
 #include "Constants.hpp"
@@ -22,6 +23,8 @@ Game::Game()
 
 void Game::start()
 {
+    CN_LOG("Start CABOn");
+
     m_isRunning = true;
     m_systemClock.restart();
     
@@ -40,7 +43,7 @@ void Game::start()
         update();
         while (accumulator >= TimePerFrame)
         {
-           fixedUpdate(TimePerFrame);
+            fixedUpdate(TimePerFrame);
             accumulator -= TimePerFrame;
         }
 

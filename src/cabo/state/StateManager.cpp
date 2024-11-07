@@ -59,7 +59,7 @@ bool StateManager::isEmpty() const
 StatePtr StateManager::createState(Name _stateName)
 {
     auto stateIt = m_factories.find(_stateName);
-    CN_ASSERT(stateIt != m_factories.end(), "The state wasn't found");
+    CN_ASSERT_FRM(stateIt != m_factories.end(), "The state: {} wasn't found", (int)_stateName);
     return stateIt->second();
 }
 
