@@ -36,9 +36,9 @@ void StateManager::draw()
         state->draw();
 }
 
-void StateManager::pushState(Name _stateName)
+void StateManager::pushState(StateId _stateId)
 {
-    m_pendingList.push_back(PendingChange(PendingChange::Action::Push, _stateName));
+    m_pendingList.push_back(PendingChange(PendingChange::Action::Push, _stateId));
 }
 
 void StateManager::popState()
@@ -56,10 +56,10 @@ bool StateManager::isEmpty() const
     return m_stack.empty();
 }
 
-StatePtr StateManager::createState(Name _stateName)
+StatePtr StateManager::createState(StateId _stateId)
 {
-    auto stateIt = m_factories.find(_stateName);
-    CN_ASSERT_FRM(stateIt != m_factories.end(), "The state: {} wasn't found", (int)_stateName);
+    auto stateIt = m_factories.find(_stateId);
+    CN_ASSERT_FRM(stateIt != m_factories.end(), "The state: {} wasn't found", (int)_stateId);
     return stateIt->second();
 }
 
@@ -70,7 +70,7 @@ void StateManager::applyPendingChanges()
         switch (change.action)
         {
         case PendingChange::Action::Push:
-            m_stack.push_back(createState(change.stateName));
+            m_stack.push_back(createState(change.stateId));
             break;
         case PendingChange::Action::Pop:
             m_stack.pop_back();

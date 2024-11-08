@@ -1,7 +1,6 @@
 #pragma once
 
 #include "state/State.hpp"
-#include "state/StateName.hpp"
 #include "state/StateTypes.hpp"
 
 #include <SFML/System/NonCopyable.hpp>
@@ -28,13 +27,13 @@ public:
     StateManager(Context _context);
 
     template <typename T>
-    void registerState(Name _stateName);
+    void registerState(StateId _stateId);
 
     void handleEvent(const sf::Event& _event);
     void update(sf::Time _dt);
     void draw();
 
-    void pushState(Name _stateName);
+    void pushState(StateId _stateId);
     void popState();
     void clearStates();
 
@@ -43,7 +42,7 @@ public:
     Context& getContext() { return m_context; }
 
 private:
-    StatePtr createState(Name _stateName);
+    StatePtr createState(StateId _stateId);
     void applyPendingChanges();
 
     struct PendingChange
@@ -55,24 +54,24 @@ private:
             Clear,
         };
 
-        explicit PendingChange(Action _action, Name _stateName = Name::None)
-            : action(_action), stateName(_stateName) {}
+        explicit PendingChange(Action _action, StateId _stateId = StateIdInvalid)
+            : action(_action), stateId(_stateId) {}
 
         Action action;
-        Name stateName;
+        StateId stateId;
     };
 
     std::vector<StatePtr> m_stack;
     std::vector<PendingChange> m_pendingList;
 
     Context m_context;
-    std::unordered_map<Name, std::function<StatePtr()>>	m_factories;
+    std::unordered_map<StateId, std::function<StatePtr()>>	m_factories;
 };
 
 template <typename T>
-void StateManager::registerState(Name _stateName)
+void StateManager::registerState(StateId _stateId)
 {
-    m_factories.emplace(_stateName, [this]() {
+    m_factories.emplace(_stateId, [this]() {
 		return std::make_unique<T>(*this);
 	});
 }

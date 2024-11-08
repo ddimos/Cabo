@@ -1,7 +1,8 @@
 #include "Game.hpp"
 
 #include "core/Log.hpp"
-#include "state/states/TitleState.hpp"
+#include "states/StateIds.hpp"
+#include "states/TitleState.hpp"
 
 #include "Constants.hpp"
 
@@ -59,9 +60,9 @@ void Game::init()
 {
     m_fontHolder.load(FontIds::Main, "res/fonts/times_new_roman.ttf");
 
-    m_stateManager.registerState<state::TitleState>(state::Name::Title);
+    m_stateManager.registerState<states::TitleState>(states::id::Title);
 
-    m_stateManager.pushState(state::Name::Title);
+    m_stateManager.pushState(states::id::Title);
 }
 
 void Game::handleEvents()

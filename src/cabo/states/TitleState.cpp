@@ -1,12 +1,13 @@
-#include "state/states/TitleState.hpp"
+#include "states/TitleState.hpp"
+#include "states/StateIds.hpp"
 #include "ResourceIds.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>
 
-namespace cn::state
+namespace cn::states
 {
 
-TitleState::TitleState(StateManager& _stateManagerRef)
+TitleState::TitleState(state::StateManager& _stateManagerRef)
     : State(_stateManagerRef)
 {
     m_text.setFont(getContext().fontHolderRef.get(FontIds::Main));
@@ -14,17 +15,17 @@ TitleState::TitleState(StateManager& _stateManagerRef)
     m_text.setPosition(sf::Vector2f(getContext().windowRef.getSize() / 2u));
 }
 
-State::Return TitleState::handleEvent(const sf::Event& _event)
+state::State::Return TitleState::handleEvent(const sf::Event& _event)
 {
     if (_event.type == sf::Event::KeyReleased)
     {
         pop();
-        push(Name::Create);
+        push(id::Create);
     }
 	return Return::Break;
 }
 
-State::Return TitleState::update(sf::Time _dt)
+state::State::Return TitleState::update(sf::Time _dt)
 {
     m_toggleEffectTimeDt += _dt;
     if (m_toggleEffectTimeDt >= m_toggleEffectTimeS)
@@ -41,4 +42,4 @@ void TitleState::draw()
         getContext().windowRef.draw(m_text);
 }
 
-} // namespace cn::state
+} // namespace cn::states

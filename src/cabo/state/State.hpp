@@ -1,6 +1,5 @@
 #pragma once
 
-#include "state/StateName.hpp"
 #include "state/StateTypes.hpp"
 
 #include <SFML/System/Time.hpp>
@@ -34,7 +33,7 @@ public:
     virtual void draw() = 0;
 
 protected:
-    void push(Name _stateName);
+    void push(StateId _stateId);
     void pop();
     void clear();
 

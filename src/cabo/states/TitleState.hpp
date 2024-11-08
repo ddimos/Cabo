@@ -5,13 +5,13 @@
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Text.hpp>
 
-namespace cn::state
+namespace cn::states
 {
 
-class TitleState : public State
+class TitleState : public state::State
 {
 public:
-    TitleState(StateManager& _stateManagerRef);
+    TitleState(state::StateManager& _stateManagerRef);
 
     Return handleEvent(const sf::Event& _event) override;
     void draw() override;
@@ -25,4 +25,4 @@ private:
     sf::Time m_toggleEffectTimeS = sf::seconds(1.f);
     sf::Time m_toggleEffectTimeDt = sf::Time::Zero;
 };
-} // namespace cn::state
+} // namespace cn::states

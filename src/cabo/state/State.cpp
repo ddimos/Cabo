@@ -11,9 +11,9 @@ State::State(StateManager& _stateManagerRef)
     
 State::~State() = default;
 
-void State::push(Name _stateName)
+void State::push(StateId _stateId)
 {
-    m_stateManagerRef.pushState(_stateName);
+    m_stateManagerRef.pushState(_stateId);
 }
 
 void State::pop()
