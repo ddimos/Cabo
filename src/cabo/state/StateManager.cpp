@@ -70,12 +70,20 @@ void StateManager::applyPendingChanges()
         switch (change.action)
         {
         case PendingChange::Action::Push:
-            m_stack.push_back(createState(change.stateId));
+            if (!m_stack.empty())
+                m_stack.back()->deactivate();
+            m_stack.emplace_back(createState(change.stateId));
+            m_stack.back()->activate();
             break;
         case PendingChange::Action::Pop:
+            m_stack.back()->deactivate();
             m_stack.pop_back();
+            if (!m_stack.empty())
+                m_stack.back()->activate();
             break;
         case PendingChange::Action::Clear:
+            for (auto it = m_stack.rbegin(); it != m_stack.rend(); ++it)
+                (*it)->deactivate();
             m_stack.clear();
             break;
         }

@@ -15,17 +15,17 @@ TitleState::TitleState(state::StateManager& _stateManagerRef)
     m_text.setPosition(sf::Vector2f(getContext().windowRef.getSize() / 2u));
 }
 
-state::State::Return TitleState::handleEvent(const sf::Event& _event)
+state::State::Return TitleState::onHandleEvent(const sf::Event& _event)
 {
     if (_event.type == sf::Event::KeyReleased)
     {
         pop();
-        push(id::Create);
+        push(id::MainMenu);
     }
 	return Return::Break;
 }
 
-state::State::Return TitleState::update(sf::Time _dt)
+state::State::Return TitleState::onUpdate(sf::Time _dt)
 {
     m_toggleEffectTimeDt += _dt;
     if (m_toggleEffectTimeDt >= m_toggleEffectTimeS)
@@ -36,7 +36,7 @@ state::State::Return TitleState::update(sf::Time _dt)
     return Return::Break;
 }
 
-void TitleState::draw()
+void TitleState::onDraw()
 {
     if (m_showText)
         getContext().windowRef.draw(m_text);

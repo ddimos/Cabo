@@ -10,7 +10,8 @@ namespace cn
 
 enum class TextureIds 
 {
-    Background
+    Background,
+    MainMenuStartButton
 };
 
 enum class FontIds

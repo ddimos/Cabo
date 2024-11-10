@@ -2,6 +2,7 @@
 
 #include "core/Log.hpp"
 #include "states/StateIds.hpp"
+#include "states/MainMenuState.hpp"
 #include "states/TitleState.hpp"
 
 #include "Constants.hpp"
@@ -59,8 +60,11 @@ void Game::start()
 void Game::init()
 {
     m_fontHolder.load(FontIds::Main, "res/fonts/times_new_roman.ttf");
+    m_textureHolder.load(TextureIds::Background, "res/textures/background.png");
+    m_textureHolder.load(TextureIds::MainMenuStartButton, "res/textures/create_menu_start_button.png");
 
     m_stateManager.registerState<states::TitleState>(states::id::Title);
+    m_stateManager.registerState<states::MainMenuState>(states::id::MainMenu);
 
     m_stateManager.pushState(states::id::Title);
 }

@@ -11,6 +11,36 @@ State::State(StateManager& _stateManagerRef)
     
 State::~State() = default;
 
+State::Return State::handleEvent(const sf::Event& _event)
+{
+    m_menuContainer.handleEvent(_event);
+    return onHandleEvent(_event);
+}
+
+State::Return State::update(sf::Time _dt)
+{
+    m_menuContainer.update(_dt);
+    return onUpdate(_dt);
+}
+
+void State::draw()
+{
+    onDraw();
+    m_menuContainer.draw(getContext().windowRef);
+}
+
+void State::activate()
+{
+    m_menuContainer.activate();
+    onActivate();
+}
+
+void State::deactivate()
+{
+    m_menuContainer.deactivate();
+    onDeactivate();
+}
+
 void State::push(StateId _stateId)
 {
     m_stateManagerRef.pushState(_stateId);
@@ -29,6 +59,11 @@ void State::clear()
 Context& State::getContext()
 {
     return m_stateManagerRef.getContext();
+}
+
+menu::Container& State::getContainer()
+{
+    return m_menuContainer;
 }
 
 } // namespace cn::state
