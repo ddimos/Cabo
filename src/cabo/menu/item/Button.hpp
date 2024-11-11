@@ -2,7 +2,6 @@
 
 #include "menu/Item.hpp"
 #include "menu/component/Clickable.hpp"
-#include "menu/component/Drawable.hpp"
 #include "menu/component/Hoverable.hpp"
 
 #include <SFML/Graphics/Sprite.hpp>
@@ -10,7 +9,7 @@
 namespace cn::menu::item
 {
 
-class Button : public Item, protected component::Clickable, protected component::Drawable, protected component::Hoverable
+class Button : public Item
 {
 public:
     Button(Position _position,
@@ -24,6 +23,10 @@ public:
 protected:
     void onHandleEvent(const sf::Event& _event) override;
     void onDraw(sf::RenderWindow& _windowRef) override;
+
+    component::Clickable m_clickable;
+    component::Hoverable m_hoverable;
+    sf::Sprite m_sprite;
 
     sf::IntRect m_textureRectDefault = {};
     sf::IntRect m_textureRectHover = {};

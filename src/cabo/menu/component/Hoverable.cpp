@@ -3,12 +3,12 @@
 namespace cn::menu::component
 {
 
-void Hoverable::setOnHoverCallback(Callback _callback)
+void Hoverable::setCallback(Callback _callback)
 {
     m_onHoverCallback = _callback;
 }
 
-void Hoverable::setHoverableBounds(sf::FloatRect _rect)
+void Hoverable::setBounds(sf::FloatRect _rect)
 {
     m_bounds = _rect;
 }

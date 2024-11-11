@@ -9,7 +9,7 @@
 namespace cn::menu
 {
 
-class Item : protected component::Transformable
+class Item
 {
 public:
     virtual ~Item();
@@ -30,6 +30,7 @@ protected:
     virtual void onActivate() {}
     virtual void onDeactivate() {}
 
+    component::Transformable m_transformable;
     bool m_isActivated = false;
 };
 

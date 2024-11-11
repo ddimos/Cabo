@@ -8,15 +8,14 @@
 namespace cn::menu::component
 {
 
-class Hoverable
+class Hoverable final
 {
 public:
     using Callback = std::function<void(bool)>;
 
-    void setOnHoverCallback(Callback _callback);
-    void setHoverableBounds(sf::FloatRect _rect);
+    void setCallback(Callback _callback);
+    void setBounds(sf::FloatRect _rect);
 
-protected:
     void onMouseMoved(sf::Event::MouseMoveEvent _event);
 
 private:

@@ -8,16 +8,15 @@
 namespace cn::menu::component
 {
 
-class Clickable
+class Clickable final
 {
 public:
     using Callback = std::function<void(bool)>;
 
-    void setOnClickCallback(Callback _callback);
-    void setClickableButton(sf::Mouse::Button _button);
-    void setClickableBounds(sf::FloatRect _rect);
+    void setCallback(Callback _callback);
+    void setButton(sf::Mouse::Button _button);
+    void setBounds(sf::FloatRect _rect);
 
-protected:
     void onMouseReleased(sf::Event::MouseButtonEvent _event);
 
 private:

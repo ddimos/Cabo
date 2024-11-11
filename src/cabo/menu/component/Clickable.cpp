@@ -5,17 +5,17 @@
 namespace cn::menu::component
 {
 
-void Clickable::setOnClickCallback(Callback _callback)
+void Clickable::setCallback(Callback _callback)
 {
     m_onClickCallback = _callback;
 }
 
-void Clickable::setClickableButton(sf::Mouse::Button _button)
+void Clickable::setButton(sf::Mouse::Button _button)
 {
     m_button = _button;
 }
 
-void Clickable::setClickableBounds(sf::FloatRect _rect)
+void Clickable::setBounds(sf::FloatRect _rect)
 {
     m_bounds = _rect;
 }
