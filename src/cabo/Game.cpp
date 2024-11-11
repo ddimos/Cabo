@@ -2,6 +2,8 @@
 
 #include "core/Log.hpp"
 #include "states/StateIds.hpp"
+#include "states/FinishState.hpp"
+#include "states/GameState.hpp"
 #include "states/MainMenuState.hpp"
 #include "states/TitleState.hpp"
 
@@ -21,6 +23,8 @@ Game::Game()
     : m_window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "CABOn", sf::Style::Close)
     , m_stateManager(state::Context(m_window, m_textureHolder, m_fontHolder))
 {
+    m_window.setKeyRepeatEnabled(false);
+    m_window.setFramerateLimit(60);
 }
 
 void Game::start()
@@ -62,9 +66,12 @@ void Game::init()
     m_fontHolder.load(FontIds::Main, "res/fonts/times_new_roman.ttf");
     m_textureHolder.load(TextureIds::Background, "res/textures/background.png");
     m_textureHolder.load(TextureIds::MainMenuStartButton, "res/textures/create_menu_start_button.png");
+    m_textureHolder.load(TextureIds::MainMenuJoinButton, "res/textures/join_menu_join_button.png");
 
     m_stateManager.registerState<states::TitleState>(states::id::Title);
     m_stateManager.registerState<states::MainMenuState>(states::id::MainMenu);
+    m_stateManager.registerState<states::GameState>(states::id::Game);
+    m_stateManager.registerState<states::FinishState>(states::id::Finish);
 
     m_stateManager.pushState(states::id::Title);
 }
@@ -82,7 +89,6 @@ void Game::handleEvents()
             m_isRunning = false;
             break;
         case sf::Event::KeyPressed:
-            // m_pressedKeysState[event.key.code] = true;
             break;
         default:
             break;

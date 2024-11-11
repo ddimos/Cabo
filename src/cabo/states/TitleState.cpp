@@ -2,6 +2,8 @@
 #include "states/StateIds.hpp"
 #include "ResourceIds.hpp"
 
+#include "menu/item/SimpleText.hpp"
+
 #include <SFML/Graphics/RenderWindow.hpp>
 
 namespace cn::states
@@ -10,9 +12,17 @@ namespace cn::states
 TitleState::TitleState(state::StateManager& _stateManagerRef)
     : State(_stateManagerRef)
 {
-    m_text.setFont(getContext().fontHolderRef.get(FontIds::Main));
-    m_text.setString("Press any key to start");
-    m_text.setPosition(sf::Vector2f(getContext().windowRef.getSize() / 2u));
+    m_text = std::make_shared<menu::item::SimpleText>(
+        menu::Position{
+            menu::Position::Special::CENTER_ALLIGNED, menu::Position::Special::OFFSET_FROM_CENTER, sf::Vector2f(0.f, -45.f)
+        },
+        "Press any key to start",
+        getContext().fontHolderRef.get(FontIds::Main),
+        24,
+        sf::Color::White,
+        getContext().windowRef
+    );
+    getContainer().add(m_text);
 }
 
 state::State::Return TitleState::onHandleEvent(const sf::Event& _event)
@@ -38,8 +48,10 @@ state::State::Return TitleState::onUpdate(sf::Time _dt)
 
 void TitleState::onDraw()
 {
-    if (m_showText)
-        getContext().windowRef.draw(m_text);
+    if (m_showText && !m_text->isActivated())
+        m_text->activate();
+    else if (!m_showText && m_text->isActivated())
+        m_text->deactivate();
 }
 
 } // namespace cn::states
