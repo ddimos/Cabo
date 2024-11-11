@@ -56,7 +56,7 @@ void State::clear()
     m_stateManagerRef.clearStates();
 }
 
-Context& State::getContext()
+core::Context& State::getContext()
 {
     return m_stateManagerRef.getContext();
 }

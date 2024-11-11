@@ -1,11 +1,12 @@
 #pragma once
 
+#include "core/Types.hpp"
+#include "menu/Container.hpp"
 #include "state/StateTypes.hpp"
 
 #include <SFML/System/Time.hpp>
 #include <SFML/Window/Event.hpp>
 
-#include "menu/Container.hpp"
 
 namespace sf
 {
@@ -49,7 +50,7 @@ protected:
     void pop();
     void clear();
 
-    Context& getContext();
+    core::Context& getContext();
     menu::Container& getContainer();
 
 private:

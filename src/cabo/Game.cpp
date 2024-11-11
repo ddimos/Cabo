@@ -1,6 +1,7 @@
 #include "Game.hpp"
 
 #include "core/Log.hpp"
+#include "core/Types.hpp"
 #include "states/StateIds.hpp"
 #include "states/FinishState.hpp"
 #include "states/GameState.hpp"
@@ -21,7 +22,7 @@ namespace cn
 
 Game::Game()
     : m_window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "CABOn", sf::Style::Close)
-    , m_stateManager(state::Context(m_window, m_textureHolder, m_fontHolder))
+    , m_stateManager(core::Context(m_window, m_textureHolder, m_fontHolder))
 {
     m_window.setKeyRepeatEnabled(false);
     m_window.setFramerateLimit(60);

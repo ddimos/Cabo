@@ -5,7 +5,7 @@
 namespace cn::state
 {
 
-StateManager::StateManager(Context _context)
+StateManager::StateManager(core::Context _context)
     : m_context(_context)
 {
 }

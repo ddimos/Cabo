@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/Types.hpp"
 #include "state/State.hpp"
 #include "state/StateTypes.hpp"
 
@@ -24,7 +25,7 @@ namespace cn::state
 class StateManager final    // TODO NonCopyable
 {
 public:		
-    StateManager(Context _context);
+    StateManager(core::Context _context);
 
     template <typename T>
     void registerState(StateId _stateId);
@@ -39,7 +40,7 @@ public:
 
     bool isEmpty() const;
 
-    Context& getContext() { return m_context; }
+    core::Context& getContext() { return m_context; }
 
 private:
     StatePtr createState(StateId _stateId);
@@ -64,7 +65,7 @@ private:
     std::vector<StatePtr> m_stack;
     std::vector<PendingChange> m_pendingList;
 
-    Context m_context;
+    core::Context m_context;
     std::unordered_map<StateId, std::function<StatePtr()>>	m_factories;
 };
 
