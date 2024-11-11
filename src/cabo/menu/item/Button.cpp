@@ -8,7 +8,7 @@ namespace cn::menu::item
 {
 
 Button::Button(Position _position, const sf::Texture& _texture, const sf::IntRect& _textureRectDefault,
-    const sf::IntRect& _textureRectHover, component::Clickable::Callback _onClickCallback, sf::Mouse::Button _button, const sf::RenderWindow& _windowRef)
+    const sf::IntRect& _textureRectHover, component::Clickable::Callback _onClickCallback, sf::Mouse::Button _button)
     : m_textureRectDefault(_textureRectDefault)
     , m_textureRectHover(_textureRectHover)
 {
@@ -16,7 +16,7 @@ Button::Button(Position _position, const sf::Texture& _texture, const sf::IntRec
 
     m_sprite.setTexture(_texture);
     m_sprite.setTextureRect(m_textureRectDefault);
-    m_sprite.setPosition(m_transformable.calculateGlobalPos(m_sprite.getGlobalBounds().getSize(), _windowRef.getSize()));
+    m_sprite.setPosition(m_transformable.calculateGlobalPos(m_sprite.getGlobalBounds().getSize()));
 
     m_clickable.setCallback(_onClickCallback);
     m_clickable.setBounds(m_sprite.getGlobalBounds());

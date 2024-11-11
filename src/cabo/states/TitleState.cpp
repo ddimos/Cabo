@@ -14,13 +14,13 @@ TitleState::TitleState(state::StateManager& _stateManagerRef)
 {
     m_text = std::make_shared<menu::item::SimpleText>(
         menu::Position{
-            menu::Position::Special::CENTER_ALLIGNED, menu::Position::Special::OFFSET_FROM_CENTER, sf::Vector2f(0.f, -45.f)
+            .m_position = sf::Vector2f(0.f, -45.f), .m_parentSize = sf::Vector2f(getContext().windowRef.getSize()),
+            .m_specPositionX = menu::Position::Special::CENTER_ALLIGNED, .m_specPositionY = menu::Position::Special::OFFSET_FROM_CENTER
         },
         "Press any key to start",
         getContext().fontHolderRef.get(FontIds::Main),
         24,
-        sf::Color::White,
-        getContext().windowRef
+        sf::Color::White
     );
     getContainer().add(m_text);
 }

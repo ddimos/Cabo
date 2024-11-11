@@ -16,12 +16,11 @@ struct Position
         OFFSET_FROM_END
     };
 
-    Position();
-    Position(sf::Vector2f _position);
-    Position(Special _specPositionX, Special _specPositionY);
-    Position(Special _specPositionX, Special _specPositionY, sf::Vector2f _position);
+    sf::Vector2f calculateGlobalPos(sf::Vector2f _size) const;
 
     sf::Vector2f m_position{0.f, 0.f};
+    sf::Vector2f m_parentPos{0.f, 0.f};
+    sf::Vector2f m_parentSize{0.f, 0.f};
     Special m_specPositionX = Special::NORMAL; 
     Special m_specPositionY = Special::NORMAL; 
 };

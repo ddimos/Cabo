@@ -11,14 +11,10 @@ namespace cn::menu::item
 class SimpleText : public Item
 {
 public:
-    SimpleText(Position _position, 
-        const std::string& _text,
-        const sf::Font& _font,
-        unsigned _fontSize, 
-        sf::Color _color,
-        const sf::RenderWindow& _windowRef);
+    SimpleText(Position _position, const std::string& _text,
+        const sf::Font& _font, unsigned _fontSize, sf::Color _color);
 
-    void updateText(const std::string& _text, const sf::RenderWindow& _windowRef);
+    void updateText(const std::string& _text);
 
 private:
     void onDraw(sf::RenderWindow& _window) override;

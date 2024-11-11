@@ -5,12 +5,8 @@
 namespace cn::menu::item
 {
 
-SimpleText::SimpleText(Position _position, 
-        const std::string& _text,
-        const sf::Font& _font,
-        unsigned _fontSize, 
-        sf::Color _color,
-        const sf::RenderWindow& _windowRef)
+SimpleText::SimpleText(Position _position, const std::string& _text,
+    const sf::Font& _font, unsigned _fontSize, sf::Color _color)
 {
     m_transformable.setPosition(_position);
 
@@ -18,13 +14,13 @@ SimpleText::SimpleText(Position _position,
     m_text.setString(_text);
     m_text.setFillColor(_color);
     m_text.setCharacterSize(_fontSize);
-    m_text.setPosition(m_transformable.calculateGlobalPos(m_text.getGlobalBounds().getSize(), _windowRef.getSize()));
+    m_text.setPosition(m_transformable.calculateGlobalPos(m_text.getGlobalBounds().getSize()));
 }
 
-void SimpleText::updateText(const std::string& _text, const sf::RenderWindow& _windowRef)
+void SimpleText::updateText(const std::string& _text)
 {
     m_text.setString(_text);
-    m_text.setPosition(m_transformable.calculateGlobalPos(m_text.getGlobalBounds().getSize(), _windowRef.getSize()));
+    m_text.setPosition(m_transformable.calculateGlobalPos(m_text.getGlobalBounds().getSize()));
 }
 
 void SimpleText::onDraw(sf::RenderWindow& _window)

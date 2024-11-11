@@ -15,7 +15,8 @@ MainMenuState::MainMenuState(state::StateManager& _stateManagerRef)
 {
     auto startButton = std::make_shared<menu::item::Button>(
         menu::Position{
-             menu::Position::Special::CENTER_ALLIGNED, menu::Position::Special::OFFSET_FROM_CENTER, sf::Vector2f(0, -45.f)
+            .m_position = sf::Vector2f(0.f, -45.f), .m_parentSize = sf::Vector2f(getContext().windowRef.getSize()),
+            .m_specPositionX = menu::Position::Special::CENTER_ALLIGNED, .m_specPositionY = menu::Position::Special::OFFSET_FROM_CENTER
         },
         getContext().textureHolderRef.get(TextureIds::MainMenuStartButton),
         sf::IntRect{0,   0, 200, 62},
@@ -24,14 +25,14 @@ MainMenuState::MainMenuState(state::StateManager& _stateManagerRef)
             pop();
             push(id::Game);
         },
-        sf::Mouse::Button::Left,
-        getContext().windowRef
+        sf::Mouse::Button::Left
     );
     getContainer().add(startButton);
 
     auto joinButton = std::make_shared<menu::item::Button>(
         menu::Position{
-             menu::Position::Special::CENTER_ALLIGNED, menu::Position::Special::OFFSET_FROM_CENTER, sf::Vector2f(0, 45.f)
+            .m_position = sf::Vector2f(0.f, 45.f), .m_parentSize = sf::Vector2f(getContext().windowRef.getSize()),
+            .m_specPositionX = menu::Position::Special::CENTER_ALLIGNED, .m_specPositionY = menu::Position::Special::OFFSET_FROM_CENTER
         },
         getContext().textureHolderRef.get(TextureIds::MainMenuJoinButton),
         sf::IntRect{0,   0, 200, 62},
@@ -39,8 +40,7 @@ MainMenuState::MainMenuState(state::StateManager& _stateManagerRef)
         [this](bool _isPressed){
 
         },
-        sf::Mouse::Button::Left,
-        getContext().windowRef
+        sf::Mouse::Button::Left
     );
     
     getContainer().add(joinButton);

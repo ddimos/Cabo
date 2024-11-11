@@ -10,7 +10,7 @@ class Transformable
 {
 public:
     void setPosition(Position _position);
-    sf::Vector2f calculateGlobalPos(sf::Vector2f _size, sf::Vector2u _windowSize) const;
+    sf::Vector2f calculateGlobalPos(sf::Vector2f _size) const;
 
 private:
     Position m_position{};

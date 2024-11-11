@@ -12,13 +12,9 @@ namespace cn::menu::item
 class Button : public Item
 {
 public:
-    Button(Position _position,
-        const sf::Texture& _texture,
-        const sf::IntRect& _textureRectDefault,
-        const sf::IntRect& _textureRectHover,
-        component::Clickable::Callback _onClickCallback,
-        sf::Mouse::Button _button,
-        const sf::RenderWindow& _windowRef);
+    Button(Position _position, const sf::Texture& _texture,
+        const sf::IntRect& _textureRectDefault, const sf::IntRect& _textureRectHover,
+        component::Clickable::Callback _onClickCallback, sf::Mouse::Button _button);
     
 protected:
     void onHandleEvent(const sf::Event& _event) override;

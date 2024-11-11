@@ -9,9 +9,9 @@ void Transformable::setPosition(Position _position)
     m_position = _position;
 }
 
-sf::Vector2f Transformable::calculateGlobalPos(sf::Vector2f _size, sf::Vector2u _windowSize) const
+sf::Vector2f Transformable::calculateGlobalPos(sf::Vector2f _size) const
 {
-    return calculateSpecialPosition(m_position, _size, _windowSize);
+    return m_position.calculateGlobalPos(_size);
 }
 
 } // namespace cn::menu::component
