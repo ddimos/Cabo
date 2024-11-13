@@ -61,7 +61,7 @@ core::Context& State::getContext()
     return m_stateManagerRef.getContext();
 }
 
-menu::Container& State::getContainer()
+core::object::Container& State::getMenuContainer()
 {
     return m_menuContainer;
 }

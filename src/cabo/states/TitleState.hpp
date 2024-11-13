@@ -4,9 +4,9 @@
 
 #include <SFML/Graphics/Sprite.hpp>
 
-namespace menu
+namespace core::object
 {
-    class Item;
+    class Object;
 }
 
 namespace cn::states
@@ -23,7 +23,7 @@ public:
 
 private:
     sf::Sprite m_background;
-    std::shared_ptr<menu::Item> m_text;
+    std::shared_ptr<core::object::Object> m_text;
 
     bool m_showText = true;
     sf::Time m_toggleEffectTimeS = sf::seconds(1.f);

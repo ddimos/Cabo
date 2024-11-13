@@ -23,7 +23,7 @@ GameState::GameState(state::StateManager& _stateManagerRef)
         20,
         sf::Color::White
     );
-    getContainer().add(text);
+    getMenuContainer().add(text);
 }
 
 state::State::Return GameState::onHandleEvent(const sf::Event& _event)

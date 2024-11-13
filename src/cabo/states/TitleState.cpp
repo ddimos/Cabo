@@ -22,7 +22,7 @@ TitleState::TitleState(state::StateManager& _stateManagerRef)
         24,
         sf::Color::White
     );
-    getContainer().add(m_text);
+    getMenuContainer().add(m_text);
 }
 
 state::State::Return TitleState::onHandleEvent(const sf::Event& _event)

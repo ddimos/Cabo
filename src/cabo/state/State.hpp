@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/Types.hpp"
-#include "menu/Container.hpp"
+#include "core/object/Container.hpp"
 #include "state/StateTypes.hpp"
 
 #include <SFML/System/Time.hpp>
@@ -51,11 +51,11 @@ protected:
     void clear();
 
     core::Context& getContext();
-    menu::Container& getContainer();
+    core::object::Container& getMenuContainer();
 
 private:
     StateManager& m_stateManagerRef;
-    menu::Container m_menuContainer;
+    core::object::Container m_menuContainer;
 };
     
 } // namespace cn::state

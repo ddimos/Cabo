@@ -27,7 +27,7 @@ MainMenuState::MainMenuState(state::StateManager& _stateManagerRef)
         },
         sf::Mouse::Button::Left
     );
-    getContainer().add(startButton);
+    getMenuContainer().add(startButton);
 
     auto joinButton = std::make_shared<menu::item::Button>(
         menu::Position{
@@ -43,7 +43,7 @@ MainMenuState::MainMenuState(state::StateManager& _stateManagerRef)
         sf::Mouse::Button::Left
     );
     
-    getContainer().add(joinButton);
+    getMenuContainer().add(joinButton);
 }
 
 state::State::Return MainMenuState::onHandleEvent(const sf::Event& _event)
