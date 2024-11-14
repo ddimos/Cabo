@@ -12,7 +12,7 @@ namespace core::object
 namespace cn::states
 {
 
-class TitleState : public state::State
+class TitleState final : public state::State
 {
 public:
     TitleState(state::StateManager& _stateManagerRef);

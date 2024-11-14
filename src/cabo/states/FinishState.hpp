@@ -5,7 +5,7 @@
 namespace cn::states
 {
 
-class FinishState : public state::State
+class FinishState final : public state::State
 {
 public:
     FinishState(state::StateManager& _stateManagerRef);

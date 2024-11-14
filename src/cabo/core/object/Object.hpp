@@ -7,15 +7,13 @@
 namespace cn::core::object
 {
 
+class Container;
+
 class Object
 {
 public:
     virtual ~Object();
-
-    void handleEvent(const sf::Event& _event);
-    void update(sf::Time _dt);
-    void draw(sf::RenderWindow& _window);
-
+    
     void activate();
     void deactivate();
 
@@ -27,6 +25,13 @@ protected:
     virtual void onDraw(sf::RenderWindow& _windowRef) { (void)_windowRef; }
     virtual void onActivate() {}
     virtual void onDeactivate() {}
+
+private:
+    friend class Container;
+
+    void handleEvent(const sf::Event& _event);
+    void update(sf::Time _dt);
+    void draw(sf::RenderWindow& _window);
 
     bool m_isActivated = false;
 };

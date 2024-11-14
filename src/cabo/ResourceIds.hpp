@@ -11,8 +11,11 @@ namespace cn
 enum class TextureIds 
 {
     Background,
+    Cards,
+    CardBacks,
+    MainMenuJoinButton,
     MainMenuStartButton,
-    MainMenuJoinButton
+    Table
 };
 
 enum class FontIds

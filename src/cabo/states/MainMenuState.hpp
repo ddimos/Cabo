@@ -7,7 +7,7 @@
 namespace cn::states
 {
 
-class MainMenuState : public state::State
+class MainMenuState final : public state::State
 {
 public:
     MainMenuState(state::StateManager& _stateManagerRef);

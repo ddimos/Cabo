@@ -66,8 +66,11 @@ void Game::init()
 {
     m_fontHolder.load(FontIds::Main, "res/fonts/times_new_roman.ttf");
     m_textureHolder.load(TextureIds::Background, "res/textures/background.png");
-    m_textureHolder.load(TextureIds::MainMenuStartButton, "res/textures/create_menu_start_button.png");
+    m_textureHolder.load(TextureIds::Cards, "res/textures/card.png");
+    m_textureHolder.load(TextureIds::CardBacks, "res/textures/card_back.png");
     m_textureHolder.load(TextureIds::MainMenuJoinButton, "res/textures/join_menu_join_button.png");
+    m_textureHolder.load(TextureIds::MainMenuStartButton, "res/textures/create_menu_start_button.png");
+    m_textureHolder.load(TextureIds::Table, "res/textures/table.png");
 
     m_stateManager.registerState<states::TitleState>(states::id::Title);
     m_stateManager.registerState<states::MainMenuState>(states::id::MainMenu);
