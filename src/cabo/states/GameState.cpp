@@ -3,6 +3,7 @@
 
 #include "game/Constants.hpp"
 #include "game/Deck.hpp"
+#include "game/Discard.hpp"
 #include "game/Table.hpp"
 
 #include "menu/item/SimpleImage.hpp"
@@ -35,15 +36,20 @@ GameState::GameState(state::StateManager& _stateManagerRef)
     unsigned seed = static_cast<unsigned>(std::time(nullptr));
 
     game::DeckPtr deck = std::make_shared<game::Deck>(
-        getContext().textureHolderRef.get(TextureIds::CardBacks), game::StandartDeckSize, seed
+        getContext(), game::StandartDeckSize, seed
+    );
+
+    game::DiscardPtr discard = std::make_shared<game::Discard>(
+        getContext()
     );
 
     m_table = std::make_shared<game::Table>(
-        getContext().textureHolderRef.get(TextureIds::Table), deck, std::time(nullptr)
+        getContext(), deck, discard, std::time(nullptr)
     );
 
     getGameContainer().add(m_table);
     getGameContainer().add(deck);
+    getGameContainer().add(discard);
 }
 
 state::State::Return GameState::onHandleEvent(const sf::Event& _event)
@@ -52,8 +58,11 @@ state::State::Return GameState::onHandleEvent(const sf::Event& _event)
 
     if (_event.type == sf::Event::KeyReleased)
     {
-        pop();
-        push(id::Finish);
+        if (_event.key.code == sf::Keyboard::Space)
+        {
+            pop();
+            push(id::Finish);
+        }
     }
     return Return::Break;
 }

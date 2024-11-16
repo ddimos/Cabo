@@ -1,13 +1,18 @@
 #pragma once
 
-#include "menu/Types.hpp"
-
 #include <SFML/System/Vector2.hpp>
-#include <SFML/Graphics/Rect.hpp>
 
 namespace cn::menu
 {
 
-float calculateCenter(float _parentSize, float _itemSize);
+inline float calculateCenter(float _parentSize, float _itemSize)
+{
+    return _parentSize / 2.f - _itemSize / 2.f;
+}
+
+inline sf::Vector2f calculateCenter(sf::Vector2f _parentSize, sf::Vector2f _itemSize)
+{
+    return _parentSize / 2.f - _itemSize / 2.f;
+}
 
 } // namespace cn::menu

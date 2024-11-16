@@ -12,7 +12,11 @@
 namespace sf
 {
     class RenderWindow;
-    class Texture;
+}
+
+namespace cn::core
+{
+    struct Context;
 }
 
 namespace cn::game
@@ -21,7 +25,7 @@ namespace cn::game
 class Deck final : public core::object::Object
 {
 public:
-    Deck(const sf::Texture& _backCardTexture, short unsigned _size, unsigned _seed);
+    Deck(const core::Context& _context, short unsigned _size, unsigned _seed);
 
     void shuffle();
     void shuffleFromDiscard();
