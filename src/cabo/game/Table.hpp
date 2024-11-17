@@ -21,12 +21,6 @@ namespace cn::game
 class Table final : public core::object::Object
 {
 public:
-    struct PlayerSpawnPoint
-    {
-        sf::Vector2f pos{};
-        float angle = 0;
-    };
-
     Table(const core::Context& _context, DeckPtr _deck, DiscardPtr _discard, unsigned _seed);
 
     void addPlayer(PlayerPtr _player);
@@ -38,6 +32,7 @@ private:
 
     sf::Sprite m_sprite;
 
+    const core::Context& m_contextRef;
     DeckPtr m_deck;
     DiscardPtr m_discard;
     std::vector<PlayerPtr> m_players;

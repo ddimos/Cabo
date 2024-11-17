@@ -17,4 +17,10 @@ using PlayerPtr = std::shared_ptr<Player>;
 class Table;
 using TablePtr = std::shared_ptr<Table>;
 
+struct PlayerSpawnPoint
+{
+    sf::Vector2f pos{};
+    float angleDeg = 0;
+};
+
 } // namespace cn::game

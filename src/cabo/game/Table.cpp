@@ -1,5 +1,6 @@
 #include "game/Table.hpp"
 #include "game/Constants.hpp"
+#include "game/Player.hpp"
 
 #include "core/math/Math.hpp"
 #include "core/Log.hpp"
@@ -33,12 +34,12 @@ unsigned g_numberOfPoints = 10;
 //     run = run + dp(t)
 // next
 
-std::vector<cn::game::Table::PlayerSpawnPoint> generateSpawnPoints(float _r1, float _r2, unsigned _numberOfPoints)
+std::vector<cn::game::PlayerSpawnPoint> generateSpawnPoints(float _r1, float _r2, unsigned _numberOfPoints, sf::Vector2f _positionOffset)
 {
     if (_numberOfPoints == 0)
         return {};
 
-    std::vector<cn::game::Table::PlayerSpawnPoint> points;
+    std::vector<cn::game::PlayerSpawnPoint> points;
     points.reserve(_numberOfPoints);
 
     const float twoPi = std::numbers::pi * 2.0;
@@ -78,8 +79,8 @@ std::vector<cn::game::Table::PlayerSpawnPoint> generateSpawnPoints(float _r1, fl
             float x = _r1 * std::cos(theta);
             float y = _r2 * std::sin(theta);
             points.push_back({ 
-                .pos = sf::Vector2f(x, y),
-                .angle = cn::core::math::toDeg(theta)
+                .pos = sf::Vector2f(x, y) + _positionOffset,
+                .angleDeg = cn::core::math::toDeg(theta)
             });
             nextPoint++;
         }
@@ -95,34 +96,17 @@ namespace cn::game
 {
 
 Table::Table(const core::Context& _context, DeckPtr _deck, DiscardPtr _discard, unsigned _seed)
-    : m_deck(_deck)
+    : m_contextRef(_context)
+    , m_deck(_deck)
     , m_discard(_discard)
 {
-    m_sprite.setTexture(_context.textureHolderRef.get(TextureIds::Table));
+    m_sprite.setTexture(m_contextRef.textureHolderRef.get(TextureIds::Table));
     m_sprite.setScale(3.f, 1.8f);
-    m_sprite.setPosition(menu::calculateCenter(sf::Vector2f(_context.windowRef.getSize()), m_sprite.getGlobalBounds().getSize()));
-
-    m_spawnPoints = generateSpawnPoints(m_sprite.getGlobalBounds().getSize().x / 2.f, m_sprite.getGlobalBounds().getSize().y / 2.f, g_numberOfPoints);
+    m_sprite.setPosition(menu::calculateCenter(sf::Vector2f(m_contextRef.windowRef.getSize()), m_sprite.getGlobalBounds().getSize()));
 }
 
 void Table::onHandleEvent(const sf::Event& _event)
 {
-    if (_event.type == sf::Event::KeyPressed)
-    {
-        if (_event.key.code == sf::Keyboard::Q)
-        {
-            if (g_numberOfPoints > 0)
-            {
-                g_numberOfPoints--;
-                m_spawnPoints = generateSpawnPoints(m_sprite.getGlobalBounds().getSize().x / 2.f, m_sprite.getGlobalBounds().getSize().y / 2.f, g_numberOfPoints);
-            }
-        }
-        if (_event.key.code == sf::Keyboard::E)
-        {
-            g_numberOfPoints++;
-            m_spawnPoints = generateSpawnPoints(m_sprite.getGlobalBounds().getSize().x / 2.f, m_sprite.getGlobalBounds().getSize().y / 2.f, g_numberOfPoints);
-        }
-    }
 }
 
 void Table::onUpdate(sf::Time _dt)
@@ -138,8 +122,8 @@ void Table::onDraw(sf::RenderWindow& _window)
         sf::RectangleShape shape(sf::Vector2f{40.f, 60.f});
         shape.setFillColor(sf::Color::Red);
         shape.setOrigin(20, 30);
-        shape.setPosition(pos.pos + sf::Vector2f(_window.getSize()) / 2.f);
-        shape.rotate(pos.angle + 90.f);
+        shape.setPosition(pos.pos);
+        shape.rotate(pos.angleDeg + 90.f);
         _window.draw(shape);
     }
 }
@@ -147,6 +131,18 @@ void Table::onDraw(sf::RenderWindow& _window)
 void Table::addPlayer(PlayerPtr _player)
 {
     m_players.push_back(_player);
+
+    m_spawnPoints = generateSpawnPoints(
+        m_sprite.getGlobalBounds().getSize().x / 2.f, m_sprite.getGlobalBounds().getSize().y / 2.f,
+        m_players.size(), sf::Vector2f(m_contextRef.windowRef.getSize()) / 2.f
+    );
+
+    int i = 0;
+    for (auto& player : m_players)
+    {
+        player->setSpawnPoint(m_spawnPoints.at(i));
+        ++i;
+    }
 }
 
 } // namespace cn::game

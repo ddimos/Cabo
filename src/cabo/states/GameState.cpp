@@ -4,6 +4,7 @@
 #include "game/Constants.hpp"
 #include "game/Deck.hpp"
 #include "game/Discard.hpp"
+#include "game/Player.hpp"
 #include "game/Table.hpp"
 
 #include "menu/item/SimpleImage.hpp"
@@ -62,6 +63,16 @@ state::State::Return GameState::onHandleEvent(const sf::Event& _event)
         {
             pop();
             push(id::Finish);
+        }
+        if (_event.key.code == sf::Keyboard::P)
+        {
+            auto player = std::make_shared<game::Player>(
+                getContext()
+            );
+            getGameContainer().add(player);
+
+            m_table->addPlayer(player);
+            player->activate();
         }
     }
     return Return::Break;
