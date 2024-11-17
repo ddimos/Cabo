@@ -1,12 +1,11 @@
 #pragma once
 
 #include "core/object/Object.hpp"
+#include "game/Card.hpp"
+#include "game/PlayerCards.hpp"
 #include "game/Types.hpp"
 
 #include <SFML/Graphics/Text.hpp>
-#include <SFML/System/Vector2.hpp>
-
-#include <vector>
 
 namespace cn::core
 {
@@ -23,10 +22,15 @@ public:
 
     void setSpawnPoint(PlayerSpawnPoint _spawnPoint);
 
+    void deal(const std::vector<Card>& _cards);
+
 private:
     void onDraw(sf::RenderWindow& _window) override;
 
     sf::Text m_nameText;
+
+    PlayerCards m_cards;
+    PlayerSpawnPoint m_spawnPoint;
 };
 
 } // namespace cn::game

@@ -25,6 +25,8 @@ public:
 
     void addPlayer(PlayerPtr _player);
 
+    void start();
+
 private:
     void onHandleEvent(const sf::Event& _event);
     void onUpdate(sf::Time _dt);

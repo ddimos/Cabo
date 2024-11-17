@@ -30,6 +30,8 @@ public:
     void shuffle();
     void shuffleFromDiscard();
 
+    Card getNextCard();
+
 private:
     void onDraw(sf::RenderWindow& _window);
 

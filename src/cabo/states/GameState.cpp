@@ -74,6 +74,10 @@ state::State::Return GameState::onHandleEvent(const sf::Event& _event)
             m_table->addPlayer(player);
             player->activate();
         }
+        if (_event.key.code == sf::Keyboard::S)
+        {
+            m_table->start();
+        }
     }
     return Return::Break;
 }

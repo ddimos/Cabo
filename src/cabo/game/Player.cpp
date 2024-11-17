@@ -1,5 +1,6 @@
 #include "game/Player.hpp"
 #include "core/Types.hpp"
+// #include "core/math/Math.hpp"
 
 #include "ResourceIds.hpp"
 
@@ -19,13 +20,20 @@ Player::Player(const core::Context& _context)
 
 void Player::setSpawnPoint(PlayerSpawnPoint _spawnPoint)
 {
+    m_spawnPoint = _spawnPoint;
     m_nameText.setPosition(_spawnPoint.pos);
-    // m_nameText.setRotation(_spawnPoint.angleDeg + 90.f);
+}
+
+void Player::deal(const std::vector<Card>& _cards)
+{
+    m_cards.setCards(_cards);
+    m_cards.setSpawnPoint(m_spawnPoint);
 }
 
 void Player::onDraw(sf::RenderWindow& _window)
 {
     _window.draw(m_nameText);
+    m_cards.draw(_window);
 }
 
 } // namespace cn::game

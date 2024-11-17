@@ -1,5 +1,6 @@
 #include "game/Table.hpp"
 #include "game/Constants.hpp"
+#include "game/Deck.hpp"
 #include "game/Player.hpp"
 
 #include "core/math/Math.hpp"
@@ -142,6 +143,23 @@ void Table::addPlayer(PlayerPtr _player)
     {
         player->setSpawnPoint(m_spawnPoints.at(i));
         ++i;
+    }
+}
+
+void Table::start()
+{
+    for (auto& player : m_players)
+    {
+        unsigned short numberOfCards = DefaultInitialNumberOfCards;
+        std::vector<Card> cardsToDeal;
+        cardsToDeal.reserve(numberOfCards);
+        while (numberOfCards)
+        {
+            // TODO if not empty
+            cardsToDeal.push_back(m_deck->getNextCard());
+            --numberOfCards;
+        }
+        player->deal(cardsToDeal);
     }
 }
 

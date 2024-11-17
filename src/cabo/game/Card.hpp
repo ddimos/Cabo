@@ -1,8 +1,12 @@
 #pragma once
 
+#include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/RenderWindow.hpp>
+
 namespace cn::game
 {
 
+// TODO ? Transformable
 class Card
 {
 public:
@@ -41,16 +45,23 @@ public:
         InDiscard
     };
 
-    Card(Rank _rank, Suit _suit);
+    Card(Rank _rank, Suit _suit, const sf::Texture& _texture);
+
+    void draw(sf::RenderWindow& _window);
 
     void deal(/*player id*/ /*position*/);
     void discard();
+
+    void setPosition(sf::Vector2f _position);
+    void setRotation(float _angleDeg);
 
 private:
     Rank m_rank;
     Suit m_suit;
 
     State m_state = State::InDeck;
+
+    sf::Sprite m_sprite;
 };
 
 } // namespace cn::game

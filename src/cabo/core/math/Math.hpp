@@ -17,4 +17,14 @@ inline float toDeg(float _angleInRad)
     return _angleInRad * 180.f / std::numbers::pi;
 }
 
+inline sf::Vector2f rotateVector(sf::Vector2f _v, float _angleDeg)
+{
+    _angleDeg = toRad(_angleDeg);
+
+    float cs = std::cos(_angleDeg);
+    float sn = std::sin(_angleDeg);
+
+    return sf::Vector2f{_v.x * cs - _v.y * sn, _v.x * sn + _v.y * cs}; 
+}
+
 } // namespace cn::core::math
