@@ -30,6 +30,12 @@ SimpleImage::SimpleImage(Position _position, const sf::Texture& _texture)
     m_sprite.setPosition(m_transformable.calculateGlobalPos(m_sprite.getGlobalBounds().getSize()));
 }
 
+void SimpleImage::setPosition(Position _position)
+{
+    m_transformable.setPosition(_position);
+    m_sprite.setPosition(m_transformable.calculateGlobalPos(m_sprite.getGlobalBounds().getSize()));
+}
+
 void SimpleImage::onDraw(sf::RenderWindow& _window)
 {
     _window.draw(m_sprite);

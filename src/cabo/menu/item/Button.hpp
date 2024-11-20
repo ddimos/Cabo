@@ -12,9 +12,15 @@ namespace cn::menu::item
 class Button : public Item
 {
 public:
+    Button(const sf::Texture& _texture, const sf::IntRect& _textureRectDefault,
+        const sf::IntRect& _textureRectHover, sf::Mouse::Button _button);
     Button(Position _position, const sf::Texture& _texture,
         const sf::IntRect& _textureRectDefault, const sf::IntRect& _textureRectHover,
         component::Clickable::Callback _onClickCallback, sf::Mouse::Button _button);
+
+    void setPosition(Position _position);
+    void setRotation(float _angleDeg);
+    void setClickCallback(component::Clickable::Callback _onClickCallback);
     
 protected:
     void onHandleEvent(const sf::Event& _event) override;

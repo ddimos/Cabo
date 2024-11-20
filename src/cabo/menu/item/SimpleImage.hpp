@@ -13,6 +13,8 @@ public:
     SimpleImage(Position _position, const sf::Texture& _texture, sf::IntRect _rectangle);
     SimpleImage(Position _position, const sf::Texture& _texture);
 
+    void setPosition(Position _position);
+
 private:
     void onDraw(sf::RenderWindow& _window) override;
     
