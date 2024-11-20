@@ -3,12 +3,7 @@
 #include "core/object/Object.hpp"
 #include "game/Card.hpp"
 
-#include <SFML/Graphics/Sprite.hpp>
-
-namespace cn::core
-{
-    struct Context;
-}
+#include "menu/Types.hpp"
 
 namespace cn::game
 {
@@ -16,12 +11,10 @@ namespace cn::game
 class Discard final : public core::object::Object
 {
 public:
-    Discard(const core::Context& _context);
+    Discard(menu::item::ButtonPtr _button);
 
 private:
-    void onDraw(sf::RenderWindow& _window);
-
-    sf::Sprite m_sprite;
+    menu::item::ButtonPtr m_button;
     std::vector<Card> m_cards;
 };
 

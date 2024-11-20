@@ -1,13 +1,12 @@
 #pragma once
 
-#include <SFML/Graphics/Sprite.hpp>
-#include <SFML/Graphics/RenderWindow.hpp>
+#include "core/object/Object.hpp"
+#include "menu/Types.hpp"
 
 namespace cn::game
 {
 
-// TODO ? Transformable
-class Card
+class Card final : public core::object::Object 
 {
 public:
     enum class Rank
@@ -45,23 +44,23 @@ public:
         InDiscard
     };
 
-    Card(Rank _rank, Suit _suit, const sf::Texture& _texture);
-
-    void draw(sf::RenderWindow& _window);
+    Card(Rank _rank, Suit _suit, menu::item::SimpleImagePtr _image);
 
     void deal(/*player id*/ /*position*/);
     void discard();
 
     void setPosition(sf::Vector2f _position);
-    void setRotation(float _angleDeg);
 
 private:
+    void onActivate() override;
+    void onDeactivate() override;
+
     Rank m_rank;
     Suit m_suit;
 
     State m_state = State::InDeck;
 
-    sf::Sprite m_sprite;
+    menu::item::SimpleImagePtr m_image;
 };
 
 } // namespace cn::game

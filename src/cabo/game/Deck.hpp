@@ -4,20 +4,10 @@
 #include "core/Random.hpp"
 
 #include "game/Card.hpp"
-
-#include <SFML/Graphics/Sprite.hpp>
+#include "game/Types.hpp"
+#include "menu/Types.hpp"
 
 #include <vector>
-
-namespace sf
-{
-    class RenderWindow;
-}
-
-namespace cn::core
-{
-    struct Context;
-}
 
 namespace cn::game
 {
@@ -25,20 +15,17 @@ namespace cn::game
 class Deck final : public core::object::Object
 {
 public:
-    Deck(const core::Context& _context, short unsigned _size, unsigned _seed);
+    Deck(menu::item::ButtonPtr _button, std::vector<CardPtr>&& _cards, unsigned _seed);
 
     void shuffle();
     void shuffleFromDiscard();
 
-    Card getNextCard();
+    CardPtr getNextCard();
 
 private:
-    void onDraw(sf::RenderWindow& _window);
-
-    std::vector<Card> m_cards;
+    menu::item::ButtonPtr m_button;
+    std::vector<CardPtr> m_cards;
     core::Random m_randomizer;
-
-    sf::Sprite m_backCardSprite;
 };
 
 } // namespace cn::game

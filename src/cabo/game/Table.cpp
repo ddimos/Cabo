@@ -151,15 +151,12 @@ void Table::start()
     for (auto& player : m_players)
     {
         unsigned short numberOfCards = DefaultInitialNumberOfCards;
-        std::vector<Card> cardsToDeal;
-        cardsToDeal.reserve(numberOfCards);
         while (numberOfCards)
         {
             // TODO if not empty
-            cardsToDeal.push_back(m_deck->getNextCard());
+            player->deal(m_deck->getNextCard());
             --numberOfCards;
         }
-        player->deal(cardsToDeal);
     }
 }
 

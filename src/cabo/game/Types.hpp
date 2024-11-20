@@ -1,9 +1,18 @@
 #pragma once
 
+#include "game/Constants.hpp"
+
+#include <SFML/System/Vector2.hpp>
+
+#include <cstdint>
+#include <limits>
 #include <memory>
 
 namespace cn::game
 {
+
+class Card;
+using CardPtr = std::shared_ptr<Card>;
 
 class Deck;
 using DeckPtr = std::shared_ptr<Deck>;
@@ -22,5 +31,10 @@ struct PlayerSpawnPoint
     sf::Vector2f pos{};
     float angleDeg = 0;
 };
+
+using PlayerSlotId = uint8_t;
+constexpr PlayerSlotId PlayerSlotIdInvalid = std::numeric_limits<PlayerSlotId>::max();
+
+static_assert(std::numeric_limits<PlayerSlotId>::max() > MaxNumberOfPlayerSlots, "Adjust the max number of player slots");
 
 } // namespace cn::game

@@ -1,21 +1,13 @@
 #include "game/Discard.hpp"
-#include "core/Types.hpp"
-
-#include "ResourceIds.hpp"
+#include "menu/item/Button.hpp"
 
 namespace cn::game
 {
 
-Discard::Discard(const core::Context& _context)
+Discard::Discard(menu::item::ButtonPtr _button)
+    : m_button(_button)
 {
-    m_sprite.setTexture(_context.textureHolderRef.get(TextureIds::Cards));
-    m_sprite.setScale(0.4, 0.4);
-    m_sprite.setPosition(650, 400);
-}
-
-void Discard::onDraw(sf::RenderWindow& _window)
-{
-    _window.draw(m_sprite);
+    m_button->setPosition(cn::menu::Position{ .m_position = sf::Vector2f(650, 400) });
 }
 
 } // namespace cn::game

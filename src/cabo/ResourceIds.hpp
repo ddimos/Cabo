@@ -12,7 +12,6 @@ enum class TextureIds
 {
     Background,
     Cards,
-    CardBacks,
     MainMenuJoinButton,
     MainMenuStartButton,
     Table

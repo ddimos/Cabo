@@ -1,17 +1,13 @@
 #include "game/Card.hpp"
 
+#include "menu/item/SimpleImage.hpp"
+
 namespace cn::game
 {
 
-Card::Card(Rank _rank, Suit _suit, const sf::Texture& _texture)
+Card::Card(Rank _rank, Suit _suit, menu::item::SimpleImagePtr _image)
+    : m_rank(_rank), m_suit(_suit), m_image(_image)
 {
-    m_sprite.setTexture(_texture);
-    m_sprite.setScale(0.4, 0.4);
-}
-
-void Card::draw(sf::RenderWindow& _window)
-{
-    _window.draw(m_sprite);
 }
 
 void Card::deal(/*player id*/ /*position*/)
@@ -24,12 +20,17 @@ void Card::discard()
 
 void Card::setPosition(sf::Vector2f _position)
 {
-    m_sprite.setPosition(_position);
+    m_image->setPosition(cn::menu::Position{ .m_position = _position });
 }
 
-void Card::setRotation(float _angleDeg)
+void Card::onActivate()
 {
-    m_sprite.setRotation(_angleDeg);
+    m_image->activate();    // TODO add the children concept on the object level
+}
+
+void Card::onDeactivate()
+{
+    m_image->deactivate();
 }
 
 } // namespace cn::game

@@ -1,12 +1,14 @@
 #include "states/GameState.hpp"
 #include "states/StateIds.hpp"
 
+#include "game/Card.hpp"
 #include "game/Constants.hpp"
 #include "game/Deck.hpp"
 #include "game/Discard.hpp"
 #include "game/Player.hpp"
 #include "game/Table.hpp"
 
+#include "menu/item/Button.hpp"
 #include "menu/item/SimpleImage.hpp"
 #include "menu/item/SimpleText.hpp"
 
@@ -36,12 +38,46 @@ GameState::GameState(state::StateManager& _stateManagerRef)
 
     unsigned seed = static_cast<unsigned>(std::time(nullptr));
 
+    std::vector<game::CardPtr> cards;
+    {
+        unsigned short deckSize = game::StandartDeckSize;
+        cards.reserve(deckSize);
+        for (unsigned short i = 0; i < deckSize; ++i)
+        {
+            auto image = std::make_shared<menu::item::SimpleImage>(
+                menu::Position{},
+                getContext().textureHolderRef.get(TextureIds::Cards),
+                sf::IntRect{0, 0, 70, 100}
+            );
+            image->setActivationOption(core::object::Object::ActivationOption::Manually);
+            getMenuContainer().add(image);
+            auto card = std::make_shared<game::Card>(game::Card::Rank::Ace, game::Card::Suit::Clubs, image);
+            card->setActivationOption(core::object::Object::ActivationOption::Manually);
+            getGameContainer().add(card);
+            cards.push_back(card);
+        }
+    }
+
+    auto deckButton = std::make_shared<menu::item::Button>(
+        getContext().textureHolderRef.get(TextureIds::Cards),
+        sf::IntRect{140, 0, 70, 100},
+        sf::IntRect{ 70, 0, 70, 100},
+        sf::Mouse::Button::Left
+    );
+    getMenuContainer().add(deckButton);
     game::DeckPtr deck = std::make_shared<game::Deck>(
-        getContext(), game::StandartDeckSize, seed
+        deckButton, std::move(cards), seed
     );
 
+    auto discardButton = std::make_shared<menu::item::Button>(
+        getContext().textureHolderRef.get(TextureIds::Cards),
+        sf::IntRect{0,  0, 70, 100},
+        sf::IntRect{70, 0, 70, 100},
+        sf::Mouse::Button::Left
+    );
+    getMenuContainer().add(discardButton);
     game::DiscardPtr discard = std::make_shared<game::Discard>(
-        getContext()
+        discardButton
     );
 
     m_table = std::make_shared<game::Table>(
@@ -66,8 +102,24 @@ state::State::Return GameState::onHandleEvent(const sf::Event& _event)
         }
         if (_event.key.code == sf::Keyboard::P)
         {
+            std::vector<game::PlayerSlot> slots;
+
+            unsigned short numberOfSlots = game::MaxNumberOfPlayerSlots;
+            slots.reserve(numberOfSlots);
+            for (game::PlayerSlotId i = 0; i < numberOfSlots; ++i)
+            {
+                // TODO make a choosable button?
+                auto slotButton = std::make_shared<menu::item::Button>(
+                    getContext().textureHolderRef.get(TextureIds::Cards),
+                    sf::IntRect{140, 0, 70, 100},
+                    sf::IntRect{ 70, 0, 70, 100},
+                    sf::Mouse::Button::Left
+                );
+                getMenuContainer().add(slotButton);
+                slots.emplace_back(game::PlayerSlot{ .id = i, .m_button = slotButton });
+            }
             auto player = std::make_shared<game::Player>(
-                getContext()
+                getContext(), std::move(slots), game::DefaultInitNumberOfPlayerSlots
             );
             getGameContainer().add(player);
 

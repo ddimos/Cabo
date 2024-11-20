@@ -2,6 +2,8 @@
 
 #include <SFML/System/Vector2.hpp>
 
+#include <memory>
+
 namespace cn::menu
 {
 
@@ -24,5 +26,14 @@ struct Position
     Special m_specPositionX = Special::NORMAL; 
     Special m_specPositionY = Special::NORMAL; 
 };
+
+namespace item
+{
+    class Button;
+    using ButtonPtr = std::shared_ptr<Button>;
+
+    class SimpleImage;
+    using SimpleImagePtr = std::shared_ptr<SimpleImage>;
+} // namespace item
 
 } // namespace cn::menu
