@@ -24,13 +24,19 @@ void Container::draw(sf::RenderWindow& _windowRef)
 void Container::activate()
 {
     for (auto& object : m_objects)
-        object->activate();
+    {
+        if (object->isAutoActivated())
+            object->activate();
+    }
 }
 
 void Container::deactivate()
 {
     for (auto& object : m_objects)
-        object->deactivate();
+    {
+        if (object->isAutoActivated())
+            object->deactivate();
+    }
 }
 
 void Container::add(std::shared_ptr<Object> _object)

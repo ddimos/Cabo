@@ -12,11 +12,20 @@ class Container;
 class Object
 {
 public:
+    enum class ActivationOption
+    {
+        Manually,
+        Auto
+    };
+
     virtual ~Object();
     
     void activate();
     void deactivate();
 
+    void setActivationOption(ActivationOption _activationOption);
+    bool isAutoActivated() const;
+    
     bool isActivated() const { return m_isActivated; }
 
 protected:
@@ -34,6 +43,7 @@ private:
     void draw(sf::RenderWindow& _window);
 
     bool m_isActivated = false;
+    ActivationOption m_activationOption = ActivationOption::Auto; 
 };
 
 } // namespace cn::core::object

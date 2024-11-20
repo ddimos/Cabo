@@ -1,4 +1,5 @@
 #include "core/object/Object.hpp"
+#include "core/Assert.hpp"
 
 namespace cn::core::object
 {
@@ -28,14 +29,30 @@ void Object::draw(sf::RenderWindow& _window)
 
 void Object::activate()
 {
+    CN_ASSERT(!m_isActivated);
+    if (m_isActivated)
+        return;
     m_isActivated = true;
     onActivate();
 }
 
 void Object::deactivate()
 {
+    // Don't need to assert if not activated
+    if (!m_isActivated)
+        return;
     m_isActivated = false;
     onDeactivate();
+}
+
+void Object::setActivationOption(ActivationOption _activationOption)
+{
+    m_activationOption = _activationOption;
+}
+
+bool Object::isAutoActivated() const
+{
+    return m_activationOption == ActivationOption::Auto;
 }
 
 } // namespace cn::core::object
