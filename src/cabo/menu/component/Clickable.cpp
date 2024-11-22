@@ -15,15 +15,9 @@ void Clickable::setButton(sf::Mouse::Button _button)
     m_button = _button;
 }
 
-void Clickable::setBounds(sf::FloatRect _rect)
-{
-    m_bounds = _rect;
-}
-
 void Clickable::onMouseReleased(sf::Event::MouseButtonEvent _event)
 {
-    const sf::Vector2f mousePosition(_event.x, _event.y);
-    if (!m_bounds.contains(mousePosition))
+    if (!contains(sf::Vector2f(_event.x, _event.y)))
         return;
     
     CN_ASSERT(m_button != sf::Mouse::Button::ButtonCount);

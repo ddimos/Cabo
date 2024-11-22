@@ -54,22 +54,21 @@ Button::Button(Position _position, const sf::Texture& _texture, const sf::IntRec
 void Button::setPosition(Position _position)
 {
     m_transformable.setPosition(_position);
-    m_sprite.setPosition(m_transformable.calculateGlobalPos(m_sprite.getGlobalBounds().getSize()));
-    m_clickable.setBounds(m_sprite.getGlobalBounds());
-    m_hoverable.setBounds(m_sprite.getGlobalBounds());
+    m_sprite.setPosition(m_transformable.calculateGlobalPos(m_sprite.getLocalBounds().getSize()));
+    m_clickable.setBounds(sf::FloatRect(m_sprite.getPosition(), m_sprite.getLocalBounds().getSize()));
+    m_hoverable.setBounds(sf::FloatRect(m_sprite.getPosition(), m_sprite.getLocalBounds().getSize()));
 }
 
 void Button::setRotation(float _angleDeg)
 {
     m_sprite.setRotation(_angleDeg);
-    m_clickable.setBounds(m_sprite.getGlobalBounds());
-    m_hoverable.setBounds(m_sprite.getGlobalBounds());
+    m_hoverable.setRotation(_angleDeg);
+    m_clickable.setRotation(_angleDeg);
 }
 
 void Button::setClickCallback(component::Clickable::Callback _onClickCallback)
 {
     m_clickable.setCallback(_onClickCallback);
-    m_clickable.setBounds(m_sprite.getGlobalBounds());
 }
 
 void Button::onHandleEvent(const sf::Event& _event)

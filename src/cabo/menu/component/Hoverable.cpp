@@ -8,15 +8,9 @@ void Hoverable::setCallback(Callback _callback)
     m_onHoverCallback = _callback;
 }
 
-void Hoverable::setBounds(sf::FloatRect _rect)
-{
-    m_bounds = _rect;
-}
-
 void Hoverable::onMouseMoved(sf::Event::MouseMoveEvent _event)
 {
-    const sf::Vector2f mousePosition(_event.x, _event.y);
-    if (m_bounds.contains(mousePosition))
+    if (contains(sf::Vector2f(_event.x, _event.y)))
     {
         if (!m_isHovered)
         {
