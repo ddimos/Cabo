@@ -6,6 +6,7 @@
 #include "game/Deck.hpp"
 #include "game/Discard.hpp"
 #include "game/Player.hpp"
+#include "game/SpriteSheet.hpp"
 #include "game/Table.hpp"
 
 #include "menu/item/Button.hpp"
@@ -44,14 +45,15 @@ GameState::GameState(state::StateManager& _stateManagerRef)
         cards.reserve(deckSize);
         for (unsigned short i = 0; i < deckSize; ++i)
         {
+            auto cardPair = game::Card::getCardFromIndex(i);
             auto image = std::make_shared<menu::item::SimpleImage>(
                 menu::Position{},
                 getContext().textureHolderRef.get(TextureIds::Cards),
-                sf::IntRect{0, 0, 70, 100}
+                game::spriteSheet::getCardTextureRect(cardPair.first, cardPair.second)
             );
             image->setActivationOption(core::object::Object::ActivationOption::Manually);
             getMenuContainer().add(image);
-            auto card = std::make_shared<game::Card>(game::Card::Rank::Ace, game::Card::Suit::Clubs, image);
+            auto card = std::make_shared<game::Card>(cardPair.first, cardPair.second, image);
             card->setActivationOption(core::object::Object::ActivationOption::Manually);
             getGameContainer().add(card);
             cards.push_back(card);
@@ -60,8 +62,8 @@ GameState::GameState(state::StateManager& _stateManagerRef)
 
     auto deckButton = std::make_shared<menu::item::Button>(
         getContext().textureHolderRef.get(TextureIds::Cards),
-        sf::IntRect{140, 0, 70, 100},
-        sf::IntRect{ 70, 0, 70, 100},
+        game::spriteSheet::getCardBackTextureRect(),
+        game::spriteSheet::getCardBackTextureRect(game::spriteSheet::Hover::Yes),
         sf::Mouse::Button::Left
     );
     getMenuContainer().add(deckButton);
@@ -71,8 +73,8 @@ GameState::GameState(state::StateManager& _stateManagerRef)
 
     auto discardButton = std::make_shared<menu::item::Button>(
         getContext().textureHolderRef.get(TextureIds::Cards),
-        sf::IntRect{0,  0, 70, 100},
-        sf::IntRect{70, 0, 70, 100},
+        game::spriteSheet::getDiscardTextureRect(),
+        game::spriteSheet::getDiscardTextureRect(game::spriteSheet::Hover::Yes),
         sf::Mouse::Button::Left
     );
     getMenuContainer().add(discardButton);
@@ -111,8 +113,8 @@ state::State::Return GameState::onHandleEvent(const sf::Event& _event)
                 // TODO make a choosable button?
                 auto slotButton = std::make_shared<menu::item::Button>(
                     getContext().textureHolderRef.get(TextureIds::Cards),
-                    sf::IntRect{140, 0, 70, 100},
-                    sf::IntRect{ 70, 0, 70, 100},
+                    game::spriteSheet::getCardBackTextureRect(),
+                    game::spriteSheet::getCardBackTextureRect(game::spriteSheet::Hover::Yes),
                     sf::Mouse::Button::Left
                 );
                 getMenuContainer().add(slotButton);

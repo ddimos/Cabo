@@ -3,6 +3,8 @@
 #include "core/object/Object.hpp"
 #include "menu/Types.hpp"
 
+#include <utility>
+
 namespace cn::game
 {
 
@@ -12,7 +14,6 @@ public:
     enum class Rank
     {
         Ace,
-        _1,
         _2,
         _3,
         _4,
@@ -25,15 +26,15 @@ public:
         Jack,
         Queen,
         King,
-        Joker
+        // TODO Joker
     };
 
     enum class Suit
     {
         Clubs,      // (♣)
-        Diamonds,   // (♦)
         Hearts,     // (♥)
-        Spades      // (♠)
+        Spades,     // (♠)
+        Diamonds    // (♦)
     }; 
 
     enum class State
@@ -43,6 +44,8 @@ public:
         OnHand,
         InDiscard
     };
+
+    static std::pair<Rank, Suit> getCardFromIndex(unsigned _index);
 
     Card(Rank _rank, Suit _suit, menu::item::SimpleImagePtr _image);
 

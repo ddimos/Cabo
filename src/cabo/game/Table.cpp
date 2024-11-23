@@ -102,7 +102,6 @@ Table::Table(const core::Context& _context, DeckPtr _deck, DiscardPtr _discard, 
     , m_discard(_discard)
 {
     m_sprite.setTexture(m_contextRef.textureHolderRef.get(TextureIds::Table));
-    m_sprite.setScale(3.f, 1.8f);
     m_sprite.setPosition(menu::calculateCenter(sf::Vector2f(m_contextRef.windowRef.getSize()), m_sprite.getGlobalBounds().getSize()));
 }
 
