@@ -17,7 +17,6 @@ void StateManager::handleEvent(const sf::Event& _event)
         if ((*it)->handleEvent(_event) == State::Return::Break)
             break;
     }
-    applyPendingChanges();
 }
 
 void StateManager::update(sf::Time _dt)

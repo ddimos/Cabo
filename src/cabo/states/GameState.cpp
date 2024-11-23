@@ -25,18 +25,6 @@ namespace cn::states
 GameState::GameState(state::StateManager& _stateManagerRef)
     : State(_stateManagerRef)
 {
-    auto text = std::make_shared<menu::item::SimpleText>(
-        menu::Position{
-            .m_position = sf::Vector2f(0.f, -45.f), .m_parentSize = sf::Vector2f(getContext().windowRef.getSize()),
-            .m_specPositionX = menu::Position::Special::CENTER_ALLIGNED, .m_specPositionY = menu::Position::Special::OFFSET_FROM_CENTER
-        },
-        "Play",
-        getContext().fontHolderRef.get(FontIds::Main),
-        20,
-        sf::Color::White
-    );
-    getMenuContainer().add(text);
-
     unsigned seed = static_cast<unsigned>(std::time(nullptr));
 
     std::vector<game::CardPtr> cards;
@@ -77,14 +65,24 @@ GameState::GameState(state::StateManager& _stateManagerRef)
         game::spriteSheet::getDiscardTextureRect(game::spriteSheet::Hover::Yes),
         sf::Mouse::Button::Left
     );
+    discardButton->setActivationOption(core::object::Object::ActivationOption::Manually);
+
     getMenuContainer().add(discardButton);
     game::DiscardPtr discard = std::make_shared<game::Discard>(
         discardButton
     );
 
     m_table = std::make_shared<game::Table>(
-        getContext(), deck, discard, std::time(nullptr)
+        getContext(), deck, discard
     );
+    deckButton->setClickCallback([this](bool _pressed){
+        m_table->onLocalPlayerClickDeck();
+    });
+    discardButton->setClickCallback([this](bool _pressed)
+    {
+        m_table->onLocalPlayerClickDiscard();
+    });
+
 
     getGameContainer().add(m_table);
     getGameContainer().add(deck);

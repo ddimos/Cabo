@@ -1,6 +1,7 @@
 #include "game/Table.hpp"
 #include "game/Constants.hpp"
 #include "game/Deck.hpp"
+#include "game/Discard.hpp"
 #include "game/Player.hpp"
 
 #include "core/math/Math.hpp"
@@ -96,7 +97,7 @@ std::vector<cn::game::PlayerSpawnPoint> generateSpawnPoints(float _r1, float _r2
 namespace cn::game
 {
 
-Table::Table(const core::Context& _context, DeckPtr _deck, DiscardPtr _discard, unsigned _seed)
+Table::Table(const core::Context& _context, DeckPtr _deck, DiscardPtr _discard)
     : m_contextRef(_context)
     , m_deck(_deck)
     , m_discard(_discard)
@@ -157,6 +158,25 @@ void Table::start()
             --numberOfCards;
         }
     }
+}
+
+void Table::onLocalPlayerClickDeck()
+{
+    // TODO if not empty
+    auto card = m_deck->getNextCard();
+    card->setPosition(sf::Vector2f(850, 500));
+    card->activate();
+
+    if (m_currentCard)
+        m_discard->discard(m_currentCard);
+
+    m_currentCard.reset();
+    m_currentCard = card;
+}
+
+void Table::onLocalPlayerClickDiscard()
+{
+
 }
 
 } // namespace cn::game

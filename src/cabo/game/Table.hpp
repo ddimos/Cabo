@@ -21,11 +21,13 @@ namespace cn::game
 class Table final : public core::object::Object
 {
 public:
-    Table(const core::Context& _context, DeckPtr _deck, DiscardPtr _discard, unsigned _seed);
+    Table(const core::Context& _context, DeckPtr _deck, DiscardPtr _discard);
 
     void addPlayer(PlayerPtr _player);
 
     void start();
+    void onLocalPlayerClickDeck();
+    void onLocalPlayerClickDiscard();
 
 private:
     void onHandleEvent(const sf::Event& _event);
@@ -39,6 +41,8 @@ private:
     DiscardPtr m_discard;
     std::vector<PlayerPtr> m_players;
     std::vector<PlayerSpawnPoint> m_spawnPoints;
+
+    CardPtr m_currentCard;
 };
 
 } // namespace cn::game
