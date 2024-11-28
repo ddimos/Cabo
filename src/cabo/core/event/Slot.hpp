@@ -22,7 +22,9 @@ struct Slot : public SlotBase
     Slot(Callback _callback)
         : m_callback(_callback)
     {}
-    void call(const Event& _event) override { m_callback(static_cast<const TEvent&>(_event)); }
+
+    void call(const Event& _event) override { callSpecific(static_cast<const TEvent&>(_event)); }
+    void callSpecific(const TEvent& _event) { m_callback(_event); }
 
 private:
     Callback m_callback;

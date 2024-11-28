@@ -10,7 +10,7 @@ Dispatcher& Manager::getDispatcher()
 
 void Manager::process()
 {
-    m_dispatcher.process();
+    m_dispatcher.processDelayed();
 }
 
 } // namespace cn::core::event

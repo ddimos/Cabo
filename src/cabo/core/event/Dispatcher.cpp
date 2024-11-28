@@ -10,9 +10,20 @@ ListenerId getNewListenerId()
     return listenerId++;
 }
 
-void Dispatcher::send(EventPtr&& _event)
+void Dispatcher::processDelayed()
 {
-    m_events.emplace(std::move(_event));
+    while (!m_delayedEvents.empty())
+    {
+        auto& eventPtr = m_delayedEvents.front();
+        auto eventIt = m_callbacks.find(eventPtr->getId());
+        if (eventIt != m_callbacks.end())
+        {
+            for(auto& listeners : eventIt->second)
+                listeners.second->call(*eventPtr);
+        }
+            
+        m_delayedEvents.pop();
+    }
 }
 
 Dispatcher::Listeners& Dispatcher::getOrCreateListeners(EventId _eventId)
@@ -34,22 +45,6 @@ void Dispatcher::unregisterEvent(ListenerId _listenerId, EventId _eventId)
         return;
 
     eventIt->second.erase(_listenerId);
-}
-
-void Dispatcher::process()
-{
-    while (!m_events.empty())
-    {
-        auto& eventPtr = m_events.front();
-        auto eventIt = m_callbacks.find(eventPtr->getId());
-        if (eventIt != m_callbacks.end())
-        {
-            for(auto& listeners : eventIt->second)
-                listeners.second->call(*eventPtr);
-        }
-            
-        m_events.pop();
-    }
 }
 
 } // namespace cn::core::event
