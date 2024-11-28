@@ -1,14 +1,14 @@
 #pragma once
 
-#include "state/State.hpp"
+#include "core/state/State.hpp"
 
 namespace cn::states
 {
 
-class MainMenuState final : public state::State
+class MainMenuState final : public core::state::State
 {
 public:
-    MainMenuState(state::StateManager& _stateManagerRef);
+    MainMenuState(core::state::Manager& _stateManagerRef);
 };
 
 } // namespace cn::states

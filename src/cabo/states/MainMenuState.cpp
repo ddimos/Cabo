@@ -10,7 +10,7 @@
 namespace cn::states
 {
 
-MainMenuState::MainMenuState(state::StateManager& _stateManagerRef)
+MainMenuState::MainMenuState(core::state::Manager& _stateManagerRef)
     : State(_stateManagerRef)
 {
     auto startButton = std::make_shared<menu::item::Button>(

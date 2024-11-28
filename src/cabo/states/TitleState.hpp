@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/event/Types.hpp"
-#include "state/State.hpp"
+#include "core/state/State.hpp"
 
 namespace core::object
 {
@@ -11,13 +11,13 @@ namespace core::object
 namespace cn::states
 {
 
-class TitleState final : public state::State
+class TitleState final : public core::state::State
 {
 public:
-    TitleState(state::StateManager& _stateManagerRef);
+    TitleState(core::state::Manager& _stateManagerRef);
 
 private:
-    Return onUpdate(sf::Time _dt) override;
+    core::state::Return onUpdate(sf::Time _dt) override;
     void onDraw() override;
     void onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered) override;
 

@@ -1,15 +1,15 @@
 #pragma once
 
 #include "core/event/Types.hpp"
-#include "state/State.hpp"
+#include "core/state/State.hpp"
 
 namespace cn::states
 {
 
-class FinishState final : public state::State
+class FinishState final : public core::state::State
 {
 public:
-    FinishState(state::StateManager& _stateManagerRef);
+    FinishState(core::state::Manager& _stateManagerRef);
 
 private:
     void onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered) override;

@@ -1,17 +1,17 @@
-#include "state/State.hpp"
-#include "state/StateManager.hpp"
+#include "core/state/State.hpp"
+#include "core/state/Manager.hpp"
 
-namespace cn::state
+namespace cn::core::state
 {
 
-State::State(StateManager& _stateManagerRef)
+State::State(Manager& _stateManagerRef)
     : m_stateManagerRef{_stateManagerRef}
 {
 }
     
 State::~State() = default;
 
-State::Return State::update(sf::Time _dt)
+Return State::update(sf::Time _dt)
 {
     m_menuContainer.update(_dt);
     return onUpdate(_dt);
@@ -68,4 +68,4 @@ core::object::Container& State::getMenuContainer()
     return m_menuContainer;
 }
 
-} // namespace cn::state
+} // namespace cn::core::state

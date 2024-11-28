@@ -27,7 +27,7 @@
 namespace cn::states
 {
 
-GameState::GameState(state::StateManager& _stateManagerRef)
+GameState::GameState(core::state::Manager& _stateManagerRef)
     : State(_stateManagerRef)
 {
     unsigned seed = static_cast<unsigned>(std::time(nullptr));
@@ -95,11 +95,11 @@ GameState::GameState(state::StateManager& _stateManagerRef)
     m_listenerId = core::event::getNewListenerId();
 }
 
-state::State::Return GameState::onUpdate(sf::Time _dt)
+core::state::Return GameState::onUpdate(sf::Time _dt)
 {
     m_gameContainer.update(_dt);
 
-    return Return::Break;
+    return core::state::Return::Break;
 }
 
 void GameState::onDraw()

@@ -13,7 +13,7 @@
 namespace cn::states
 {
 
-FinishState::FinishState(state::StateManager& _stateManagerRef)
+FinishState::FinishState(core::state::Manager& _stateManagerRef)
     : State(_stateManagerRef)
 {
     auto text = std::make_shared<menu::item::SimpleText>(
