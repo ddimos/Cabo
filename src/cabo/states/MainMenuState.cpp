@@ -1,9 +1,9 @@
 #include "states/MainMenuState.hpp"
-
 #include "states/StateIds.hpp"
-#include "ResourceIds.hpp"
 
 #include "menu/item/Button.hpp"
+
+#include "ResourceIds.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>
 
@@ -44,20 +44,6 @@ MainMenuState::MainMenuState(state::StateManager& _stateManagerRef)
     );
     
     getMenuContainer().add(joinButton);
-}
-
-state::State::Return MainMenuState::onHandleEvent(const sf::Event& _event)
-{
-	return Return::Break;
-}
-
-state::State::Return MainMenuState::onUpdate(sf::Time _dt)
-{
-    return Return::Break;
-}
-
-void MainMenuState::onDraw()
-{
 }
 
 } // namespace cn::states

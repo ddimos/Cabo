@@ -20,6 +20,12 @@ namespace cn::game
 
 class Table final : public core::object::Object
 {
+    enum class State
+    {
+        PlayersJoining,
+        Game,
+        Cabon
+    };
 public:
     Table(const core::Context& _context, DeckPtr _deck, DiscardPtr _discard);
 

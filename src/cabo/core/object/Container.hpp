@@ -15,11 +15,11 @@ namespace cn::core::object
 class Container final
 {
 public:
-    void handleEvent(const sf::Event& _event);
     void update(sf::Time _dt);
     void draw(sf::RenderWindow& _windowRef);
     void activate();
     void deactivate();
+    void registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered);
 
     void add(std::shared_ptr<Object> _object);
 

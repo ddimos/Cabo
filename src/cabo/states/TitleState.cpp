@@ -1,8 +1,12 @@
 #include "states/TitleState.hpp"
 #include "states/StateIds.hpp"
-#include "ResourceIds.hpp"
+
+#include "core/event/Dispatcher.hpp"
+#include "events/SystemEvents.hpp"
 
 #include "menu/item/SimpleText.hpp"
+
+#include "ResourceIds.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>
 
@@ -23,16 +27,8 @@ TitleState::TitleState(state::StateManager& _stateManagerRef)
         sf::Color::White
     );
     getMenuContainer().add(m_text);
-}
 
-state::State::Return TitleState::onHandleEvent(const sf::Event& _event)
-{
-    if (_event.type == sf::Event::KeyReleased)
-    {
-        pop();
-        push(id::MainMenu);
-    }
-	return Return::Break;
+    m_listenerId = core::event::getNewListenerId();
 }
 
 state::State::Return TitleState::onUpdate(sf::Time _dt)
@@ -52,6 +48,23 @@ void TitleState::onDraw()
         m_text->activate();
     else if (!m_showText && m_text->isActivated())
         m_text->deactivate();
+}
+
+void TitleState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered)
+{
+    if (_isBeingRegistered)
+    {
+        getContext().eventDispatcher.registerEvent<events::KeyReleasedEvent>(m_listenerId,
+            [this](const events::KeyReleasedEvent& _event){
+                pop();
+                push(id::MainMenu);
+            }
+        );
+    }
+    else
+    {
+        getContext().eventDispatcher.unregisterEvent<events::KeyReleasedEvent>(m_listenerId);
+    }
 }
 
 } // namespace cn::states

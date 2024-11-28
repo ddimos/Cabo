@@ -3,12 +3,6 @@
 namespace cn::core::object
 {
 
-void Container::handleEvent(const sf::Event& _event)
-{
-    for (auto& object : m_objects)
-        object->handleEvent(_event);
-}
-
 void Container::update(sf::Time _dt)
 {
     for (auto& object : m_objects)
@@ -37,6 +31,12 @@ void Container::deactivate()
         if (object->isAutoActivated())
             object->deactivate();
     }
+}
+
+void Container::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered)
+{
+    for (auto& object : m_objects)
+        object->registerEvents(_dispatcher, _isBeingRegistered);
 }
 
 void Container::add(std::shared_ptr<Object> _object)

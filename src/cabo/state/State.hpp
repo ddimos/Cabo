@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/event/Dispatcher.hpp"
 #include "core/Types.hpp"
 #include "core/object/Container.hpp"
 #include "state/StateTypes.hpp"
@@ -32,19 +33,20 @@ public:
     virtual ~State();
 
     // TODO rethink Return 
-    Return handleEvent(const sf::Event& _event);
     Return update(sf::Time _dt);
     void draw();
 
     void activate();
     void deactivate();
     
+    void registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered);
+
 protected:
-    virtual Return onHandleEvent(const sf::Event& _event) { (void)_event; return Return::Continue; }
     virtual Return onUpdate(sf::Time _dt) { (void)_dt; return Return::Continue; }
     virtual void onDraw() {}
     virtual void onActivate() {}
     virtual void onDeactivate() {}
+    virtual void onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered) {}
 
     void push(StateId _stateId);
     void pop();

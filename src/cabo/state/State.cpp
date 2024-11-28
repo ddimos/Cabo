@@ -11,12 +11,6 @@ State::State(StateManager& _stateManagerRef)
     
 State::~State() = default;
 
-State::Return State::handleEvent(const sf::Event& _event)
-{
-    m_menuContainer.handleEvent(_event);
-    return onHandleEvent(_event);
-}
-
 State::Return State::update(sf::Time _dt)
 {
     m_menuContainer.update(_dt);
@@ -33,12 +27,20 @@ void State::activate()
 {
     m_menuContainer.activate();
     onActivate();
+    registerEvents(getContext().eventDispatcher, true);
 }
 
 void State::deactivate()
 {
+    registerEvents(getContext().eventDispatcher, false);
     m_menuContainer.deactivate();
     onDeactivate();
+}
+
+void State::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered)
+{
+    m_menuContainer.registerEvents(_dispatcher, _isBeingRegistered);
+    onRegisterEvents(_dispatcher, _isBeingRegistered);
 }
 
 void State::push(StateId _stateId)

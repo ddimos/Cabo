@@ -10,15 +10,6 @@ StateManager::StateManager(core::Context _context)
 {
 }
 
-void StateManager::handleEvent(const sf::Event& _event)
-{
-    for (auto it = m_stack.rbegin(); it != m_stack.rend(); ++it)
-    {
-        if ((*it)->handleEvent(_event) == State::Return::Break)
-            break;
-    }
-}
-
 void StateManager::update(sf::Time _dt)
 {
     for (auto it = m_stack.rbegin(); it != m_stack.rend(); ++it)

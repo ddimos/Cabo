@@ -1,7 +1,11 @@
 #include "Game.hpp"
 
+#include "core/event/Dispatcher.hpp"
 #include "core/Log.hpp"
 #include "core/Types.hpp"
+
+#include "events/SystemEvents.hpp"
+
 #include "states/StateIds.hpp"
 #include "states/FinishState.hpp"
 #include "states/GameState.hpp"
@@ -22,7 +26,7 @@ namespace cn
 
 Game::Game()
     : m_window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "CABOn", sf::Style::Close)
-    , m_stateManager(core::Context(m_window, m_textureHolder, m_fontHolder))
+    , m_stateManager(core::Context(m_window, m_textureHolder, m_fontHolder, m_eventManager.getDispatcher()))
 {
     m_window.setKeyRepeatEnabled(false);
     m_window.setFramerateLimit(60);
@@ -84,19 +88,26 @@ void Game::handleEvents()
     sf::Event event;
     while (m_window.pollEvent(event))
     {
-        m_stateManager.handleEvent(event);
-
         switch (event.type)
         {
         case sf::Event::Closed:
             m_isRunning = false;
             break;
-        case sf::Event::KeyPressed:
+        case sf::Event::KeyReleased:
+            // m_eventManager.getDispatcher().send(std::make_unique<events::OnKeyReleasedEvent>(event.key));
+            m_eventManager.getDispatcher().send<events::KeyReleasedEvent>(event.key);
+            break;
+        case sf::Event::MouseButtonReleased:
+            m_eventManager.getDispatcher().send<events::MouseButtonReleasedEvent>(event.mouseButton);
+            break;
+        case sf::Event::MouseMoved:
+            m_eventManager.getDispatcher().send<events::MouseMovedEvent>(event.mouseMove);
             break;
         default:
             break;
         }
     }
+    m_eventManager.process();
 }
 
 void Game::update()

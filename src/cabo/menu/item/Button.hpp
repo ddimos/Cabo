@@ -1,5 +1,7 @@
 #pragma once
 
+#include "core/event/Types.hpp"
+
 #include "menu/Item.hpp"
 #include "menu/component/Clickable.hpp"
 #include "menu/component/Hoverable.hpp"
@@ -23,8 +25,9 @@ public:
     void setClickCallback(component::Clickable::Callback _onClickCallback);
     
 protected:
-    void onHandleEvent(const sf::Event& _event) override;
+    // void onHandleEvent(const sf::Event& _event) override;
     void onDraw(sf::RenderWindow& _windowRef) override;
+    void onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered) override;
 
     component::Clickable m_clickable;
     component::Hoverable m_hoverable;
@@ -32,6 +35,8 @@ protected:
 
     sf::IntRect m_textureRectDefault = {};
     sf::IntRect m_textureRectHover = {};
+
+    core::event::ListenerId m_listenerId = core::event::ListenerIdInvalid;
 };
 
 } // namespace cn::menu::item

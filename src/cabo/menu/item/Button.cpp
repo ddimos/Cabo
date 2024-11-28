@@ -1,6 +1,8 @@
 #include "menu/item/Button.hpp"
 #include "menu/Utils.hpp"
 
+#include "events/SystemEvents.hpp"
+
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
 
@@ -71,22 +73,47 @@ void Button::setClickCallback(component::Clickable::Callback _onClickCallback)
     m_clickable.setCallback(_onClickCallback);
 }
 
-void Button::onHandleEvent(const sf::Event& _event)
-{
-    switch (_event.type)
-    {
-    case sf::Event::MouseButtonReleased:
-        m_clickable.onMouseReleased(_event.mouseButton);
-        break;
-    case sf::Event::MouseMoved:
-        m_hoverable.onMouseMoved(_event.mouseMove);
-        break;
-    }
-}
+// void Button::onHandleEvent(const sf::Event& _event)
+// {
+//     switch (_event.type)
+//     {
+//     case sf::Event::MouseButtonReleased:
+//         m_clickable.onMouseReleased(_event.mouseButton);
+//         break;
+//     case sf::Event::MouseMoved:
+//         m_hoverable.onMouseMoved(_event.mouseMove);
+//         break;
+//     }
+// }
 
 void Button::onDraw(sf::RenderWindow& _windowRef)
 {
     _windowRef.draw(m_sprite);
+}
+
+void Button::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered)
+{
+    if (_isBeingRegistered)
+    {
+        if (m_listenerId == core::event::ListenerIdInvalid)
+            m_listenerId = core::event::getNewListenerId();
+
+        _dispatcher.registerEvent<events::MouseButtonReleasedEvent>(m_listenerId,
+            [this](const events::MouseButtonReleasedEvent& _event){
+                m_clickable.onMouseReleased(_event.mouseButton);
+            }
+        );
+        _dispatcher.registerEvent<events::MouseMovedEvent>(m_listenerId,
+            [this](const events::MouseMovedEvent& _event){
+                m_hoverable.onMouseMoved(_event.mouseMove);
+            }
+        );
+    }
+    else
+    {
+        _dispatcher.unregisterEvent<events::MouseButtonReleasedEvent>(m_listenerId);
+        _dispatcher.unregisterEvent<events::MouseMovedEvent>(m_listenerId);
+    }
 }
 
 } // namespace cn::menu::item

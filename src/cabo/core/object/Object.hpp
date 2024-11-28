@@ -1,5 +1,7 @@
 #pragma once
 
+#include "core/event/Dispatcher.hpp"
+
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/System/Time.hpp>
 #include <SFML/Window/Event.hpp>
@@ -29,18 +31,19 @@ public:
     bool isActivated() const { return m_isActivated; }
 
 protected:
-    virtual void onHandleEvent(const sf::Event& _event) { (void)_event; }
     virtual void onUpdate(sf::Time _dt) { (void)_dt; }
     virtual void onDraw(sf::RenderWindow& _windowRef) { (void)_windowRef; }
     virtual void onActivate() {}
     virtual void onDeactivate() {}
+    virtual void onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered) {}
 
 private:
     friend class Container;
 
-    void handleEvent(const sf::Event& _event);
     void update(sf::Time _dt);
     void draw(sf::RenderWindow& _window);
+
+    void registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered);
 
     bool m_isActivated = false;
     ActivationOption m_activationOption = ActivationOption::Auto; 

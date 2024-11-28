@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/event/Manager.hpp"
 #include "state/StateManager.hpp"
 #include "ResourceIds.hpp"
 
@@ -29,6 +30,7 @@ private:
     TextureHolder m_textureHolder;
     FontHolder m_fontHolder;
 
+    core::event::Manager m_eventManager;
     state::StateManager m_stateManager;
 
     bool m_isRunning = false;

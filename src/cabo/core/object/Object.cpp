@@ -6,25 +6,14 @@ namespace cn::core::object
 
 Object::~Object() = default;
 
-void Object::handleEvent(const sf::Event& _event)
+void Object::setActivationOption(ActivationOption _activationOption)
 {
-    if (!m_isActivated)
-        return;
-    onHandleEvent(_event);
+    m_activationOption = _activationOption;
 }
 
-void Object::update(sf::Time _dt)
+bool Object::isAutoActivated() const
 {
-    if (!m_isActivated)
-        return;
-    onUpdate(_dt);
-}
-
-void Object::draw(sf::RenderWindow& _window)
-{
-    if (!m_isActivated)
-        return;
-    onDraw(_window);
+    return m_activationOption == ActivationOption::Auto;
 }
 
 void Object::activate()
@@ -45,14 +34,23 @@ void Object::deactivate()
     onDeactivate();
 }
 
-void Object::setActivationOption(ActivationOption _activationOption)
+void Object::update(sf::Time _dt)
 {
-    m_activationOption = _activationOption;
+    if (!m_isActivated)
+        return;
+    onUpdate(_dt);
 }
 
-bool Object::isAutoActivated() const
+void Object::draw(sf::RenderWindow& _window)
 {
-    return m_activationOption == ActivationOption::Auto;
+    if (!m_isActivated)
+        return;
+    onDraw(_window);
+}
+
+void Object::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered)
+{
+    onRegisterEvents(_dispatcher, _isBeingRegistered);
 }
 
 } // namespace cn::core::object

@@ -1,6 +1,9 @@
 #include "states/GameState.hpp"
 #include "states/StateIds.hpp"
 
+#include "core/event/Dispatcher.hpp"
+#include "events/SystemEvents.hpp"
+
 #include "game/Card.hpp"
 #include "game/Constants.hpp"
 #include "game/Deck.hpp"
@@ -18,6 +21,8 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 
 #include <ctime>
+
+#include "core/Log.hpp"
 
 namespace cn::states
 {
@@ -83,55 +88,11 @@ GameState::GameState(state::StateManager& _stateManagerRef)
         m_table->onLocalPlayerClickDiscard();
     });
 
-
     getGameContainer().add(m_table);
     getGameContainer().add(deck);
     getGameContainer().add(discard);
-}
 
-state::State::Return GameState::onHandleEvent(const sf::Event& _event)
-{
-    m_gameContainer.handleEvent(_event);
-
-    if (_event.type == sf::Event::KeyReleased)
-    {
-        if (_event.key.code == sf::Keyboard::Space)
-        {
-            pop();
-            push(id::Finish);
-        }
-        if (_event.key.code == sf::Keyboard::P)
-        {
-            std::vector<game::PlayerSlot> slots;
-
-            unsigned short numberOfSlots = game::MaxNumberOfPlayerSlots;
-            slots.reserve(numberOfSlots);
-            for (game::PlayerSlotId i = 0; i < numberOfSlots; ++i)
-            {
-                // TODO make a choosable button?
-                auto slotButton = std::make_shared<menu::item::Button>(
-                    getContext().textureHolderRef.get(TextureIds::Cards),
-                    game::spriteSheet::getCardBackTextureRect(),
-                    game::spriteSheet::getCardBackTextureRect(game::spriteSheet::Hover::Yes),
-                    sf::Mouse::Button::Left
-                );
-                getMenuContainer().add(slotButton);
-                slots.emplace_back(game::PlayerSlot{ .id = i, .m_button = slotButton });
-            }
-            auto player = std::make_shared<game::Player>(
-                getContext(), std::move(slots), game::DefaultInitNumberOfPlayerSlots
-            );
-            getGameContainer().add(player);
-
-            m_table->addPlayer(player);
-            player->activate();
-        }
-        if (_event.key.code == sf::Keyboard::S)
-        {
-            m_table->start();
-        }
-    }
-    return Return::Break;
+    m_listenerId = core::event::getNewListenerId();
 }
 
 state::State::Return GameState::onUpdate(sf::Time _dt)
@@ -154,6 +115,58 @@ void GameState::onActivate()
 void GameState::onDeactivate()
 {
     m_gameContainer.deactivate();
+}
+
+void GameState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered)
+{
+    if (_isBeingRegistered)
+    {
+        _dispatcher.registerEvent<events::KeyReleasedEvent>(m_listenerId,
+            [this](const events::KeyReleasedEvent& _event){
+                if (_event.key.code == sf::Keyboard::Space)
+                {
+                    pop();
+                    push(id::Finish);
+                }
+                if (_event.key.code == sf::Keyboard::P)
+                {
+                    std::vector<game::PlayerSlot> slots;
+
+                    unsigned short numberOfSlots = game::MaxNumberOfPlayerSlots;
+                    slots.reserve(numberOfSlots);
+                    for (game::PlayerSlotId i = 0; i < numberOfSlots; ++i)
+                    {
+                        // TODO make a choosable button?
+                        auto slotButton = std::make_shared<menu::item::Button>(
+                            getContext().textureHolderRef.get(TextureIds::Cards),
+                            game::spriteSheet::getCardBackTextureRect(),
+                            game::spriteSheet::getCardBackTextureRect(game::spriteSheet::Hover::Yes),
+                            sf::Mouse::Button::Left
+                        );
+                        getMenuContainer().add(slotButton);
+                        slots.emplace_back(game::PlayerSlot{ .id = i, .m_button = slotButton });
+                    }
+                    auto player = std::make_shared<game::Player>(
+                        getContext(), std::move(slots), game::DefaultInitNumberOfPlayerSlots
+                    );
+                    getGameContainer().add(player);
+
+                    m_table->addPlayer(player);
+                    player->activate();
+                }
+                if (_event.key.code == sf::Keyboard::S)
+                {
+                    m_table->start();
+                }
+            }
+        );
+    }
+    else
+    {
+        _dispatcher.unregisterEvent<events::KeyReleasedEvent>(m_listenerId);
+    }
+
+    m_gameContainer.registerEvents(_dispatcher, _isBeingRegistered);
 }
 
 } // namespace cn::states

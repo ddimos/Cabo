@@ -1,9 +1,12 @@
 #include "states/FinishState.hpp"
-
 #include "states/StateIds.hpp"
-#include "ResourceIds.hpp"
+
+#include "core/event/Dispatcher.hpp"
+#include "events/SystemEvents.hpp"
 
 #include "menu/item/SimpleText.hpp"
+
+#include "ResourceIds.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>
 
@@ -24,16 +27,25 @@ FinishState::FinishState(state::StateManager& _stateManagerRef)
         sf::Color::White
     );
     getMenuContainer().add(text);
+
+    m_listenerId = core::event::getNewListenerId();
 }
 
-state::State::Return FinishState::onHandleEvent(const sf::Event& _event)
+void FinishState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered)
 {
-    if (_event.type == sf::Event::KeyReleased)
+    if (_isBeingRegistered)
     {
-        pop();
-        push(id::MainMenu);
+        _dispatcher.registerEvent<events::KeyReleasedEvent>(m_listenerId,
+            [this](const events::KeyReleasedEvent& _event){
+                pop();
+                push(id::MainMenu);
+            }
+        );
     }
-    return Return::Break;
+    else
+    {
+        _dispatcher.unregisterEvent<events::KeyReleasedEvent>(m_listenerId);
+    }
 }
 
 } // namespace cn::states

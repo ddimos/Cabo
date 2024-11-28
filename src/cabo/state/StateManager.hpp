@@ -30,7 +30,6 @@ public:
     template <typename T>
     void registerState(StateId _stateId);
 
-    void handleEvent(const sf::Event& _event);
     void update(sf::Time _dt);
     void draw();
 
@@ -66,7 +65,7 @@ private:
     std::vector<PendingChange> m_pendingList;
 
     core::Context m_context;
-    std::unordered_map<StateId, std::function<StatePtr()>>	m_factories;
+    std::unordered_map<StateId, std::function<StatePtr()>> m_factories;
 };
 
 template <typename T>
