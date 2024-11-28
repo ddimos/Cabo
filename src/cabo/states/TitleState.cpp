@@ -9,7 +9,7 @@
 namespace cn::states
 {
 
-TitleState::TitleState(state::StateManager& _stateManagerRef)
+TitleState::TitleState(core::state::Manager& _stateManagerRef)
     : State(_stateManagerRef)
 {
     m_text = std::make_shared<menu::item::SimpleText>(
@@ -25,17 +25,17 @@ TitleState::TitleState(state::StateManager& _stateManagerRef)
     getMenuContainer().add(m_text);
 }
 
-state::State::Return TitleState::onHandleEvent(const sf::Event& _event)
+core::state::Return TitleState::onHandleEvent(const sf::Event& _event)
 {
     if (_event.type == sf::Event::KeyReleased)
     {
         pop();
         push(id::MainMenu);
     }
-	return Return::Break;
+	return core::state::Return::Break;
 }
 
-state::State::Return TitleState::onUpdate(sf::Time _dt)
+core::state::Return TitleState::onUpdate(sf::Time _dt)
 {
     m_toggleEffectTimeDt += _dt;
     if (m_toggleEffectTimeDt >= m_toggleEffectTimeS)
@@ -43,7 +43,7 @@ state::State::Return TitleState::onUpdate(sf::Time _dt)
         m_showText = !m_showText;
         m_toggleEffectTimeDt = sf::Time::Zero;
     }
-    return Return::Break;
+    return core::state::Return::Break;
 }
 
 void TitleState::onDraw()

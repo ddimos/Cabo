@@ -1,6 +1,6 @@
 #pragma once
 
-#include "state/StateManager.hpp"
+#include "core/state/Manager.hpp"
 #include "ResourceIds.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -29,7 +29,7 @@ private:
     TextureHolder m_textureHolder;
     FontHolder m_fontHolder;
 
-    state::StateManager m_stateManager;
+    core::state::Manager m_stateManager;
 
     bool m_isRunning = false;
 };

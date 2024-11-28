@@ -1,15 +1,15 @@
 #pragma once
-#include "state/StateTypes.hpp"
+#include "core/state/StateTypes.hpp"
 
 namespace cn::states
 {
 
 namespace id
 {
-    inline constexpr state::StateId Title = 0;
-    inline constexpr state::StateId MainMenu = 1;
-    inline constexpr state::StateId Game = 2;
-    inline constexpr state::StateId Finish = 3;
+    inline constexpr core::state::StateId Title = 0;
+    inline constexpr core::state::StateId MainMenu = 1;
+    inline constexpr core::state::StateId Game = 2;
+    inline constexpr core::state::StateId Finish = 3;
 }
 
 } // namespace cn::states

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "state/State.hpp"
+#include "core/state/State.hpp"
 
 #include <SFML/Graphics/Sprite.hpp>
 
@@ -12,13 +12,13 @@ namespace core::object
 namespace cn::states
 {
 
-class TitleState final : public state::State
+class TitleState final : public core::state::State
 {
 public:
-    TitleState(state::StateManager& _stateManagerRef);
+    TitleState(core::state::Manager& _stateManagerRef);
 
-    Return onHandleEvent(const sf::Event& _event) override;
-    Return onUpdate(sf::Time _dt) override;
+    core::state::Return onHandleEvent(const sf::Event& _event) override;
+    core::state::Return onUpdate(sf::Time _dt) override;
     void onDraw() override;
 
 private:

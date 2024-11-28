@@ -1,16 +1,16 @@
 #pragma once
 
-#include "state/State.hpp"
+#include "core/state/State.hpp"
 
 namespace cn::states
 {
 
-class FinishState final : public state::State
+class FinishState final : public core::state::State
 {
 public:
-    FinishState(state::StateManager& _stateManagerRef);
+    FinishState(core::state::Manager& _stateManagerRef);
 
-    Return onHandleEvent(const sf::Event& _event) override;
+    core::state::Return onHandleEvent(const sf::Event& _event) override;
 };
 
 } // namespace cn::states

@@ -1,22 +1,13 @@
 #pragma once
 
-#include "state/State.hpp"
-#include <SFML/Graphics/Sprite.hpp>
-#include <memory>
+#include "core/state/State.hpp"
 
 namespace cn::states
 {
 
-class MainMenuState final : public state::State
+class MainMenuState final : public core::state::State
 {
 public:
-    MainMenuState(state::StateManager& _stateManagerRef);
-
-private:
-    Return onHandleEvent(const sf::Event& _event) override;
-    Return onUpdate(sf::Time _dt) override;
-    void onDraw() override;
-
-    sf::Sprite m_background;
+    MainMenuState(core::state::Manager& _stateManagerRef);
 };
 } // namespace cn::states

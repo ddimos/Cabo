@@ -1,68 +1,67 @@
-#include "state/StateManager.hpp"
-
+#include "core/state/Manager.hpp"
 #include "core/Assert.hpp"
 
-namespace cn::state
+namespace cn::core::state
 {
 
-StateManager::StateManager(core::Context _context)
+Manager::Manager(core::Context _context)
     : m_context(_context)
 {
 }
 
-void StateManager::handleEvent(const sf::Event& _event)
+void Manager::handleEvent(const sf::Event& _event)
 {
     for (auto it = m_stack.rbegin(); it != m_stack.rend(); ++it)
     {
-        if ((*it)->handleEvent(_event) == State::Return::Break)
+        if ((*it)->handleEvent(_event) == Return::Break)
             break;
     }
 }
 
-void StateManager::update(sf::Time _dt)
+void Manager::update(sf::Time _dt)
 {
     for (auto it = m_stack.rbegin(); it != m_stack.rend(); ++it)
     {
-        if ((*it)->update(_dt) == State::Return::Break)
+        if ((*it)->update(_dt) == Return::Break)
             break;
     }
     applyPendingChanges();
 }
 
-void StateManager::draw()
+void Manager::draw()
 {
     for (auto &state : m_stack)
         state->draw();
 }
 
-void StateManager::pushState(StateId _stateId)
+void Manager::pushState(StateId _stateId)
 {
     m_pendingList.push_back(PendingChange(PendingChange::Action::Push, _stateId));
 }
 
-void StateManager::popState()
+void Manager::popState()
 {
     m_pendingList.push_back(PendingChange(PendingChange::Action::Pop));
 }
 
-void StateManager::clearStates()
+void Manager::clearStates()
 {
     m_pendingList.push_back(PendingChange(PendingChange::Action::Clear));
 }
 
-bool StateManager::isEmpty() const
+bool Manager::isEmpty() const
 {
     return m_stack.empty();
 }
 
-StatePtr StateManager::createState(StateId _stateId)
+StatePtr Manager::createState(StateId _stateId)
 {
     auto stateIt = m_factories.find(_stateId);
     CN_ASSERT_FRM(stateIt != m_factories.end(), "The state: {} wasn't found", (int)_stateId);
     return stateIt->second();
 }
 
-void StateManager::applyPendingChanges()
+void Manager::applyPendingChanges()
 {
     for(auto change : m_pendingList)
     {
@@ -90,4 +89,4 @@ void StateManager::applyPendingChanges()
     m_pendingList.clear();
 }
 
-} // namespace cn::state
+} // namespace cn::core::state

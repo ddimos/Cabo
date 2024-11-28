@@ -1,8 +1,8 @@
 #pragma once
 
 #include "core/Types.hpp"
-#include "state/State.hpp"
-#include "state/StateTypes.hpp"
+#include "core/state/State.hpp"
+#include "core/state/StateTypes.hpp"
 
 #include <SFML/System/NonCopyable.hpp>
 #include <SFML/System/Time.hpp>
@@ -16,16 +16,15 @@
 namespace sf
 {
 	class Event;
-	class RenderWindow;
 }
 
-namespace cn::state
+namespace cn::core::state
 {
 
-class StateManager final    // TODO NonCopyable
+class Manager final    // TODO NonCopyable
 {
 public:		
-    StateManager(core::Context _context);
+    Manager(core::Context _context);
 
     template <typename T>
     void registerState(StateId _stateId);
@@ -70,11 +69,11 @@ private:
 };
 
 template <typename T>
-void StateManager::registerState(StateId _stateId)
+void Manager::registerState(StateId _stateId)
 {
     m_factories.emplace(_stateId, [this]() {
 		return std::make_unique<T>(*this);
 	});
 }
 
-} // namespace cn::state
+} // namespace cn::core::state

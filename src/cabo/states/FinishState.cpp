@@ -10,7 +10,7 @@
 namespace cn::states
 {
 
-FinishState::FinishState(state::StateManager& _stateManagerRef)
+FinishState::FinishState(core::state::Manager& _stateManagerRef)
     : State(_stateManagerRef)
 {
     auto text = std::make_shared<menu::item::SimpleText>(
@@ -26,14 +26,14 @@ FinishState::FinishState(state::StateManager& _stateManagerRef)
     getMenuContainer().add(text);
 }
 
-state::State::Return FinishState::onHandleEvent(const sf::Event& _event)
+core::state::Return FinishState::onHandleEvent(const sf::Event& _event)
 {
     if (_event.type == sf::Event::KeyReleased)
     {
         pop();
         push(id::MainMenu);
     }
-    return Return::Break;
+    return core::state::Return::Break;
 }
 
 } // namespace cn::states

@@ -22,7 +22,7 @@
 namespace cn::states
 {
 
-GameState::GameState(state::StateManager& _stateManagerRef)
+GameState::GameState(core::state::Manager& _stateManagerRef)
     : State(_stateManagerRef)
 {
     unsigned seed = static_cast<unsigned>(std::time(nullptr));
@@ -89,7 +89,7 @@ GameState::GameState(state::StateManager& _stateManagerRef)
     getGameContainer().add(discard);
 }
 
-state::State::Return GameState::onHandleEvent(const sf::Event& _event)
+core::state::Return GameState::onHandleEvent(const sf::Event& _event)
 {
     m_gameContainer.handleEvent(_event);
 
@@ -131,14 +131,14 @@ state::State::Return GameState::onHandleEvent(const sf::Event& _event)
             m_table->start();
         }
     }
-    return Return::Break;
+    return core::state::Return::Break;
 }
 
-state::State::Return GameState::onUpdate(sf::Time _dt)
+core::state::Return GameState::onUpdate(sf::Time _dt)
 {
     m_gameContainer.update(_dt);
 
-    return Return::Break;
+    return core::state::Return::Break;
 }
 
 void GameState::onDraw()

@@ -2,33 +2,22 @@
 
 #include "core/Types.hpp"
 #include "core/object/Container.hpp"
-#include "state/StateTypes.hpp"
+#include "core/state/StateTypes.hpp"
 
 #include <SFML/System/Time.hpp>
 #include <SFML/Window/Event.hpp>
 
-
-namespace sf
-{
-    class RenderWindow;
-}
-
-namespace cn::state
+namespace cn::core::state
 {
 
-class StateManager;
+class Manager;
 
 class State
 {
 public:
-    enum class Return
-    {
-        Continue,
-        Break
-    };
 
 public:
-    State(StateManager& _stateManagerRef);
+    State(Manager& _stateManagerRef);
     virtual ~State();
 
     // TODO rethink Return 
@@ -54,8 +43,8 @@ protected:
     core::object::Container& getMenuContainer();
 
 private:
-    StateManager& m_stateManagerRef;
+    Manager& m_stateManagerRef;
     core::object::Container m_menuContainer;
 };
     
-} // namespace cn::state
+} // namespace cn::core::state
