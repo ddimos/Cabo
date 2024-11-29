@@ -51,7 +51,7 @@ void Game::start()
 
         handleEvents();
 
-        update();
+        update(elapsed);
         while (accumulator >= TimePerFrame)
         {
             fixedUpdate(TimePerFrame);
@@ -110,13 +110,13 @@ void Game::handleEvents()
     m_eventManager.process();
 }
 
-void Game::update()
+void Game::update(sf::Time _dt)
 {
+    m_stateManager.update(_dt);
 }
 
 void Game::fixedUpdate(sf::Time _dt)
 {
-    m_stateManager.update(_dt);
 }
 
 void Game::draw()

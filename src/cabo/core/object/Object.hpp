@@ -21,9 +21,9 @@ public:
     };
 
     virtual ~Object();
-    
-    void activate();
-    void deactivate();
+
+    void requestActivated();
+    void requestDeactivated();
 
     void setActivationOption(ActivationOption _activationOption);
     bool isAutoActivated() const;
@@ -40,13 +40,25 @@ protected:
 private:
     friend class Container;
 
+    bool wantsActivated() const;
+    bool wantsDeactivated() const;
+
     void update(sf::Time _dt);
-    void draw(sf::RenderWindow& _window);
+    void draw(sf::RenderWindow& _window);    
+    void activate();
+    void deactivate();
 
     void registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered);
 
+    enum class DesiredState
+    {
+        None,
+        Activated,
+        Deactivated
+    };
     bool m_isActivated = false;
     ActivationOption m_activationOption = ActivationOption::Auto; 
+    DesiredState m_desiredState = DesiredState::None;
 };
 
 } // namespace cn::core::object

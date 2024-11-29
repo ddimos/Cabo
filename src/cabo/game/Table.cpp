@@ -165,7 +165,7 @@ void Table::onLocalPlayerClickDeck()
     // TODO if not empty
     auto card = m_deck->getNextCard();
     card->setPosition(sf::Vector2f(850, 500));
-    card->activate();
+    card->requestActivated();
 
     if (m_currentCard)
         m_discard->discard(m_currentCard);

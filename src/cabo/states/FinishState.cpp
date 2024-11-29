@@ -16,6 +16,8 @@ namespace cn::states
 FinishState::FinishState(core::state::Manager& _stateManagerRef)
     : State(_stateManagerRef)
 {
+    createContainer(core::object::Container::Type::Menu);
+
     auto text = std::make_shared<menu::item::SimpleText>(
         menu::Position{
             .m_position = sf::Vector2f(0.f, -45.f), .m_parentSize = sf::Vector2f(getContext().windowRef.getSize()),
@@ -26,7 +28,7 @@ FinishState::FinishState(core::state::Manager& _stateManagerRef)
         20,
         sf::Color::White
     );
-    getMenuContainer().add(text);
+    getContainer(core::object::Container::Type::Menu).add(text);
 
     m_listenerId = core::event::getNewListenerId();
 }

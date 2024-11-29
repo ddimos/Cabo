@@ -21,7 +21,7 @@ public:
 private:
     void init();
     void handleEvents();
-    void update();
+    void update(sf::Time _dt);
     void fixedUpdate(sf::Time _dt);
     void draw();
 

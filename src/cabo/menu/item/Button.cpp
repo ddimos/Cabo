@@ -111,6 +111,9 @@ void Button::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isBein
     }
     else
     {
+        if (m_listenerId == core::event::ListenerIdInvalid)
+            return;
+
         _dispatcher.unregisterEvent<events::MouseButtonReleasedEvent>(m_listenerId);
         _dispatcher.unregisterEvent<events::MouseMovedEvent>(m_listenerId);
     }

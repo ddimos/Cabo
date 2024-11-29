@@ -60,12 +60,12 @@ void Card::setPosition(sf::Vector2f _position)
 
 void Card::onActivate()
 {
-    m_image->activate();    // TODO add the children concept on the object level
+    m_image->requestActivated();    // TODO add the children concept on the object level
 }
 
 void Card::onDeactivate()
 {
-    m_image->deactivate();
+    m_image->requestDeactivated();
 }
 
 } // namespace cn::game

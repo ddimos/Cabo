@@ -37,7 +37,7 @@ CardPtr Deck::getNextCard()
     m_cards.pop_back(); // can I do this without popping
 
     if (m_cards.empty())
-        m_button->deactivate();
+        m_button->requestDeactivated();
 
     return card;
 }

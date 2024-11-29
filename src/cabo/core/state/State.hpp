@@ -8,6 +8,8 @@
 #include <SFML/System/Time.hpp>
 #include <SFML/Window/Event.hpp>
 
+#include <map>
+
 namespace cn::core::state
 {
 
@@ -28,25 +30,26 @@ public:
     void activate();
     void deactivate();
     
-    void registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered);
+    void registerEvents(event::Dispatcher& _dispatcher, bool _isBeingRegistered);
 
 protected:
     virtual Return onUpdate(sf::Time _dt) { (void)_dt; return Return::Continue; }
     virtual void onDraw() {}
     virtual void onActivate() {}
     virtual void onDeactivate() {}
-    virtual void onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered) {}
+    virtual void onRegisterEvents(event::Dispatcher& _dispatcher, bool _isBeingRegistered) {}
 
     void push(StateId _stateId);
     void pop();
     void clear();
 
-    core::Context& getContext();
-    core::object::Container& getMenuContainer();
+    Context& getContext();
+    void createContainer(object::Container::Type _type);
+    object::Container& getContainer(object::Container::Type _type);
 
 private:
     Manager& m_stateManagerRef;
-    core::object::Container m_menuContainer;
+    std::map<object::Container::Type, object::Container> m_containers;
 };
     
 } // namespace cn::core::state

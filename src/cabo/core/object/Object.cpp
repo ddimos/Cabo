@@ -6,6 +6,18 @@ namespace cn::core::object
 
 Object::~Object() = default;
 
+void Object::requestActivated()
+{
+    CN_ASSERT(!m_isActivated);
+    m_desiredState = DesiredState::Activated;
+}
+
+void Object::requestDeactivated()
+{
+    CN_ASSERT(m_isActivated);
+    m_desiredState = DesiredState::Deactivated;
+}
+
 void Object::setActivationOption(ActivationOption _activationOption)
 {
     m_activationOption = _activationOption;
@@ -14,6 +26,30 @@ void Object::setActivationOption(ActivationOption _activationOption)
 bool Object::isAutoActivated() const
 {
     return m_activationOption == ActivationOption::Auto;
+}
+
+bool Object::wantsActivated() const
+{
+    return m_desiredState == DesiredState::Activated;
+}
+
+bool Object::wantsDeactivated() const
+{
+    return m_desiredState == DesiredState::Deactivated;
+}
+
+void Object::update(sf::Time _dt)
+{
+    if (!m_isActivated)
+        return;
+    onUpdate(_dt);
+}
+
+void Object::draw(sf::RenderWindow& _window)
+{
+    if (!m_isActivated)
+        return;
+    onDraw(_window);
 }
 
 void Object::activate()
@@ -32,20 +68,6 @@ void Object::deactivate()
         return;
     m_isActivated = false;
     onDeactivate();
-}
-
-void Object::update(sf::Time _dt)
-{
-    if (!m_isActivated)
-        return;
-    onUpdate(_dt);
-}
-
-void Object::draw(sf::RenderWindow& _window)
-{
-    if (!m_isActivated)
-        return;
-    onDraw(_window);
 }
 
 void Object::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered)

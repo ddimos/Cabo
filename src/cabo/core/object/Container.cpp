@@ -4,7 +4,7 @@ namespace cn::core::object
 {
 
 void Container::update(sf::Time _dt)
-{
+{    
     for (auto& object : m_objects)
         object->update(_dt);
 }
@@ -41,7 +41,37 @@ void Container::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBei
 
 void Container::add(std::shared_ptr<Object> _object)
 {
-    m_objects.emplace_back(_object);
+    m_newObjects.emplace_back(_object);
+}
+
+void Container::processChanges(core::Context& _context)
+{
+    for (auto& object : m_newObjects)
+    {
+        if (object->isAutoActivated())
+        {
+            object->activate();
+            object->registerEvents(_context.eventDispatcher, true);
+        }
+        m_objects.push_back(object);
+    }
+    m_newObjects.clear();
+
+    for (auto& object : m_objects)
+    {
+        if (object->wantsActivated() && !object->isActivated())
+        {
+            object->activate();
+            object->registerEvents(_context.eventDispatcher, true);
+            object->m_desiredState = Object::DesiredState::None;
+        }
+        else if (object->wantsDeactivated() && object->isActivated())
+        {
+            object->registerEvents(_context.eventDispatcher, false);
+            object->deactivate();
+            object->m_desiredState = Object::DesiredState::None;
+        }
+    }
 }
 
 } // namespace cn::core::object

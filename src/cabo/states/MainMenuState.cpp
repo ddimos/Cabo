@@ -13,6 +13,8 @@ namespace cn::states
 MainMenuState::MainMenuState(core::state::Manager& _stateManagerRef)
     : State(_stateManagerRef)
 {
+    createContainer(core::object::Container::Type::Menu);
+    
     auto startButton = std::make_shared<menu::item::Button>(
         menu::Position{
             .m_position = sf::Vector2f(0.f, -45.f), .m_parentSize = sf::Vector2f(getContext().windowRef.getSize()),
@@ -27,7 +29,7 @@ MainMenuState::MainMenuState(core::state::Manager& _stateManagerRef)
         },
         sf::Mouse::Button::Left
     );
-    getMenuContainer().add(startButton);
+    getContainer(core::object::Container::Type::Menu).add(startButton);
 
     auto joinButton = std::make_shared<menu::item::Button>(
         menu::Position{
@@ -43,7 +45,7 @@ MainMenuState::MainMenuState(core::state::Manager& _stateManagerRef)
         sf::Mouse::Button::Left
     );
     
-    getMenuContainer().add(joinButton);
+    getContainer(core::object::Container::Type::Menu).add(joinButton);
 }
 
 } // namespace cn::states

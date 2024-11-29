@@ -12,16 +12,14 @@ Discard::Discard(menu::item::ButtonPtr _button)
 {
     m_button->setPosition(cn::menu::Position{ .m_position = sf::Vector2f(650, 400) });
     m_cards.reserve(StandartDeckSize);
-
-    m_button->deactivate();
 }
 
 void Discard::discard(CardPtr _card)
 {
     if (!m_cards.empty())
-        m_cards.back()->deactivate();
+        m_cards.back()->requestDeactivated();
     else
-        m_button->activate();
+        m_button->requestActivated();
 
     _card->setPosition(sf::Vector2f(650, 400));
     m_cards.push_back(_card);

@@ -30,6 +30,9 @@ namespace cn::states
 GameState::GameState(core::state::Manager& _stateManagerRef)
     : State(_stateManagerRef)
 {
+    createContainer(core::object::Container::Type::Menu);
+    createContainer(core::object::Container::Type::Game);
+
     unsigned seed = static_cast<unsigned>(std::time(nullptr));
 
     std::vector<game::CardPtr> cards;
@@ -45,10 +48,10 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
                 game::spriteSheet::getCardTextureRect(cardPair.first, cardPair.second)
             );
             image->setActivationOption(core::object::Object::ActivationOption::Manually);
-            getMenuContainer().add(image);
+            getContainer(core::object::Container::Type::Menu).add(image);
             auto card = std::make_shared<game::Card>(cardPair.first, cardPair.second, image);
             card->setActivationOption(core::object::Object::ActivationOption::Manually);
-            getGameContainer().add(card);
+            getContainer(core::object::Container::Type::Game).add(card);
             cards.push_back(card);
         }
     }
@@ -59,7 +62,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
         game::spriteSheet::getCardBackTextureRect(game::spriteSheet::Hover::Yes),
         sf::Mouse::Button::Left
     );
-    getMenuContainer().add(deckButton);
+    getContainer(core::object::Container::Type::Menu).add(deckButton);
     game::DeckPtr deck = std::make_shared<game::Deck>(
         deckButton, std::move(cards), seed
     );
@@ -72,7 +75,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
     );
     discardButton->setActivationOption(core::object::Object::ActivationOption::Manually);
 
-    getMenuContainer().add(discardButton);
+    getContainer(core::object::Container::Type::Menu).add(discardButton);
     game::DiscardPtr discard = std::make_shared<game::Discard>(
         discardButton
     );
@@ -88,33 +91,11 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
         m_table->onLocalPlayerClickDiscard();
     });
 
-    getGameContainer().add(m_table);
-    getGameContainer().add(deck);
-    getGameContainer().add(discard);
+    getContainer(core::object::Container::Type::Game).add(m_table);
+    getContainer(core::object::Container::Type::Game).add(deck);
+    getContainer(core::object::Container::Type::Game).add(discard);
 
     m_listenerId = core::event::getNewListenerId();
-}
-
-core::state::Return GameState::onUpdate(sf::Time _dt)
-{
-    m_gameContainer.update(_dt);
-
-    return core::state::Return::Break;
-}
-
-void GameState::onDraw()
-{
-    m_gameContainer.draw(getContext().windowRef);
-}
-
-void GameState::onActivate()
-{
-    m_gameContainer.activate();
-}
-
-void GameState::onDeactivate()
-{
-    m_gameContainer.deactivate();
 }
 
 void GameState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered)
@@ -143,16 +124,17 @@ void GameState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isB
                             game::spriteSheet::getCardBackTextureRect(game::spriteSheet::Hover::Yes),
                             sf::Mouse::Button::Left
                         );
-                        getMenuContainer().add(slotButton);
+                        slotButton->setActivationOption(core::object::Object::ActivationOption::Manually);
+                        getContainer(core::object::Container::Type::Menu).add(slotButton);
                         slots.emplace_back(game::PlayerSlot{ .id = i, .m_button = slotButton });
                     }
                     auto player = std::make_shared<game::Player>(
                         getContext(), std::move(slots), game::DefaultInitNumberOfPlayerSlots
                     );
-                    getGameContainer().add(player);
+                    getContainer(core::object::Container::Type::Game).add(player);
 
                     m_table->addPlayer(player);
-                    player->activate();
+                    player->requestActivated();
                 }
                 if (_event.key.code == sf::Keyboard::S)
                 {
@@ -166,7 +148,7 @@ void GameState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isB
         _dispatcher.unregisterEvent<events::KeyReleasedEvent>(m_listenerId);
     }
 
-    m_gameContainer.registerEvents(_dispatcher, _isBeingRegistered);
+    // m_gameContainer.registerEvents(_dispatcher, _isBeingRegistered);
 }
 
 } // namespace cn::states

@@ -16,6 +16,8 @@ namespace cn::states
 TitleState::TitleState(core::state::Manager& _stateManagerRef)
     : State(_stateManagerRef)
 {
+    createContainer(core::object::Container::Type::Menu);
+
     m_text = std::make_shared<menu::item::SimpleText>(
         menu::Position{
             .m_position = sf::Vector2f(0.f, -45.f), .m_parentSize = sf::Vector2f(getContext().windowRef.getSize()),
@@ -26,7 +28,7 @@ TitleState::TitleState(core::state::Manager& _stateManagerRef)
         24,
         sf::Color::White
     );
-    getMenuContainer().add(m_text);
+    getContainer(core::object::Container::Type::Menu).add(m_text);
 
     m_listenerId = core::event::getNewListenerId();
 }
@@ -45,9 +47,9 @@ core::state::Return TitleState::onUpdate(sf::Time _dt)
 void TitleState::onDraw()
 {
     if (m_showText && !m_text->isActivated())
-        m_text->activate();
+        m_text->requestActivated();
     else if (!m_showText && m_text->isActivated())
-        m_text->deactivate();
+        m_text->requestDeactivated();
 }
 
 void TitleState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered)

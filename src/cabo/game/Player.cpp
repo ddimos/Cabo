@@ -29,15 +29,23 @@ void Player::setSpawnPoint(PlayerSpawnPoint _spawnPoint)
     m_spawnPoint = _spawnPoint;
     m_nameText.setPosition(_spawnPoint.pos);
 
-    float offsetBetweenCards = 100;
+    float offsetBetweenCardsX = 85;
+    float offsetBetweenCardsY = 115;
+    int cardsInRow = 4;
     int i = 0;
+    int j = 0;
     for (auto& slot : m_slots)
     {
-        sf::Vector2f localPos = sf::Vector2f(i * offsetBetweenCards - 200, 20);
+        sf::Vector2f localPos = sf::Vector2f(i * offsetBetweenCardsX - 165, j * offsetBetweenCardsY + 20);
         localPos = core::math::rotateVector(localPos, m_spawnPoint.angleDeg + 90.f);
         slot.m_button->setPosition(cn::menu::Position{ .m_position = (m_spawnPoint.pos + localPos) });
         slot.m_button->setRotation(m_spawnPoint.angleDeg + 90.f);
         ++i;
+        if(i >= cardsInRow)
+        {
+            i = 0;
+            j++;
+        }
     }
 }
 
@@ -61,7 +69,7 @@ void Player::removeSlot(PlayerSlotId _id)
     }
     m_currentNumberOfSlots--;
 
-    m_slots.at(_id).m_button->deactivate();
+    m_slots.at(_id).m_button->requestDeactivated();
 }
 
 void Player::deal(CardPtr _card)
@@ -74,7 +82,7 @@ void Player::deal(CardPtr _card)
             continue;
 
         slot.card = _card;
-        slot.m_button->activate();
+        slot.m_button->requestActivated();
         assigned = true;
         break;
     }
