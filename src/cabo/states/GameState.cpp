@@ -80,6 +80,8 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
         discardButton
     );
 
+    auto table = std::make_shared<game::Table>(getContext());
+
     {
         auto matchButton = std::make_shared<menu::item::Button>(
             getContext().textureHolderRef.get(TextureIds::DecideButtons),
@@ -117,23 +119,23 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
         discardButton->setActivationOption(core::object::Object::ActivationOption::Manually);
         getContainer(core::object::Container::Type::Menu).add(discardButton);
 
-        game::Table::DecideButtons buttons({
+        game::Board::DecideButtons buttons({
             matchButton, takeButton, actionButton, discardButton
         });
 
-        m_table = std::make_shared<game::Table>(
-            getContext(), deck, discard, std::move(buttons)
+        m_board = std::make_unique<game::Board>(
+            getContext(), deck, discard, table, std::move(buttons)
         );
     }
     deckButton->setClickCallback([this](bool _pressed){
-        m_table->onLocalPlayerClickDeck();
+        m_board->onLocalPlayerClickDeck();
     });
     discardButton->setClickCallback([this](bool _pressed)
     {
-        m_table->onLocalPlayerClickDiscard();
+        m_board->onLocalPlayerClickDiscard();
     });
 
-    getContainer(core::object::Container::Type::Game).add(m_table);
+    getContainer(core::object::Container::Type::Game).add(table);
     getContainer(core::object::Container::Type::Game).add(deck);
     getContainer(core::object::Container::Type::Game).add(discard);
 
@@ -178,16 +180,16 @@ void GameState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isB
                     game::Player& playerRef = *player;
                     player->visitSlots([this, &playerRef](game::PlayerSlot& _slot) {
                         _slot.m_button->setClickCallback([this, &_slot, &playerRef](bool _isPressed) {
-                            m_table->onLocalPlayerClickSlot(_slot.id, playerRef);
+                            m_board->onLocalPlayerClickSlot(_slot.id, playerRef);
                         });
                     });
 
-                    m_table->addPlayer(player);
+                    m_board->addPlayer(player);
                     player->requestActivated();
                 }
                 if (_event.key.code == sf::Keyboard::S)
                 {
-                    m_table->start();
+                    m_board->start();
                 }
             }
         );

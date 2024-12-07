@@ -2,6 +2,7 @@
 
 #include "core/event/Types.hpp"
 #include "core/state/State.hpp"
+#include "game/Board.hpp"
 #include "game/Types.hpp"
 
 namespace cn::states
@@ -15,7 +16,7 @@ public:
 private:
     void onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered) override;
 
-    game::TablePtr m_table;
+    std::unique_ptr<game::Board> m_board;
     core::event::ListenerId m_listenerId = core::event::ListenerIdInvalid;
 };
 
