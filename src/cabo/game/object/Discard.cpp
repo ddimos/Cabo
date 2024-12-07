@@ -1,5 +1,5 @@
-#include "game/Discard.hpp"
-#include "game/Card.hpp"
+#include "game/object/Discard.hpp"
+#include "game/object/Card.hpp"
 #include "game/Constants.hpp"
 #include "menu/item/Button.hpp"
 #include "core/Assert.hpp"

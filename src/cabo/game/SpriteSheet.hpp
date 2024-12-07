@@ -1,6 +1,6 @@
 #pragma once
 
-#include "game/Card.hpp"
+#include "game/object/Card.hpp"
 
 #include <SFML/Graphics/Rect.hpp>
 

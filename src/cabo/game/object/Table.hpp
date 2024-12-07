@@ -2,7 +2,7 @@
 
 #include "core/object/Object.hpp"
 
-#include "game/Card.hpp"
+#include "game/object/Card.hpp"
 #include "game/Types.hpp"
 
 #include "menu/Types.hpp"

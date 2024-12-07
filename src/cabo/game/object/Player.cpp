@@ -1,5 +1,5 @@
-#include "game/Player.hpp"
-#include "game/Card.hpp"
+#include "game/object/Player.hpp"
+#include "game/object/Card.hpp"
 
 #include "core/Types.hpp"
 #include "core/math/Math.hpp"

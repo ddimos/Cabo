@@ -1,4 +1,4 @@
-#include "game/Deck.hpp"
+#include "game/object/Deck.hpp"
 
 #include "core/Types.hpp"
 #include "core/Assert.hpp"

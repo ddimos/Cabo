@@ -4,13 +4,13 @@
 #include "core/event/Dispatcher.hpp"
 #include "events/SystemEvents.hpp"
 
-#include "game/Card.hpp"
+#include "game/object/Card.hpp"
+#include "game/object/Deck.hpp"
+#include "game/object/Discard.hpp"
+#include "game/object/Player.hpp"
+#include "game/object/Table.hpp"
 #include "game/Constants.hpp"
-#include "game/Deck.hpp"
-#include "game/Discard.hpp"
-#include "game/Player.hpp"
 #include "game/SpriteSheet.hpp"
-#include "game/Table.hpp"
 
 #include "menu/item/Button.hpp"
 #include "menu/item/SimpleImage.hpp"

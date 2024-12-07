@@ -1,4 +1,4 @@
-#include "game/Card.hpp"
+#include "game/object/Card.hpp"
 
 #include "menu/item/SimpleImage.hpp"
 #include "core/Assert.hpp"

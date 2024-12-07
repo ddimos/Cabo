@@ -1,8 +1,8 @@
-#include "game/Table.hpp"
+#include "game/object/Table.hpp"
+#include "game/object/Deck.hpp"
+#include "game/object/Discard.hpp"
+#include "game/object/Player.hpp"
 #include "game/Constants.hpp"
-#include "game/Deck.hpp"
-#include "game/Discard.hpp"
-#include "game/Player.hpp"
 
 #include "core/math/Math.hpp"
 #include "core/Assert.hpp"
