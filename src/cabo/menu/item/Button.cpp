@@ -73,19 +73,6 @@ void Button::setClickCallback(component::Clickable::Callback _onClickCallback)
     m_clickable.setCallback(_onClickCallback);
 }
 
-// void Button::onHandleEvent(const sf::Event& _event)
-// {
-//     switch (_event.type)
-//     {
-//     case sf::Event::MouseButtonReleased:
-//         m_clickable.onMouseReleased(_event.mouseButton);
-//         break;
-//     case sf::Event::MouseMoved:
-//         m_hoverable.onMouseMoved(_event.mouseMove);
-//         break;
-//     }
-// }
-
 void Button::onDraw(sf::RenderWindow& _windowRef)
 {
     _windowRef.draw(m_sprite);

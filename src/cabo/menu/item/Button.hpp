@@ -25,7 +25,6 @@ public:
     void setClickCallback(component::Clickable::Callback _onClickCallback);
     
 protected:
-    // void onHandleEvent(const sf::Event& _event) override;
     void onDraw(sf::RenderWindow& _windowRef) override;
     void onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered) override;
 

@@ -13,6 +13,7 @@ enum class TextureIds
     Background,
     Cards,
     MainMenuJoinButton,
+    DecideButtons,
     MainMenuStartButton,
     Table
 };

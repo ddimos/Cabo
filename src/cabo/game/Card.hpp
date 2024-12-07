@@ -46,9 +46,13 @@ public:
     };
 
     static std::pair<Rank, Suit> getCardFromIndex(unsigned _index);
+    static bool hasAbility(Card& _card);
 
     Card(Rank _rank, Suit _suit, menu::item::SimpleImagePtr _image);
 
+    Rank getRank() const { return m_rank; }
+    Suit getSuit() const { return m_suit; }
+    
     void deal(/*player id*/ /*position*/);
     void discard();
 

@@ -13,8 +13,9 @@
 namespace cn::game
 {
 
-Player::Player(const core::Context& _context, std::vector<PlayerSlot>&& _slots, unsigned short _initialNumberOfSlots)
-    : m_slots(std::move(_slots))
+Player::Player(const core::Context& _context, bool _isLocal, std::map<PlayerSlotId, PlayerSlot>&& _slots, unsigned short _initialNumberOfSlots)
+    : m_isLocal(_isLocal)
+    , m_slots(std::move(_slots))
     , m_currentNumberOfSlots(_initialNumberOfSlots)
 {
     m_nameText.setFont(_context.fontHolderRef.get(FontIds::Main));
@@ -34,7 +35,7 @@ void Player::setSpawnPoint(PlayerSpawnPoint _spawnPoint)
     int cardsInRow = 4;
     int i = 0;
     int j = 0;
-    for (auto& slot : m_slots)
+    for (auto& [id, slot] : m_slots)
     {
         sf::Vector2f localPos = sf::Vector2f(i * offsetBetweenCardsX - 165, j * offsetBetweenCardsY + 20);
         localPos = core::math::rotateVector(localPos, m_spawnPoint.angleDeg + 90.f);
@@ -72,11 +73,23 @@ void Player::removeSlot(PlayerSlotId _id)
     m_slots.at(_id).m_button->requestDeactivated();
 }
 
+CardPtr Player::get(PlayerSlotId _id)
+{
+    return m_slots.at(_id).card;
+}
+
+CardPtr Player::replace(PlayerSlotId _id, CardPtr _card)
+{
+    auto prevCard = m_slots.at(_id).card;
+    m_slots.at(_id).card = _card;
+    return prevCard;
+}
+
 void Player::deal(CardPtr _card)
 {
     bool assigned = false;
 
-    for (auto& slot : m_slots)
+    for (auto& [id, slot] : m_slots)
     {
         if (slot.card)
             continue;
@@ -87,6 +100,12 @@ void Player::deal(CardPtr _card)
         break;
     }
     CN_ASSERT(assigned);
+}
+
+void Player::visitSlots(std::function<void(PlayerSlot& _slot)> _visitor)
+{
+    for (auto& [id, slot] : m_slots)
+        _visitor(slot);
 }
 
 void Player::onDraw(sf::RenderWindow& _window)

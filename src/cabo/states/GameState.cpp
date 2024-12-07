@@ -80,9 +80,51 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
         discardButton
     );
 
-    m_table = std::make_shared<game::Table>(
-        getContext(), deck, discard
-    );
+    {
+        auto matchButton = std::make_shared<menu::item::Button>(
+            getContext().textureHolderRef.get(TextureIds::DecideButtons),
+            game::spriteSheet::getMatchButtonTextureRect(),
+            game::spriteSheet::getMatchButtonTextureRect(game::spriteSheet::Hover::Yes),
+            sf::Mouse::Button::Left
+        );
+        matchButton->setActivationOption(core::object::Object::ActivationOption::Manually);
+        getContainer(core::object::Container::Type::Menu).add(matchButton);
+        
+        auto takeButton = std::make_shared<menu::item::Button>(
+            getContext().textureHolderRef.get(TextureIds::DecideButtons),
+            game::spriteSheet::getTakeButtonTextureRect(),
+            game::spriteSheet::getTakeButtonTextureRect(game::spriteSheet::Hover::Yes),
+            sf::Mouse::Button::Left
+        );
+        takeButton->setActivationOption(core::object::Object::ActivationOption::Manually);
+        getContainer(core::object::Container::Type::Menu).add(takeButton);
+
+        auto actionButton = std::make_shared<menu::item::Button>(
+            getContext().textureHolderRef.get(TextureIds::DecideButtons),
+            game::spriteSheet::getActionButtonTextureRect(),
+            game::spriteSheet::getActionButtonTextureRect(game::spriteSheet::Hover::Yes),
+            sf::Mouse::Button::Left
+        );
+        actionButton->setActivationOption(core::object::Object::ActivationOption::Manually);
+        getContainer(core::object::Container::Type::Menu).add(actionButton);
+
+        auto discardButton = std::make_shared<menu::item::Button>(
+            getContext().textureHolderRef.get(TextureIds::DecideButtons),
+            game::spriteSheet::getDiscardButtonTextureRect(),
+            game::spriteSheet::getDiscardButtonTextureRect(game::spriteSheet::Hover::Yes),
+            sf::Mouse::Button::Left
+        );
+        discardButton->setActivationOption(core::object::Object::ActivationOption::Manually);
+        getContainer(core::object::Container::Type::Menu).add(discardButton);
+
+        game::Table::DecideButtons buttons({
+            matchButton, takeButton, actionButton, discardButton
+        });
+
+        m_table = std::make_shared<game::Table>(
+            getContext(), deck, discard, std::move(buttons)
+        );
+    }
     deckButton->setClickCallback([this](bool _pressed){
         m_table->onLocalPlayerClickDeck();
     });
@@ -111,10 +153,9 @@ void GameState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isB
                 }
                 if (_event.key.code == sf::Keyboard::P)
                 {
-                    std::vector<game::PlayerSlot> slots;
+                    std::map<game::PlayerSlotId, game::PlayerSlot> slots;
 
                     unsigned short numberOfSlots = game::MaxNumberOfPlayerSlots;
-                    slots.reserve(numberOfSlots);
                     for (game::PlayerSlotId i = 0; i < numberOfSlots; ++i)
                     {
                         // TODO make a choosable button?
@@ -125,13 +166,21 @@ void GameState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isB
                             sf::Mouse::Button::Left
                         );
                         slotButton->setActivationOption(core::object::Object::ActivationOption::Manually);
+                        
                         getContainer(core::object::Container::Type::Menu).add(slotButton);
-                        slots.emplace_back(game::PlayerSlot{ .id = i, .m_button = slotButton });
+                        slots.emplace(i, game::PlayerSlot{ .id = i, .m_button = slotButton });
                     }
                     auto player = std::make_shared<game::Player>(
-                        getContext(), std::move(slots), game::DefaultInitNumberOfPlayerSlots
+                        getContext(), true, std::move(slots), game::DefaultInitNumberOfPlayerSlots
                     );
                     getContainer(core::object::Container::Type::Game).add(player);
+
+                    game::Player& playerRef = *player;
+                    player->visitSlots([this, &playerRef](game::PlayerSlot& _slot) {
+                        _slot.m_button->setClickCallback([this, &_slot, &playerRef](bool _isPressed) {
+                            m_table->onLocalPlayerClickSlot(_slot.id, playerRef);
+                        });
+                    });
 
                     m_table->addPlayer(player);
                     player->requestActivated();

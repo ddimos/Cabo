@@ -5,9 +5,11 @@
 #include "game/Player.hpp"
 
 #include "core/math/Math.hpp"
+#include "core/Assert.hpp"
 #include "core/Log.hpp"
 #include "core/Types.hpp"
 
+#include "menu/item/Button.hpp"
 #include "menu/Utils.hpp"
 
 #include "ResourceIds.hpp"
@@ -80,7 +82,7 @@ std::vector<cn::game::PlayerSpawnPoint> generateSpawnPoints(float _r1, float _r2
         {
             float x = _r1 * std::cos(theta);
             float y = _r2 * std::sin(theta);
-            points.push_back({ 
+            points.push_back({
                 .pos = sf::Vector2f(x, y) + _positionOffset,
                 .angleDeg = cn::core::math::toDeg(theta)
             });
@@ -97,21 +99,33 @@ std::vector<cn::game::PlayerSpawnPoint> generateSpawnPoints(float _r1, float _r2
 namespace cn::game
 {
 
-Table::Table(const core::Context& _context, DeckPtr _deck, DiscardPtr _discard)
+Table::Table(const core::Context& _context, DeckPtr _deck, DiscardPtr _discard,
+        DecideButtons&& _decideButtons)
     : m_contextRef(_context)
     , m_deck(_deck)
     , m_discard(_discard)
+    , m_decideButtons(std::move(_decideButtons))
 {
     m_sprite.setTexture(m_contextRef.textureHolderRef.get(TextureIds::Table));
     m_sprite.setPosition(menu::calculateCenter(sf::Vector2f(m_contextRef.windowRef.getSize()), m_sprite.getGlobalBounds().getSize()));
-}
 
-void Table::onHandleEvent(const sf::Event& _event)
-{
+    unsigned index = 0;
+    for (auto& button : m_decideButtons)
+    {
+        button->setPosition(cn::menu::Position{ .m_position = sf::Vector2f(780, 510 + index * 22) });
+        button->setClickCallback([this, index](bool _isPressed){
+            onLocalPlayerClickDecideButton(index);
+        });
+        ++index;
+    }
 }
 
 void Table::onUpdate(sf::Time _dt)
 {
+    if (m_playerTurn == PlayerTurn::End)
+    {
+        m_playerTurn = PlayerTurn::DrawCard;
+    }
 }
 
 void Table::onDraw(sf::RenderWindow& _window)
@@ -148,6 +162,8 @@ void Table::addPlayer(PlayerPtr _player)
 
 void Table::start()
 {
+    CN_ASSERT(!hasGameStarted());
+
     for (auto& player : m_players)
     {
         unsigned short numberOfCards = DefaultInitialNumberOfCards;
@@ -158,25 +174,122 @@ void Table::start()
             --numberOfCards;
         }
     }
+
+    m_playingState = State::LookingCard;
+}
+
+bool Table::hasGameStarted() const
+{
+    return m_playingState != State::None;
 }
 
 void Table::onLocalPlayerClickDeck()
 {
+    if (!hasGameStarted())
+        return;
+    
+    if (m_playerTurn != PlayerTurn::DrawCard)
+        return;
+    m_playerTurn = PlayerTurn::DecideAction;
+
     // TODO if not empty
     auto card = m_deck->getNextCard();
     card->setPosition(sf::Vector2f(850, 500));
     card->requestActivated();
 
-    if (m_currentCard)
-        m_discard->discard(m_currentCard);
-
-    m_currentCard.reset();
     m_currentCard = card;
+
+    for (auto& button : m_decideButtons)
+        button->requestActivated();
 }
 
 void Table::onLocalPlayerClickDiscard()
 {
 
+}
+
+void Table::onLocalPlayerClickDecideButton(unsigned _butonIndex)
+{
+    if (m_playerTurn != PlayerTurn::DecideAction)
+    {
+        CN_ASSERT(false);
+        return;
+    }
+    for (auto& button : m_decideButtons)
+        button->requestDeactivated();
+
+    switch (_butonIndex)
+    {
+    case 0: // Match
+        m_playerTurn = PlayerTurn::Match;
+        // Highlight player cards
+        break;
+    case 1: // Take
+        m_playerTurn = PlayerTurn::Take;
+        // Highlight player cards
+        break;
+    case 2: // Action
+        if (!Card::hasAbility(*m_currentCard))
+            return;
+        m_playerTurn = PlayerTurn::CardAction;
+        break;
+    case 3: // Discard
+        m_discard->discard(m_currentCard);
+        m_currentCard.reset();
+        m_playerTurn = PlayerTurn::End;
+        break;
+    default:
+        CN_ASSERT(false);
+        break;
+    }
+
+}
+
+void Table::onLocalPlayerClickSlot(PlayerSlotId _slotId, Player& _player)
+{
+    if (m_playerTurn == PlayerTurn::CardAction)
+    {
+        // TODO
+    }
+    else if (m_playerTurn == PlayerTurn::Match)
+    {
+        if (!_player.isLocal())
+            return;
+
+        auto card = _player.get(_slotId);
+        if (card->getRank() == m_currentCard->getRank())
+        {
+            m_discard->discard(m_currentCard);
+            card->requestActivated();
+            m_discard->discard(card);
+            m_currentCard.reset();
+            _player.removeSlot(_slotId);
+
+        }
+        else
+        {
+            card->requestActivated();
+            _player.addSlot();
+            _player.deal(m_deck->getNextCard());
+        }
+        m_playerTurn = PlayerTurn::End;
+    } 
+    else if (m_playerTurn == PlayerTurn::Take)
+    {
+        if (!_player.isLocal())
+            return;
+        
+        auto prevCard = _player.replace(_slotId, m_currentCard);
+        m_currentCard->requestDeactivated();
+        m_currentCard.reset();
+        prevCard->requestActivated();
+        m_discard->discard(prevCard);
+        m_playerTurn = PlayerTurn::End;
+    }
+    else
+    {
+        CN_ASSERT(false);
+    }
 }
 
 } // namespace cn::game

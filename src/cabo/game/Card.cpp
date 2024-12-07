@@ -40,6 +40,16 @@ std::pair<Card::Rank, Card::Suit> Card::getCardFromIndex(unsigned _index)
     return std::make_pair(static_cast<Rank>(rank), static_cast<Suit>(suit));
 }
 
+bool Card::hasAbility(Card& _card)
+{
+    return _card.m_rank == Rank::_7
+        || _card.m_rank == Rank::_8
+        || _card.m_rank == Rank::_9
+        || _card.m_rank == Rank::_10
+        || _card.m_rank == Rank::Jack
+        || _card.m_rank == Rank::Queen;
+}
+
 Card::Card(Rank _rank, Suit _suit, menu::item::SimpleImagePtr _image)
     : m_rank(_rank), m_suit(_suit), m_image(_image)
 {
