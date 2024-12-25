@@ -42,6 +42,8 @@ public:
 
     void start();
     bool hasGameStarted() const;
+
+    PlayerPtr getPlayer(PlayerId _id) const;
     
     // TODO replace with events
     void addPlayer(PlayerPtr _player);

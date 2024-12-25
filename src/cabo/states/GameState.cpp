@@ -172,8 +172,9 @@ void GameState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isB
                         getContainer(core::object::Container::Type::Menu).add(slotButton);
                         slots.emplace(i, game::PlayerSlot{ .id = i, .m_button = slotButton });
                     }
+                    auto playerId = m_playerIdGenerator++;
                     auto player = std::make_shared<game::Player>(
-                        getContext(), true, std::move(slots), game::DefaultInitNumberOfPlayerSlots
+                        getContext(), playerId, true, std::move(slots), game::DefaultInitNumberOfPlayerSlots
                     );
                     getContainer(core::object::Container::Type::Game).add(player);
 

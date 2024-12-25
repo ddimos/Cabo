@@ -13,13 +13,14 @@
 namespace cn::game
 {
 
-Player::Player(const core::Context& _context, bool _isLocal, std::map<PlayerSlotId, PlayerSlot>&& _slots, unsigned short _initialNumberOfSlots)
-    : m_isLocal(_isLocal)
+Player::Player(const core::Context& _context, PlayerId _id, bool _isLocal, std::map<PlayerSlotId, PlayerSlot>&& _slots, unsigned short _initialNumberOfSlots)
+    : m_id(_id)
+    , m_isLocal(_isLocal)
     , m_slots(std::move(_slots))
     , m_currentNumberOfSlots(_initialNumberOfSlots)
 {
     m_nameText.setFont(_context.fontHolderRef.get(FontIds::Main));
-    m_nameText.setString("Player");
+    m_nameText.setString("Player " + std::to_string(m_id));
     m_nameText.setFillColor(sf::Color::White);
     m_nameText.setCharacterSize(24);
     m_nameText.setOrigin(m_nameText.getGlobalBounds().getSize() / 2.f);

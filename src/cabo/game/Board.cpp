@@ -66,6 +66,16 @@ bool Board::hasGameStarted() const
     return m_playingState != State::None;
 }
 
+PlayerPtr Board::getPlayer(PlayerId _id) const
+{
+    for (auto& player : m_players)
+    {
+        if (player->getId() == _id)
+            return player;
+    }
+    return {};
+}
+
 void Board::addPlayer(PlayerPtr _player)
 {
     m_players.push_back(_player);

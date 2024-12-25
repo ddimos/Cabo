@@ -23,9 +23,11 @@ namespace cn::game
 class Player final : public core::object::Object
 {
 public:
-    Player(const core::Context& _context, bool _isLocal, std::map<PlayerSlotId, PlayerSlot>&& _slots, unsigned short _initialNumberOfSlots);
+    Player(const core::Context& _context, PlayerId _id, bool _isLocal, std::map<PlayerSlotId, PlayerSlot>&& _slots, unsigned short _initialNumberOfSlots);
 
+    PlayerId getId() const { return m_id; }
     bool isLocal() const { return m_isLocal; }
+
     void setSpawnPoint(PlayerSpawnPoint _spawnPoint);
 
     void addSlot();
@@ -43,7 +45,9 @@ private:
 
     sf::Text m_nameText;
 
+    PlayerId m_id = PlayerIdInvalid;
     bool m_isLocal = false;
+    
     std::map<PlayerSlotId, PlayerSlot> m_slots;
     PlayerSpawnPoint m_spawnPoint;
     unsigned short m_currentNumberOfSlots = 0;
