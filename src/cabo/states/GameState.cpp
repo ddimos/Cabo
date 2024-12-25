@@ -2,6 +2,7 @@
 #include "states/StateIds.hpp"
 
 #include "core/event/Dispatcher.hpp"
+#include "events/GameEvents.hpp"
 #include "events/SystemEvents.hpp"
 
 #include "game/object/Card.hpp"
@@ -11,7 +12,6 @@
 #include "game/object/Table.hpp"
 #include "game/Constants.hpp"
 #include "game/SpriteSheet.hpp"
-
 #include "menu/item/Button.hpp"
 #include "menu/item/SimpleImage.hpp"
 #include "menu/item/SimpleText.hpp"
@@ -179,9 +179,9 @@ void GameState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isB
                     getContainer(core::object::Container::Type::Game).add(player);
 
                     game::Player& playerRef = *player;
-                    player->visitSlots([this, &playerRef](game::PlayerSlot& _slot) {
-                        _slot.m_button->setClickCallback([this, &_slot, &playerRef](bool _isPressed) {
-                            m_board->onLocalPlayerClickSlot(_slot.id, playerRef);
+                    player->visitSlots([this, playerId](game::PlayerSlot& _slot) {
+                        _slot.m_button->setClickCallback([this, playerId ,&_slot](bool _isPressed) {
+                            getContext().eventDispatcher.send<events::LocalPlayerClickSlotEvent>(_slot.id, playerId);
                         });
                     });
 
@@ -201,6 +201,13 @@ void GameState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isB
     }
 
     // m_gameContainer.registerEvents(_dispatcher, _isBeingRegistered);
+}
+
+core::state::Return GameState::onUpdate(sf::Time _dt)
+{
+    m_board->update(_dt);
+
+    return core::state::Return::Break;
 }
 
 } // namespace cn::states

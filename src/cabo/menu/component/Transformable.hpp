@@ -9,6 +9,7 @@ namespace cn::menu::component
 class Transformable
 {
 public:
+    Position getPosition() const;
     void setPosition(Position _position);
     sf::Vector2f calculateGlobalPos(sf::Vector2f _size) const;
 

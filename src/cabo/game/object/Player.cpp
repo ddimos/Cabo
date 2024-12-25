@@ -74,9 +74,35 @@ void Player::removeSlot(PlayerSlotId _id)
     m_slots.at(_id).m_button->requestDeactivated();
 }
 
-CardPtr Player::get(PlayerSlotId _id)
+void Player::showCardInSlot(PlayerSlotId _id)
 {
-    return m_slots.at(_id).card;
+    auto slot = getSlot(_id);
+    slot.card->requestActivated();
+    slot.m_button->requestDeactivated();
+
+    // TODO think about a better position
+    sf::Vector2f localPos = sf::Vector2f(50, 200);
+    localPos = core::math::rotateVector(localPos, m_spawnPoint.angleDeg + 90.f);
+    
+    slot.card->setPosition(m_spawnPoint.pos + localPos);
+}
+
+void Player::hideCardInSlot(PlayerSlotId _id)
+{
+    auto slot = getSlot(_id);
+    slot.card->requestDeactivated();
+    slot.m_button->requestActivated();
+}
+
+const PlayerSlot& Player::getSlot(PlayerSlotId _id) const
+{
+    CN_ASSERT(m_slots.contains(_id));
+    return m_slots.at(_id);
+}
+
+CardPtr Player::getCard(PlayerSlotId _id) const
+{
+    return getSlot(_id).card;
 }
 
 CardPtr Player::replace(PlayerSlotId _id, CardPtr _card)

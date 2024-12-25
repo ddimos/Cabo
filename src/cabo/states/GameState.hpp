@@ -15,6 +15,7 @@ public:
 
 private:
     void onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered) override;
+    core::state::Return onUpdate(sf::Time _dt) override;
 
     std::unique_ptr<game::Board> m_board;
     core::event::ListenerId m_listenerId = core::event::ListenerIdInvalid;

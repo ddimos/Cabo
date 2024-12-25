@@ -4,11 +4,15 @@
 namespace cn::events
 {
 
+// TODO rename
 enum Id : core::event::EventId
 {
     OnKeyReleased,
     OnMouseButtonReleased,
-    OnMouseMoved
+    OnMouseMoved,
+
+    PlayerClickDeck,
+    LocalPlayerClickSlot
 };
 
 } // namespace cn::events

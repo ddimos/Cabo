@@ -37,4 +37,7 @@ constexpr PlayerSlotId PlayerSlotIdInvalid = std::numeric_limits<PlayerSlotId>::
 
 static_assert(std::numeric_limits<PlayerSlotId>::max() > MaxNumberOfPlayerSlots, "Adjust the max number of player slots");
 
+using PlayerId = uint8_t;
+constexpr PlayerId PlayerIdInvalid = std::numeric_limits<PlayerId>::max();
+
 } // namespace cn::game

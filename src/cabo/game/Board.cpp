@@ -3,6 +3,9 @@
 #include "game/object/Discard.hpp"
 #include "game/object/Player.hpp"
 #include "game/object/Table.hpp"
+
+#include "game/step/SeeOwnCard.hpp"
+
 #include "game/Constants.hpp"
 
 #include "core/Assert.hpp"
@@ -35,12 +38,10 @@ Board::Board(const core::Context& _context, DeckPtr _deck, DiscardPtr _discard, 
     }
 }
 
-void Board::onUpdate(sf::Time _dt)
+void Board::update(sf::Time _dt)
 {
-    if (m_playerTurn == PlayerTurn::End)
-    {
-        m_playerTurn = PlayerTurn::DrawCard;
-    }
+    if (m_localPlayerStep)
+        m_localPlayerStep->update(_dt);
 }
 
 void Board::start()
@@ -59,6 +60,8 @@ void Board::start()
     }
 
     m_playingState = State::LookingCard;
+    m_localPlayerStep = std::make_unique<step::SeeOwnCard>(*this);
+    m_localPlayerStep->registerEvents(m_contextRef.eventDispatcher, true);
 }
 
 bool Board::hasGameStarted() const
@@ -94,19 +97,19 @@ void Board::onLocalPlayerClickDeck()
     if (!hasGameStarted())
         return;
     
-    if (m_playerTurn != PlayerTurn::DrawCard)
-        return;
-    m_playerTurn = PlayerTurn::DecideAction;
+    // if (m_playerTurn != PlayerTurn::DrawCard)
+    //     return;
+    // m_playerTurn = PlayerTurn::DecideAction;
 
-    // TODO if not empty
-    auto card = m_deck->getNextCard();
-    card->setPosition(sf::Vector2f(850, 500));
-    card->requestActivated();
+    // // TODO if not empty
+    // auto card = m_deck->getNextCard();
+    // card->setPosition(sf::Vector2f(850, 500));
+    // card->requestActivated();
 
-    m_currentCard = card;
+    // m_currentCard = card;
 
-    for (auto& button : m_decideButtons)
-        button->requestActivated();
+    // for (auto& button : m_decideButtons)
+    //     button->requestActivated();
 }
 
 void Board::onLocalPlayerClickDiscard()
@@ -116,85 +119,85 @@ void Board::onLocalPlayerClickDiscard()
 
 void Board::onLocalPlayerClickDecideButton(unsigned _butonIndex)
 {
-    if (m_playerTurn != PlayerTurn::DecideAction)
-    {
-        CN_ASSERT(false);
-        return;
-    }
-    for (auto& button : m_decideButtons)
-        button->requestDeactivated();
+    // if (m_playerTurn != PlayerTurn::DecideAction)
+    // {
+    //     CN_ASSERT(false);
+    //     return;
+    // }
+    // for (auto& button : m_decideButtons)
+    //     button->requestDeactivated();
 
-    switch (_butonIndex)
-    {
-    case 0: // Match
-        m_playerTurn = PlayerTurn::Match;
-        // Highlight player cards
-        break;
-    case 1: // Take
-        m_playerTurn = PlayerTurn::Take;
-        // Highlight player cards
-        break;
-    case 2: // Action
-        if (!Card::hasAbility(*m_currentCard))
-            return;
-        m_playerTurn = PlayerTurn::CardAction;
-        break;
-    case 3: // Discard
-        m_discard->discard(m_currentCard);
-        m_currentCard.reset();
-        m_playerTurn = PlayerTurn::End;
-        break;
-    default:
-        CN_ASSERT(false);
-        break;
-    }
+    // switch (_butonIndex)
+    // {
+    // case 0: // Match
+    //     m_playerTurn = PlayerTurn::Match;
+    //     // Highlight player cards
+    //     break;
+    // case 1: // Take
+    //     m_playerTurn = PlayerTurn::Take;
+    //     // Highlight player cards
+    //     break;
+    // case 2: // Action
+    //     if (!Card::hasAbility(*m_currentCard))
+    //         return;
+    //     m_playerTurn = PlayerTurn::CardAction;
+    //     break;
+    // case 3: // Discard
+    //     m_discard->discard(m_currentCard);
+    //     m_currentCard.reset();
+    //     m_playerTurn = PlayerTurn::End;
+    //     break;
+    // default:
+    //     CN_ASSERT(false);
+    //     break;
+    // }
 }
 
 void Board::onLocalPlayerClickSlot(PlayerSlotId _slotId, Player& _player)
 {
-    if (m_playerTurn == PlayerTurn::CardAction)
-    {
-        // TODO
-    }
-    else if (m_playerTurn == PlayerTurn::Match)
-    {
-        if (!_player.isLocal())
-            return;
+    // if (m_playerTurn == PlayerTurn::CardAction)
+    // {
+    //     // TODO
+    // }
+    // else if (m_playerTurn == PlayerTurn::Match)
+    // {
+    //     if (!_player.isLocal())
+    //         return;
 
-        auto card = _player.get(_slotId);
-        if (card->getRank() == m_currentCard->getRank())
-        {
-            m_discard->discard(m_currentCard);
-            card->requestActivated();
-            m_discard->discard(card);
-            m_currentCard.reset();
-            _player.removeSlot(_slotId);
+    //     auto card = _player.get(_slotId);
+    //     if (card->getRank() == m_currentCard->getRank())
+    //     {
+    //         m_discard->discard(m_currentCard);
+    //         card->requestActivated();
+    //         m_discard->discard(card);
+    //         m_currentCard.reset();
+    //         _player.removeSlot(_slotId);
 
-        }
-        else
-        {
-            card->requestActivated();
-            _player.addSlot();
-            _player.deal(m_deck->getNextCard());
-        }
-        m_playerTurn = PlayerTurn::End;
-    } 
-    else if (m_playerTurn == PlayerTurn::Take)
-    {
-        if (!_player.isLocal())
-            return;
+    //     }
+    //     else
+    //     {
+    //         card->requestActivated();
+    //         _player.addSlot();
+    //         _player.deal(m_deck->getNextCard());
+    //     }
+    //     m_playerTurn = PlayerTurn::End;
+    // } 
+    // else if (m_playerTurn == PlayerTurn::Take)
+    // {
+    //     if (!_player.isLocal())
+    //         return;
         
-        auto prevCard = _player.replace(_slotId, m_currentCard);
-        m_currentCard->requestDeactivated();
-        m_currentCard.reset();
-        prevCard->requestActivated();
-        m_discard->discard(prevCard);
-        m_playerTurn = PlayerTurn::End;
-    }
-    else
-    {
-        CN_ASSERT(false);
-    }
+    //     auto prevCard = _player.replace(_slotId, m_currentCard);
+    //     m_currentCard->requestDeactivated();
+    //     m_currentCard.reset();
+    //     prevCard->requestActivated();
+    //     m_discard->discard(prevCard);
+    //     m_playerTurn = PlayerTurn::End;
+    // }
+    // else
+    // {
+    //     CN_ASSERT(false);
+    // }
 }
 
 } // namespace cn::game

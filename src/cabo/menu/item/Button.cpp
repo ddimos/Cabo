@@ -53,6 +53,16 @@ Button::Button(Position _position, const sf::Texture& _texture, const sf::IntRec
     );
 }
 
+Position Button::getPosition() const
+{
+    return m_transformable.getPosition();
+}
+
+float Button::getRotation() const
+{
+    return m_sprite.getRotation();
+}
+
 void Button::setPosition(Position _position)
 {
     m_transformable.setPosition(_position);

@@ -20,6 +20,9 @@ public:
         const sf::IntRect& _textureRectDefault, const sf::IntRect& _textureRectHover,
         component::Clickable::Callback _onClickCallback, sf::Mouse::Button _button);
 
+    Position getPosition() const;
+    float getRotation() const;
+
     void setPosition(Position _position);
     void setRotation(float _angleDeg);
     void setClickCallback(component::Clickable::Callback _onClickCallback);

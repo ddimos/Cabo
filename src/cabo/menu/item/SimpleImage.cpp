@@ -36,6 +36,11 @@ void SimpleImage::setPosition(Position _position)
     m_sprite.setPosition(m_transformable.calculateGlobalPos(m_sprite.getGlobalBounds().getSize()));
 }
 
+void SimpleImage::setRotation(float _angleDeg)
+{
+    m_sprite.setRotation(_angleDeg);
+}
+
 void SimpleImage::onDraw(sf::RenderWindow& _window)
 {
     _window.draw(m_sprite);

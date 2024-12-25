@@ -33,7 +33,12 @@ public:
     void addSlot();
     void removeSlot(PlayerSlotId _id);
 
-    CardPtr get(PlayerSlotId _id);
+    void showCardInSlot(PlayerSlotId _id);
+    void hideCardInSlot(PlayerSlotId _id);
+
+    const PlayerSlot& getSlot(PlayerSlotId _id) const;
+    CardPtr getCard(PlayerSlotId _id) const;
+
     CardPtr replace(PlayerSlotId _id, CardPtr _card);
 
     void deal(CardPtr _card);
@@ -47,7 +52,7 @@ private:
 
     PlayerId m_id = PlayerIdInvalid;
     bool m_isLocal = false;
-    
+
     std::map<PlayerSlotId, PlayerSlot> m_slots;
     PlayerSpawnPoint m_spawnPoint;
     unsigned short m_currentNumberOfSlots = 0;

@@ -4,6 +4,8 @@
 #include "core/object/Object.hpp"
 #include "core/Types.hpp"
 
+#include "game/step/Step.hpp"
+
 #include "game/Types.hpp"
 #include "menu/Types.hpp"
 
@@ -39,6 +41,7 @@ public:
         DecideButtons&& _decideButtons);
 
     void registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered);
+    void update(sf::Time _dt);
 
     void start();
     bool hasGameStarted() const;
@@ -53,7 +56,6 @@ public:
     void onLocalPlayerClickSlot(PlayerSlotId _slotId, Player& _player);
 
 private:
-    void onUpdate(sf::Time _dt);
 
     const core::Context& m_contextRef;
     DeckPtr m_deck;
@@ -67,7 +69,8 @@ private:
     CardPtr m_currentCard;
 
     State m_playingState = State::None;
-    PlayerTurn m_playerTurn = PlayerTurn::DrawCard;
+
+    std::unique_ptr<step::Step> m_localPlayerStep = {}; 
 };
 
 } // namespace cn::game

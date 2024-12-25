@@ -4,6 +4,11 @@
 namespace cn::menu::component
 {
 
+Position Transformable::getPosition() const
+{
+    return m_position;
+}
+
 void Transformable::setPosition(Position _position)
 {
     m_position = _position;

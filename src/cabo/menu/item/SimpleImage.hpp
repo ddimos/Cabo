@@ -14,6 +14,7 @@ public:
     SimpleImage(Position _position, const sf::Texture& _texture);
 
     void setPosition(Position _position);
+    void setRotation(float _angleDeg);
 
 private:
     void onDraw(sf::RenderWindow& _window) override;

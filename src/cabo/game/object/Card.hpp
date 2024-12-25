@@ -57,6 +57,7 @@ public:
     void discard();
 
     void setPosition(sf::Vector2f _position);
+    void setRotation(float _angleDeg);
 
 private:
     void onActivate() override;
