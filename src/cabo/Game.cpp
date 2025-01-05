@@ -95,7 +95,7 @@ void Game::handleEvents()
             m_isRunning = false;
             break;
         case sf::Event::KeyReleased:
-            // m_eventManager.getDispatcher().send(std::make_unique<events::OnKeyReleasedEvent>(event.key));
+            // m_eventManager.getDispatcher().send(std::make_unique<events::KeyReleasedEvent>(event.key));
             m_eventManager.getDispatcher().send<events::KeyReleasedEvent>(event.key);
             break;
         case sf::Event::MouseButtonReleased:
