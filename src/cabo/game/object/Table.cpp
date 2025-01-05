@@ -13,8 +13,6 @@
 namespace
 {
 
-unsigned g_numberOfPoints = 10;
-
 // https://stackoverflow.com/a/20510150
 //
 // dp(t) = sqrt( (r1*sin(t))^2 + (r2*cos(t))^2)

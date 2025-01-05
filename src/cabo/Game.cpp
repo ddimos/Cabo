@@ -118,6 +118,7 @@ void Game::update(sf::Time _dt)
 
 void Game::fixedUpdate(sf::Time _dt)
 {
+    (void)_dt;
 }
 
 void Game::draw()

@@ -127,10 +127,10 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
             getContext(), deck, discard, table, std::move(buttons)
         );
     }
-    deckButton->setClickCallback([this](bool _pressed){
+    deckButton->setClickCallback([this](){
         m_board->onLocalPlayerClickDeck();
     });
-    discardButton->setClickCallback([this](bool _pressed)
+    discardButton->setClickCallback([this]()
     {
         m_board->onLocalPlayerClickDiscard();
     });
@@ -170,7 +170,7 @@ void GameState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isB
                         slotButton->setActivationOption(core::object::Object::ActivationOption::Manually);
                         
                         getContainer(core::object::Container::Type::Menu).add(slotButton);
-                        slots.emplace(i, game::PlayerSlot{ .id = i, .m_button = slotButton });
+                        slots.emplace(i, game::PlayerSlot{ .id = i, .m_button = slotButton, .card = {} });
                     }
                     auto playerId = m_playerIdGenerator++;
                     auto player = std::make_shared<game::Player>(
@@ -178,9 +178,8 @@ void GameState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isB
                     );
                     getContainer(core::object::Container::Type::Game).add(player);
 
-                    game::Player& playerRef = *player;
                     player->visitSlots([this, playerId](game::PlayerSlot& _slot) {
-                        _slot.m_button->setClickCallback([this, playerId ,&_slot](bool _isPressed) {
+                        _slot.m_button->setClickCallback([this, playerId ,&_slot]() {
                             getContext().eventDispatcher.send<events::LocalPlayerClickSlotEvent>(_slot.id, playerId);
                         });
                     });

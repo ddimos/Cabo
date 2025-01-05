@@ -10,7 +10,7 @@ namespace cn::menu::component
 class Clickable final : public MouseInteractable
 {
 public:
-    using Callback = std::function<void(bool)>;
+    using Callback = std::function<void(void)>;
 
     void setCallback(Callback _callback);
     void setButton(sf::Mouse::Button _button);

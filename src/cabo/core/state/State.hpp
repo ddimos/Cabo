@@ -33,11 +33,11 @@ public:
     void registerEvents(event::Dispatcher& _dispatcher, bool _isBeingRegistered);
 
 protected:
-    virtual Return onUpdate(sf::Time _dt) { (void)_dt; return Return::Continue; }
+    virtual Return onUpdate(sf::Time) { return Return::Continue; }
     virtual void onDraw() {}
     virtual void onActivate() {}
     virtual void onDeactivate() {}
-    virtual void onRegisterEvents(event::Dispatcher& _dispatcher, bool _isBeingRegistered) {}
+    virtual void onRegisterEvents(event::Dispatcher&, bool) {}
 
     void push(StateId _stateId);
     void pop();

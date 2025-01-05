@@ -56,8 +56,9 @@ void TitleState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _is
 {
     if (_isBeingRegistered)
     {
-        getContext().eventDispatcher.registerEvent<events::KeyReleasedEvent>(m_listenerId,
+        _dispatcher.registerEvent<events::KeyReleasedEvent>(m_listenerId,
             [this](const events::KeyReleasedEvent& _event){
+                (void)_event;
                 pop();
                 push(id::MainMenu);
             }
@@ -65,7 +66,7 @@ void TitleState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _is
     }
     else
     {
-        getContext().eventDispatcher.unregisterEvent<events::KeyReleasedEvent>(m_listenerId);
+        _dispatcher.unregisterEvent<events::KeyReleasedEvent>(m_listenerId);
     }
 }
 

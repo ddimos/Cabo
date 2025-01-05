@@ -39,6 +39,7 @@ void FinishState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _i
     {
         _dispatcher.registerEvent<events::KeyReleasedEvent>(m_listenerId,
             [this](const events::KeyReleasedEvent& _event){
+                (void)_event;
                 pop();
                 push(id::MainMenu);
             }

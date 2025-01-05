@@ -31,7 +31,7 @@ Board::Board(const core::Context& _context, DeckPtr _deck, DiscardPtr _discard, 
     for (auto& button : m_decideButtons)
     {
         button->setPosition(cn::menu::Position{ .m_position = sf::Vector2f(780, 510 + index * 22) });
-        button->setClickCallback([this, index](bool _isPressed){
+        button->setClickCallback([this, index](){
             onLocalPlayerClickDecideButton(index);
         });
         ++index;
@@ -119,6 +119,7 @@ void Board::onLocalPlayerClickDiscard()
 
 void Board::onLocalPlayerClickDecideButton(unsigned _butonIndex)
 {
+    (void)_butonIndex;
     // if (m_playerTurn != PlayerTurn::DecideAction)
     // {
     //     CN_ASSERT(false);
@@ -155,6 +156,8 @@ void Board::onLocalPlayerClickDecideButton(unsigned _butonIndex)
 
 void Board::onLocalPlayerClickSlot(PlayerSlotId _slotId, Player& _player)
 {
+    (void)_slotId;
+    (void)_player;
     // if (m_playerTurn == PlayerTurn::CardAction)
     // {
     //     // TODO

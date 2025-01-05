@@ -12,8 +12,8 @@ class Step
 public:
     Step();
     virtual ~Step() = default;
-    virtual void registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered) {}
-    virtual void update(sf::Time _dt) {}
+    virtual void registerEvents(core::event::Dispatcher&, bool) {}
+    virtual void update(sf::Time) {}
 
 protected:
     core::event::ListenerId getListenerId() const { return m_listenerId; }

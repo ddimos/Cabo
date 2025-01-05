@@ -23,7 +23,7 @@ MainMenuState::MainMenuState(core::state::Manager& _stateManagerRef)
         getContext().textureHolderRef.get(TextureIds::MainMenuStartButton),
         sf::IntRect{0,   0, 200, 62},
         sf::IntRect{200, 0, 200, 62},
-        [this](bool _isPressed){
+        [this](){
             pop();
             push(id::Game);
         },
@@ -39,7 +39,7 @@ MainMenuState::MainMenuState(core::state::Manager& _stateManagerRef)
         getContext().textureHolderRef.get(TextureIds::MainMenuJoinButton),
         sf::IntRect{0,   0, 200, 62},
         sf::IntRect{200, 0, 200, 62},
-        [this](bool _isPressed){
+        [this](){
 
         },
         sf::Mouse::Button::Left

@@ -25,7 +25,7 @@ void Clickable::onMouseReleased(sf::Event::MouseButtonEvent _event)
     if (_event.button != m_button)
         return;
     
-    m_onClickCallback(true);
+    m_onClickCallback();
 }
 
 } // namespace cn::menu::component

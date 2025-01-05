@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.24)
 project(Cabo VERSION 0.1.0)
 
 find_package(SFML 2.6 COMPONENTS graphics system window network REQUIRED)
@@ -23,3 +23,5 @@ target_include_directories(Cabo PUBLIC
                             "${PROJECT_BINARY_DIR}"
                             "${PROJECT_SOURCE_DIR}/src/cabo"
                             )
+
+set(CMAKE_COMPILE_WARNING_AS_ERROR ON)

@@ -31,11 +31,11 @@ public:
     bool isActivated() const { return m_isActivated; }
 
 protected:
-    virtual void onUpdate(sf::Time _dt) { (void)_dt; }
-    virtual void onDraw(sf::RenderWindow& _windowRef) { (void)_windowRef; }
+    virtual void onUpdate(sf::Time) {}
+    virtual void onDraw(sf::RenderWindow&) {}
     virtual void onActivate() {}
     virtual void onDeactivate() {}
-    virtual void onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered) {}
+    virtual void onRegisterEvents(core::event::Dispatcher&, bool) {}
 
 private:
     friend class Container;
