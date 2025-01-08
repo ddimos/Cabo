@@ -32,23 +32,22 @@ target_include_directories(Cabo PUBLIC
 
 set(CMAKE_COMPILE_WARNING_AS_ERROR ON)
 
-set(LAUNCH_TYPE "DEV" CACHE STRING "Set the launch type. Possible values [CLIENT, DEV, SERVER]")
+set(LAUNCH_TYPE "CLIENT" CACHE STRING "Set the launch type. Possible values [CLIENT, SERVER]")
 
 message("Generated launch type: ${LAUNCH_TYPE}")
 
 if (LAUNCH_TYPE STREQUAL "CLIENT")
     set(TARGET_OUTPUT_NAME "Cabo_Client")
-elseif (LAUNCH_TYPE STREQUAL "DEV")
-    set(TARGET_OUTPUT_NAME "Cabo_Dev")
 elseif (LAUNCH_TYPE STREQUAL "SERVER")
     set(TARGET_OUTPUT_NAME "Cabo_Server")
 else ()
-    message(FATAL_ERROR "LAUNCH_TYPE should be equal to CLIENT|DEV|SERVER, current value is ${LAUNCH_TYPE}")
+    message(FATAL_ERROR "LAUNCH_TYPE should be equal to CLIENT|SERVER, current value is ${LAUNCH_TYPE}")
 endif()
 
 target_compile_definitions(Cabo PRIVATE
+    CN_LAUNCH_TYPE_CLIENT=1
+    CN_LAUNCH_TYPE_SERVER=2
     $<$<STREQUAL:${LAUNCH_TYPE},CLIENT>:CN_LAUNCH_TYPE=CN_LAUNCH_TYPE_CLIENT>
-    $<$<STREQUAL:${LAUNCH_TYPE},DEV>:CN_LAUNCH_TYPE=CN_LAUNCH_TYPE_DEV>
     $<$<STREQUAL:${LAUNCH_TYPE},SERVER>:CN_LAUNCH_TYPE=CN_LAUNCH_TYPE_SERVER>
 )
 
