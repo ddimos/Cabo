@@ -32,23 +32,23 @@ target_include_directories(Cabo PUBLIC
 
 set(CMAKE_COMPILE_WARNING_AS_ERROR ON)
 
-set(LAUNCH_TYPE "CLIENT" CACHE STRING "Set the launch type. Possible values [CLIENT, SERVER]")
+set(LAUNCH_TARGET "Client" CACHE STRING "Set the launch target. Possible values [Client, Server]")
 
-message("Generated launch type: ${LAUNCH_TYPE}")
+message("Generated launch type: ${LAUNCH_TARGET}")
 
-if (LAUNCH_TYPE STREQUAL "CLIENT")
+if (LAUNCH_TARGET STREQUAL "Client")
     set(TARGET_OUTPUT_NAME "Cabo_Client")
-elseif (LAUNCH_TYPE STREQUAL "SERVER")
+elseif (LAUNCH_TARGET STREQUAL "Server")
     set(TARGET_OUTPUT_NAME "Cabo_Server")
 else ()
-    message(FATAL_ERROR "LAUNCH_TYPE should be equal to CLIENT|SERVER, current value is ${LAUNCH_TYPE}")
+    message(FATAL_ERROR "LAUNCH_TARGET should be equal to Client|Server, current value is ${LAUNCH_TARGET}")
 endif()
 
 target_compile_definitions(Cabo PRIVATE
-    CN_LAUNCH_TYPE_CLIENT=1
-    CN_LAUNCH_TYPE_SERVER=2
-    $<$<STREQUAL:${LAUNCH_TYPE},CLIENT>:CN_LAUNCH_TYPE=CN_LAUNCH_TYPE_CLIENT>
-    $<$<STREQUAL:${LAUNCH_TYPE},SERVER>:CN_LAUNCH_TYPE=CN_LAUNCH_TYPE_SERVER>
+    CN_LAUNCH_TARGET_CLIENT=1
+    CN_LAUNCH_TARGET_SERVER=2
+    $<$<STREQUAL:${LAUNCH_TARGET},Client>:CN_LAUNCH_TARGET=CN_LAUNCH_TARGET_CLIENT>
+    $<$<STREQUAL:${LAUNCH_TARGET},Server>:CN_LAUNCH_TARGET=CN_LAUNCH_TARGET_SERVER>
 )
 
 message("Generated executable name: ${TARGET_OUTPUT_NAME}")
