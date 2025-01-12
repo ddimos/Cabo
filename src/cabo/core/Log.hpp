@@ -24,12 +24,12 @@
     #include <format>
     #include <iostream>
     #include <string_view>
-    #define CN_LOG(_msg) core::log::log(_msg)
-    #define CN_LOG_FRM(_fmt, ...) core::log::logFmt(_fmt, __VA_ARGS__)
+    #define CN_LOG(_msg) cn::core::log::log(_msg)
+    #define CN_LOG_FRM(_fmt, ...) cn::core::log::logFmt(_fmt, __VA_ARGS__)
     #define CN_LOG_ERROR_FRM(_fmt, ...)             \
         do {                                        \
-            core::log::logFmt(_fmt, __VA_ARGS__);   \
-            core::log::flush();                     \
+            cn::core::log::logFmt(_fmt, __VA_ARGS__);   \
+            cn::core::log::flush();                     \
         } while(0)
 
 namespace cn::core::log

@@ -9,7 +9,6 @@
 #include "game/Constants.hpp"
 
 #include "core/Assert.hpp"
-#include "core/Types.hpp"
 
 #include "menu/item/Button.hpp"
 #include "menu/Utils.hpp"
@@ -59,9 +58,11 @@ void Board::start()
         }
     }
 
+    auto& eventDispatcherRef = m_contextRef.get<core::event::Dispatcher>();
+
     m_playingState = State::LookingCard;
     m_localPlayerStep = std::make_unique<step::SeeOwnCard>(*this);
-    m_localPlayerStep->registerEvents(m_contextRef.eventDispatcher, true);
+    m_localPlayerStep->registerEvents(eventDispatcherRef, true);
 }
 
 bool Board::hasGameStarted() const
@@ -81,8 +82,10 @@ PlayerPtr Board::getPlayer(PlayerId _id) const
 
 void Board::addPlayer(PlayerPtr _player)
 {
+    auto& windowRef = m_contextRef.get<sf::RenderWindow>();
+
     m_players.push_back(_player);
-    auto spawnPoints = m_table->generateSpawnPoints(m_players.size(), sf::Vector2f(m_contextRef.windowRef.getSize()) / 2.f);
+    auto spawnPoints = m_table->generateSpawnPoints(m_players.size(), sf::Vector2f(windowRef.getSize()) / 2.f);
 
     int i = 0;
     for (auto& player : m_players)

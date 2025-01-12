@@ -2,6 +2,7 @@
 
 #include "core/event/Manager.hpp"
 #include "core/state/Manager.hpp"
+#include "core/Context.hpp"
 
 #include "ResourceIds.hpp"
 
@@ -25,6 +26,7 @@ private:
     void fixedUpdate(sf::Time _dt);
     void draw();
 
+    core::Context m_context;
     sf::RenderWindow m_window;
     sf::Clock m_systemClock;
 

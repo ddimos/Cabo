@@ -1,5 +1,8 @@
 #include "Game.hpp"
 
+#include "ContextObjectIds.hpp"
+#include "LaunchTarget.hpp"
+
 #include "core/event/Dispatcher.hpp"
 #include "core/Log.hpp"
 #include "core/Types.hpp"
@@ -26,8 +29,13 @@ namespace cn
 
 Game::Game()
     : m_window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "CABOn", sf::Style::Close)
-    , m_stateManager(core::Context(m_window, m_textureHolder, m_fontHolder, m_eventManager.getDispatcher()))
+    , m_stateManager(m_context)
 {
+    m_context.insert(m_window);
+    m_context.insert(m_textureHolder);
+    m_context.insert(m_fontHolder);
+    m_context.insert(m_eventManager.getDispatcher());
+
     m_window.setKeyRepeatEnabled(false);
     m_window.setFramerateLimit(60);
 }

@@ -33,6 +33,8 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
     createContainer(core::object::Container::Type::Menu);
     createContainer(core::object::Container::Type::Game);
 
+    auto& textureHolderRef = getContext().get<TextureHolder>();
+
     unsigned seed = static_cast<unsigned>(std::time(nullptr));
 
     std::vector<game::CardPtr> cards;
@@ -44,7 +46,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
             auto cardPair = game::Card::getCardFromIndex(i);
             auto image = std::make_shared<menu::item::SimpleImage>(
                 menu::Position{},
-                getContext().textureHolderRef.get(TextureIds::Cards),
+                textureHolderRef.get(TextureIds::Cards),
                 game::spriteSheet::getCardTextureRect(cardPair.first, cardPair.second)
             );
             image->setActivationOption(core::object::Object::ActivationOption::Manually);
@@ -57,7 +59,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
     }
 
     auto deckButton = std::make_shared<menu::item::Button>(
-        getContext().textureHolderRef.get(TextureIds::Cards),
+        textureHolderRef.get(TextureIds::Cards),
         game::spriteSheet::getCardBackTextureRect(),
         game::spriteSheet::getCardBackTextureRect(game::spriteSheet::Hover::Yes),
         sf::Mouse::Button::Left
@@ -68,7 +70,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
     );
 
     auto discardButton = std::make_shared<menu::item::Button>(
-        getContext().textureHolderRef.get(TextureIds::Cards),
+        textureHolderRef.get(TextureIds::Cards),
         game::spriteSheet::getDiscardTextureRect(),
         game::spriteSheet::getDiscardTextureRect(game::spriteSheet::Hover::Yes),
         sf::Mouse::Button::Left
@@ -84,7 +86,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
 
     {
         auto matchButton = std::make_shared<menu::item::Button>(
-            getContext().textureHolderRef.get(TextureIds::DecideButtons),
+            textureHolderRef.get(TextureIds::DecideButtons),
             game::spriteSheet::getMatchButtonTextureRect(),
             game::spriteSheet::getMatchButtonTextureRect(game::spriteSheet::Hover::Yes),
             sf::Mouse::Button::Left
@@ -93,7 +95,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
         getContainer(core::object::Container::Type::Menu).add(matchButton);
         
         auto takeButton = std::make_shared<menu::item::Button>(
-            getContext().textureHolderRef.get(TextureIds::DecideButtons),
+            textureHolderRef.get(TextureIds::DecideButtons),
             game::spriteSheet::getTakeButtonTextureRect(),
             game::spriteSheet::getTakeButtonTextureRect(game::spriteSheet::Hover::Yes),
             sf::Mouse::Button::Left
@@ -102,7 +104,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
         getContainer(core::object::Container::Type::Menu).add(takeButton);
 
         auto actionButton = std::make_shared<menu::item::Button>(
-            getContext().textureHolderRef.get(TextureIds::DecideButtons),
+            textureHolderRef.get(TextureIds::DecideButtons),
             game::spriteSheet::getActionButtonTextureRect(),
             game::spriteSheet::getActionButtonTextureRect(game::spriteSheet::Hover::Yes),
             sf::Mouse::Button::Left
@@ -111,7 +113,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
         getContainer(core::object::Container::Type::Menu).add(actionButton);
 
         auto discardButton = std::make_shared<menu::item::Button>(
-            getContext().textureHolderRef.get(TextureIds::DecideButtons),
+            textureHolderRef.get(TextureIds::DecideButtons),
             game::spriteSheet::getDiscardButtonTextureRect(),
             game::spriteSheet::getDiscardButtonTextureRect(game::spriteSheet::Hover::Yes),
             sf::Mouse::Button::Left
@@ -155,6 +157,8 @@ void GameState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isB
                 }
                 if (_event.key.code == sf::Keyboard::P)
                 {
+                    auto& textureHolderRef = getContext().get<TextureHolder>();
+
                     std::map<game::PlayerSlotId, game::PlayerSlot> slots;
 
                     unsigned short numberOfSlots = game::MaxNumberOfPlayerSlots;
@@ -162,7 +166,7 @@ void GameState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isB
                     {
                         // TODO make a choosable button?
                         auto slotButton = std::make_shared<menu::item::Button>(
-                            getContext().textureHolderRef.get(TextureIds::Cards),
+                            textureHolderRef.get(TextureIds::Cards),
                             game::spriteSheet::getCardBackTextureRect(),
                             game::spriteSheet::getCardBackTextureRect(game::spriteSheet::Hover::Yes),
                             sf::Mouse::Button::Left
@@ -180,7 +184,8 @@ void GameState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isB
 
                     player->visitSlots([this, playerId](game::PlayerSlot& _slot) {
                         _slot.m_button->setClickCallback([this, playerId ,&_slot]() {
-                            getContext().eventDispatcher.send<events::LocalPlayerClickSlotEvent>(_slot.id, playerId);
+                            auto& eventDispatcherRef = getContext().get<core::event::Dispatcher>();
+                            eventDispatcherRef.send<events::LocalPlayerClickSlotEvent>(_slot.id, playerId);
                         });
                     });
 

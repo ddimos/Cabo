@@ -1,9 +1,9 @@
 #pragma once
 
 #include "core/event/Dispatcher.hpp"
-#include "core/Types.hpp"
 #include "core/object/Container.hpp"
 #include "core/state/StateTypes.hpp"
+#include "core/Context.hpp"
 
 #include <SFML/System/Time.hpp>
 #include <SFML/Window/Event.hpp>

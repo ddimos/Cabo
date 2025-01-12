@@ -25,22 +25,26 @@ Return State::update(sf::Time _dt)
 
 void State::draw()
 {
+    // TODO don't retrieve the value each frame
+    auto& windowRef = getContext().get<sf::RenderWindow>();
     onDraw();
     for (auto& [id, container] : m_containers)
-        container.draw(getContext().windowRef);
+        container.draw(windowRef);
 }
 
 void State::activate()
 {
+    auto& eventDispatcherRef = getContext().get<core::event::Dispatcher>();
     for (auto& [id, container] : m_containers)
         container.activate();
     onActivate();
-    registerEvents(getContext().eventDispatcher, true);
+    registerEvents(eventDispatcherRef, true);
 }
 
 void State::deactivate()
 {
-    registerEvents(getContext().eventDispatcher, false);
+    auto& eventDispatcherRef = getContext().get<core::event::Dispatcher>();
+    registerEvents(eventDispatcherRef, false);
     for (auto& [id, container] : m_containers)
         container.deactivate();
     onDeactivate();

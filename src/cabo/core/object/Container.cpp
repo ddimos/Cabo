@@ -46,12 +46,13 @@ void Container::add(std::shared_ptr<Object> _object)
 
 void Container::processChanges(core::Context& _context)
 {
+    auto& eventDispatcherRef = _context.get<core::event::Dispatcher>();
     for (auto& object : m_newObjects)
     {
         if (object->isAutoActivated())
         {
             object->activate();
-            object->registerEvents(_context.eventDispatcher, true);
+            object->registerEvents(eventDispatcherRef, true);
         }
         m_objects.push_back(object);
     }
@@ -62,12 +63,12 @@ void Container::processChanges(core::Context& _context)
         if (object->wantsActivated() && !object->isActivated())
         {
             object->activate();
-            object->registerEvents(_context.eventDispatcher, true);
+            object->registerEvents(eventDispatcherRef, true);
             object->m_desiredState = Object::DesiredState::None;
         }
         else if (object->wantsDeactivated() && object->isActivated())
         {
-            object->registerEvents(_context.eventDispatcher, false);
+            object->registerEvents(eventDispatcherRef, false);
             object->deactivate();
             object->m_desiredState = Object::DesiredState::None;
         }

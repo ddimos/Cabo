@@ -4,8 +4,8 @@
 namespace cn::core::state
 {
 
-Manager::Manager(core::Context _context)
-    : m_context(_context)
+Manager::Manager(core::Context& _contextRef)
+    : m_contextRef(_contextRef)
 {
 }
 

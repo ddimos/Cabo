@@ -1,8 +1,8 @@
 #include "game/object/Player.hpp"
 #include "game/object/Card.hpp"
 
-#include "core/Types.hpp"
 #include "core/math/Math.hpp"
+#include "core/Context.hpp"
 
 #include "menu/item/Button.hpp"
 
@@ -19,7 +19,9 @@ Player::Player(const core::Context& _context, PlayerId _id, bool _isLocal, std::
     , m_slots(std::move(_slots))
     , m_currentNumberOfSlots(_initialNumberOfSlots)
 {
-    m_nameText.setFont(_context.fontHolderRef.get(FontIds::Main));
+    auto& fontHolderRef = _context.get<FontHolder>();
+
+    m_nameText.setFont(fontHolderRef.get(FontIds::Main));
     m_nameText.setString("Player " + std::to_string(m_id));
     m_nameText.setFillColor(sf::Color::White);
     m_nameText.setCharacterSize(24);

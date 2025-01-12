@@ -1,7 +1,7 @@
 #include "game/object/Table.hpp"
 
 #include "core/math/Math.hpp"
-#include "core/Types.hpp"
+#include "core/Context.hpp"
 
 #include "menu/Utils.hpp"
 
@@ -91,8 +91,11 @@ namespace cn::game
 
 Table::Table(const core::Context& _context)
 {
-    m_sprite.setTexture(_context.textureHolderRef.get(TextureIds::Table));
-    m_sprite.setPosition(menu::calculateCenter(sf::Vector2f(_context.windowRef.getSize()), m_sprite.getGlobalBounds().getSize()));
+    auto& textureHolderRef = _context.get<TextureHolder>();
+    auto& windowRef = _context.get<sf::RenderWindow>();
+
+    m_sprite.setTexture(textureHolderRef.get(TextureIds::Table));
+    m_sprite.setPosition(menu::calculateCenter(sf::Vector2f(windowRef.getSize()), m_sprite.getGlobalBounds().getSize()));
 }
 
 std::vector<PlayerSpawnPoint> Table::generateSpawnPoints(unsigned _count, sf::Vector2f _windowHalfSize)

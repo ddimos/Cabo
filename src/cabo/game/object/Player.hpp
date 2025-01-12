@@ -14,7 +14,7 @@
 
 namespace cn::core
 {
-    struct Context;
+    class Context;
 }
 
 namespace cn::game

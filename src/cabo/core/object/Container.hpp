@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/Types.hpp"
+#include "core/Context.hpp"
 #include "core/object/Object.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>

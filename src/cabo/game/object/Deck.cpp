@@ -1,6 +1,5 @@
 #include "game/object/Deck.hpp"
 
-#include "core/Types.hpp"
 #include "core/Assert.hpp"
 
 #include "menu/item/Button.hpp"
