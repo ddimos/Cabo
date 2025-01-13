@@ -21,24 +21,12 @@ enum : core::ContextObjectId
 } // namespace context::id
 
 template <>
-core::ContextObjectId core::getContextObjectId<sf::RenderWindow>()
-{
-    return context::id::Window;
-}
+core::ContextObjectId core::getContextObjectId<sf::RenderWindow>();
 template <>
-core::ContextObjectId core::getContextObjectId<TextureHolder>()
-{
-    return context::id::TextureHolder;
-}
+core::ContextObjectId core::getContextObjectId<TextureHolder>();
 template <>
-core::ContextObjectId core::getContextObjectId<FontHolder>()
-{
-    return context::id::FontHolder;
-}
+core::ContextObjectId core::getContextObjectId<FontHolder>();
 template <>
-core::ContextObjectId core::getContextObjectId<core::event::Dispatcher>()
-{
-    return context::id::EventDispatcher;
-}
+core::ContextObjectId core::getContextObjectId<core::event::Dispatcher>();
 
 } // namespace cn

@@ -1,17 +1,17 @@
-#include "Game.hpp"
+#include "client/Client.hpp"
 
 #include "ContextObjectIds.hpp"
 #include "LaunchTarget.hpp"
 
 #include "core/event/Dispatcher.hpp"
 #include "core/Log.hpp"
-#include "core/Types.hpp"
 
 #include "events/SystemEvents.hpp"
 
 #include "states/StateIds.hpp"
 #include "states/FinishState.hpp"
 #include "states/GameState.hpp"
+#include "states/LobbyState.hpp"
 #include "states/MainMenuState.hpp"
 #include "states/TitleState.hpp"
 
@@ -19,15 +19,10 @@
 
 #include <SFML/Window/Event.hpp>
 
-namespace
-{
-    const sf::Time TimePerFrame = sf::seconds(cn::FRAME_TIME_s);
-}
-
-namespace cn
+namespace cn::client
 {
 
-Game::Game()
+Client::Client()
     : m_window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "CABOn", sf::Style::Close)
     , m_stateManager(m_context)
 {
@@ -40,9 +35,9 @@ Game::Game()
     m_window.setFramerateLimit(60);
 }
 
-void Game::start()
+void Client::start()
 {
-    CN_LOG("Start CABOn");
+    CN_LOG("Start Client CABOn");
 
     m_isRunning = true;
     m_systemClock.restart();
@@ -71,10 +66,10 @@ void Game::start()
         draw();
 
         m_window.display();
-    } 
+    }
 }
 
-void Game::init()
+void Client::init()
 {
     m_fontHolder.load(FontIds::Main, "res/fonts/times_new_roman.ttf");
     m_textureHolder.load(TextureIds::Background, "res/textures/background.png");
@@ -84,15 +79,17 @@ void Game::init()
     m_textureHolder.load(TextureIds::MainMenuJoinButton, "res/textures/join_menu_join_button.png");
     m_textureHolder.load(TextureIds::Table, "res/textures/table.png");
 
+// TODO move states
     m_stateManager.registerState<states::TitleState>(states::id::Title);
     m_stateManager.registerState<states::MainMenuState>(states::id::MainMenu);
+    m_stateManager.registerState<states::LobbyState>(states::id::Lobby);
     m_stateManager.registerState<states::GameState>(states::id::Game);
     m_stateManager.registerState<states::FinishState>(states::id::Finish);
 
     m_stateManager.pushState(states::id::Title);
 }
 
-void Game::handleEvents()
+void Client::handleEvents()
 {
     sf::Event event;
     while (m_window.pollEvent(event))
@@ -119,19 +116,19 @@ void Game::handleEvents()
     m_eventManager.process();
 }
 
-void Game::update(sf::Time _dt)
+void Client::update(sf::Time _dt)
 {
     m_stateManager.update(_dt);
 }
 
-void Game::fixedUpdate(sf::Time _dt)
+void Client::fixedUpdate(sf::Time _dt)
 {
     (void)_dt;
 }
 
-void Game::draw()
+void Client::draw()
 {
     m_stateManager.draw();
 }
 
-} // namespace cn
+} // namespace cn::client

@@ -8,14 +8,13 @@
 
 #include <SFML/Graphics/RenderWindow.hpp>
 
-namespace cn
+namespace cn::client
 {
 
-class Game
+class Client final
 {
 public:
-    Game();
-    ~Game() = default;
+    Client();
 
     void start();
 
@@ -39,4 +38,4 @@ private:
     bool m_isRunning = false;
 };
 
-} // namespace cn
+} // namespace cn::client
