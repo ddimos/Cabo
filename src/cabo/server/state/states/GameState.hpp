@@ -5,7 +5,7 @@
 #include "game/Board.hpp"
 #include "game/Types.hpp"
 
-namespace cn::states
+namespace cn::server::states
 {
 
 class GameState final : public core::state::State
@@ -22,4 +22,4 @@ private:
     game::PlayerId m_playerIdGenerator = 0;
 };
 
-} // namespace cn::states
+} // namespace cn::server::states

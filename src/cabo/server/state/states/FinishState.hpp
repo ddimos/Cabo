@@ -3,7 +3,7 @@
 #include "core/event/Types.hpp"
 #include "core/state/State.hpp"
 
-namespace cn::states
+namespace cn::server::states
 {
 
 class FinishState final : public core::state::State
@@ -17,4 +17,4 @@ private:
     core::event::ListenerId m_listenerId = core::event::ListenerIdInvalid;
 };
 
-} // namespace cn::states
+} // namespace cn::server::states

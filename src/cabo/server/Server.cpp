@@ -8,12 +8,7 @@
 
 #include "events/SystemEvents.hpp"
 
-#include "states/StateIds.hpp"
-#include "states/FinishState.hpp"
-#include "states/GameState.hpp"
-#include "states/LobbyState.hpp"
-#include "states/MainMenuState.hpp"
-#include "states/TitleState.hpp"
+#include "server/state/States.hpp"
 
 #include "Constants.hpp"
 
@@ -67,6 +62,7 @@ void Server::start()
 
 void Server::init()
 {
+    m_stateManager.registerState<states::LoadingState>(states::id::Loading);
     m_stateManager.registerState<states::LobbyState>(states::id::Lobby);
     m_stateManager.registerState<states::GameState>(states::id::Game);
     m_stateManager.registerState<states::FinishState>(states::id::Finish);

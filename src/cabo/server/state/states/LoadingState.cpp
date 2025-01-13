@@ -1,5 +1,5 @@
-#include "states/MainMenuState.hpp"
-#include "states/StateIds.hpp"
+#include "server/state/states/LoadingState.hpp"
+#include "server/state/StateIds.hpp"
 
 #include "menu/item/Button.hpp"
 
@@ -7,10 +7,10 @@
 
 #include <SFML/Graphics/RenderWindow.hpp>
 
-namespace cn::states
+namespace cn::server::states
 {
 
-MainMenuState::MainMenuState(core::state::Manager& _stateManagerRef)
+LoadingState::LoadingState(core::state::Manager& _stateManagerRef)
     : State(_stateManagerRef)
 {
     createContainer(core::object::Container::Type::Menu);
@@ -51,4 +51,4 @@ MainMenuState::MainMenuState(core::state::Manager& _stateManagerRef)
     getContainer(core::object::Container::Type::Menu).add(joinButton);
 }
 
-} // namespace cn::states
+} // namespace cn::server::states

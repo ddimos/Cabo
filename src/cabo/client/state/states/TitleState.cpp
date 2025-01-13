@@ -1,5 +1,5 @@
-#include "states/FinishState.hpp"
-#include "states/StateIds.hpp"
+#include "client/state/states/TitleState.hpp"
+#include "client/state/StateIds.hpp"
 
 #include "core/event/Dispatcher.hpp"
 #include "events/SystemEvents.hpp"
@@ -10,33 +10,52 @@
 
 #include <SFML/Graphics/RenderWindow.hpp>
 
-namespace cn::states
+namespace cn::client::states
 {
 
-FinishState::FinishState(core::state::Manager& _stateManagerRef)
+TitleState::TitleState(core::state::Manager& _stateManagerRef)
     : State(_stateManagerRef)
 {
     createContainer(core::object::Container::Type::Menu);
 
     auto& windowRef = getContext().get<sf::RenderWindow>();
     auto& fontHolderRef = getContext().get<FontHolder>();
-
-    auto text = std::make_shared<menu::item::SimpleText>(
+    
+    m_text = std::make_shared<menu::item::SimpleText>(
         menu::Position{
             .m_position = sf::Vector2f(0.f, -45.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
             .m_specPositionX = menu::Position::Special::CENTER_ALLIGNED, .m_specPositionY = menu::Position::Special::OFFSET_FROM_CENTER
         },
-        "Finish",
+        "Press any key to start",
         fontHolderRef.get(FontIds::Main),
-        20,
+        24,
         sf::Color::White
     );
-    getContainer(core::object::Container::Type::Menu).add(text);
+    getContainer(core::object::Container::Type::Menu).add(m_text);
 
     m_listenerId = core::event::getNewListenerId();
 }
 
-void FinishState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered)
+core::state::Return TitleState::onUpdate(sf::Time _dt)
+{
+    m_toggleEffectTimeDt += _dt;
+    if (m_toggleEffectTimeDt >= m_toggleEffectTimeS)
+    {
+        m_showText = !m_showText;
+        m_toggleEffectTimeDt = sf::Time::Zero;
+    }
+    return core::state::Return::Break;
+}
+
+void TitleState::onDraw()
+{
+    if (m_showText && !m_text->isActivated())
+        m_text->requestActivated();
+    else if (!m_showText && m_text->isActivated())
+        m_text->requestDeactivated();
+}
+
+void TitleState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered)
 {
     if (_isBeingRegistered)
     {
@@ -54,4 +73,4 @@ void FinishState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _i
     }
 }
 
-} // namespace cn::states
+} // namespace cn::client::states

@@ -1,5 +1,5 @@
-#include "states/GameState.hpp"
-#include "states/StateIds.hpp"
+#include "client/state/states/GameState.hpp"
+#include "client/state/StateIds.hpp"
 
 #include "core/event/Dispatcher.hpp"
 #include "events/GameEvents.hpp"
@@ -24,7 +24,7 @@
 
 #include "core/Log.hpp"
 
-namespace cn::states
+namespace cn::client::states
 {
 
 GameState::GameState(core::state::Manager& _stateManagerRef)
@@ -214,4 +214,4 @@ core::state::Return GameState::onUpdate(sf::Time _dt)
     return core::state::Return::Break;
 }
 
-} // namespace cn::states
+} // namespace cn::client::states

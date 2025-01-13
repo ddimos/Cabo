@@ -8,12 +8,7 @@
 
 #include "events/SystemEvents.hpp"
 
-#include "states/StateIds.hpp"
-#include "states/FinishState.hpp"
-#include "states/GameState.hpp"
-#include "states/LobbyState.hpp"
-#include "states/MainMenuState.hpp"
-#include "states/TitleState.hpp"
+#include "client/state/States.hpp"
 
 #include "Constants.hpp"
 

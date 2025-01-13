@@ -8,7 +8,7 @@ namespace core::object
     class Object;
 }
 
-namespace cn::states
+namespace cn::client::states
 {
 
 class TitleState final : public core::state::State
@@ -29,4 +29,4 @@ private:
 
     core::event::ListenerId m_listenerId = core::event::ListenerIdInvalid;
 };
-} // namespace cn::states
+} // namespace cn::client::states
