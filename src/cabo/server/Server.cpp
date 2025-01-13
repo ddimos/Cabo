@@ -67,7 +67,7 @@ void Server::init()
     m_stateManager.registerState<states::GameState>(states::id::Game);
     m_stateManager.registerState<states::FinishState>(states::id::Finish);
 
-    m_stateManager.pushState(states::id::Lobby);
+    m_stateManager.pushState(states::id::Loading);
 }
 
 void Server::handleEvents()
