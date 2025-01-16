@@ -10,7 +10,7 @@ namespace cn::events
 class KeyReleasedEvent final : public core::event::Event
 {
 public:
-    CN_EVENT(Id::KeyReleased)
+    CN_EVENT(id::KeyReleased)
 
     KeyReleasedEvent(sf::Event::KeyEvent _event)
         : core::event::Event(), key(_event) 
@@ -22,7 +22,7 @@ public:
 class MouseButtonReleasedEvent final : public core::event::Event
 {
 public:
-    CN_EVENT(Id::MouseButtonReleased)
+    CN_EVENT(id::MouseButtonReleased)
 
     MouseButtonReleasedEvent(sf::Event::MouseButtonEvent _event)
         : core::event::Event(), mouseButton(_event) 
@@ -34,7 +34,7 @@ public:
 class MouseMovedEvent final : public core::event::Event
 {
 public:
-    CN_EVENT(Id::MouseMoved)
+    CN_EVENT(id::MouseMoved)
 
     MouseMovedEvent(sf::Event::MouseMoveEvent _event)
         : core::event::Event(), mouseMove(_event) 

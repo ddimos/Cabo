@@ -12,7 +12,7 @@ namespace cn::events
 class PlayerClickDeckEvent final : public core::event::Event
 {
 public:
-    CN_EVENT(Id::PlayerClickDeck)
+    CN_EVENT(id::PlayerClickDeck)
 
     PlayerClickDeckEvent()
         : core::event::Event() 
@@ -22,7 +22,7 @@ public:
 class LocalPlayerClickSlotEvent final : public core::event::Event
 {
 public:
-    CN_EVENT(Id::LocalPlayerClickSlot)
+    CN_EVENT(id::LocalPlayerClickSlot)
 
     LocalPlayerClickSlotEvent(game::PlayerSlotId _slotId, game::PlayerId _playerId)
         : core::event::Event(), slotId(_slotId), playerId(_playerId)

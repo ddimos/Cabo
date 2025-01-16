@@ -1,7 +1,7 @@
 #include "menu/item/Button.hpp"
 #include "menu/Utils.hpp"
 
-#include "events/SystemEvents.hpp"
+#include "events/InputEvents.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>

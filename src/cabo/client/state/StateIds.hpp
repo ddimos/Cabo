@@ -10,6 +10,7 @@ namespace id
     {
         Finish,
         Game,
+        Joining,
         Lobby,
         MainMenu,
         Title

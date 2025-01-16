@@ -4,6 +4,8 @@
 #include "core/state/Manager.hpp"
 #include "core/Context.hpp"
 
+#include "net/Manager.hpp"
+
 #include "ResourceIds.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -32,6 +34,7 @@ private:
     TextureHolder m_textureHolder;
     FontHolder m_fontHolder;
 
+    net::Manager m_netManager;
     core::event::Manager m_eventManager;
     core::state::Manager m_stateManager;
 

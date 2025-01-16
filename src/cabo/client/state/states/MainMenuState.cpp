@@ -2,6 +2,9 @@
 #include "client/state/StateIds.hpp"
 
 #include "menu/item/Button.hpp"
+#include "menu/item/SimpleText.hpp"
+
+#include "net/Manager.hpp"
 
 #include "ResourceIds.hpp"
 
@@ -17,38 +20,49 @@ MainMenuState::MainMenuState(core::state::Manager& _stateManagerRef)
     
     auto& windowRef = getContext().get<sf::RenderWindow>();
     auto& textureHolderRef = getContext().get<TextureHolder>();
+    auto& fontHolderRef = getContext().get<FontHolder>();
+
 
     auto startButton = std::make_shared<menu::item::Button>(
         menu::Position{
-            .m_position = sf::Vector2f(0.f, -45.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
-            .m_specPositionX = menu::Position::Special::CENTER_ALLIGNED, .m_specPositionY = menu::Position::Special::OFFSET_FROM_CENTER
+            .m_position = sf::Vector2f(0.f, 0.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
+            .m_specPositionX = menu::Position::Special::CENTER_ALLIGNED, .m_specPositionY = menu::Position::Special::CENTER_ALLIGNED
         },
         textureHolderRef.get(TextureIds::MainMenuStartButton),
         sf::IntRect{0,   0, 200, 62},
         sf::IntRect{200, 0, 200, 62},
         [this](){
-            pop();
-            push(id::Game);
+            connect();
         },
         sf::Mouse::Button::Left
     );
     getContainer(core::object::Container::Type::Menu).add(startButton);
 
-    auto joinButton = std::make_shared<menu::item::Button>(
-        menu::Position{
-            .m_position = sf::Vector2f(0.f, 45.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
-            .m_specPositionX = menu::Position::Special::CENTER_ALLIGNED, .m_specPositionY = menu::Position::Special::OFFSET_FROM_CENTER
-        },
-        textureHolderRef.get(TextureIds::MainMenuJoinButton),
-        sf::IntRect{0,   0, 200, 62},
-        sf::IntRect{200, 0, 200, 62},
-        [this](){
+    // auto joinButton = std::make_shared<menu::item::Button>(
+    //     menu::Position{
+    //         .m_position = sf::Vector2f(0.f, 45.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
+    //         .m_specPositionX = menu::Position::Special::CENTER_ALLIGNED, .m_specPositionY = menu::Position::Special::OFFSET_FROM_CENTER
+    //     },
+    //     textureHolderRef.get(TextureIds::MainMenuJoinButton),
+    //     sf::IntRect{0,   0, 200, 62},
+    //     sf::IntRect{200, 0, 200, 62},
+    //     [this](){
 
-        },
-        sf::Mouse::Button::Left
-    );
+    //     },
+    //     sf::Mouse::Button::Left
+    // );
     
-    getContainer(core::object::Container::Type::Menu).add(joinButton);
+    // getContainer(core::object::Container::Type::Menu).add(joinButton);
+}
+
+void MainMenuState::connect()
+{
+    if (m_isConnecting)
+        return;
+
+    m_isConnecting = true;
+    getContext().get<net::Manager>().connect(nsf::NetworkAddress(sf::IpAddress("127.0.0.1"), 20475));
+    push(states::id::Joining);
 }
 
 } // namespace cn::client::states

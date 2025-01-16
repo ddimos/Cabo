@@ -2,7 +2,7 @@
 #include "client/state/StateIds.hpp"
 
 #include "core/event/Dispatcher.hpp"
-#include "events/SystemEvents.hpp"
+#include "events/InputEvents.hpp"
 
 #include "menu/item/SimpleText.hpp"
 

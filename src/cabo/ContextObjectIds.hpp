@@ -1,6 +1,8 @@
 #pragma once
 #include "core/Context.hpp"
 #include "core/event/Dispatcher.hpp"
+#include "net/Manager.hpp"
+
 #include "ResourceIds.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -14,6 +16,7 @@ enum : core::ContextObjectId
 {
     EventDispatcher,
     FontHolder,
+    NetManager,
     TextureHolder,
     Window
 };
@@ -28,5 +31,7 @@ template <>
 core::ContextObjectId core::getContextObjectId<FontHolder>();
 template <>
 core::ContextObjectId core::getContextObjectId<core::event::Dispatcher>();
+template <>
+core::ContextObjectId core::getContextObjectId<net::Manager>();
 
 } // namespace cn

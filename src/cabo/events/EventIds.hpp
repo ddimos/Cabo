@@ -4,15 +4,27 @@
 namespace cn::events
 {
 
-// TODO rename
-enum Id : core::event::EventId
+namespace id
 {
+
+enum : core::event::EventId
+{
+    // Input events
     KeyReleased,
     MouseButtonReleased,
     MouseMoved,
 
-    PlayerClickDeck,
-    LocalPlayerClickSlot
+    // Net events
+    // PlayerJoined,
+    // PlayerLeft,
+    PeerConnected,
+    PeerDisconnected,
+
+    // Player action events
+    LocalPlayerClickSlot,
+    PlayerClickDeck
 };
+
+} // namespace id
 
 } // namespace cn::events

@@ -3,7 +3,7 @@
 
 #include "core/event/Dispatcher.hpp"
 #include "events/GameEvents.hpp"
-#include "events/SystemEvents.hpp"
+#include "events/InputEvents.hpp"
 
 #include "game/object/Card.hpp"
 #include "game/object/Deck.hpp"

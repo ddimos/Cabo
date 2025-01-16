@@ -23,5 +23,10 @@ core::ContextObjectId core::getContextObjectId<core::event::Dispatcher>()
 {
     return context::id::EventDispatcher;
 }
+template <>
+core::ContextObjectId core::getContextObjectId<net::Manager>()
+{
+    return context::id::NetManager;
+}
 
 } // namespace cn

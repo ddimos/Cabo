@@ -4,6 +4,8 @@
 #include "core/state/Manager.hpp"
 #include "core/Context.hpp"
 
+#include "net/Manager.hpp"
+
 namespace cn::server
 {
 
@@ -23,6 +25,7 @@ private:
     core::Context m_context;
     sf::Clock m_systemClock;
 
+    net::Manager m_netManager;
     core::event::Manager m_eventManager;
     core::state::Manager m_stateManager;
 

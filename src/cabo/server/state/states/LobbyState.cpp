@@ -2,7 +2,8 @@
 #include "server/state/StateIds.hpp"
 
 #include "core/event/Dispatcher.hpp"
-#include "events/SystemEvents.hpp"
+
+#include "events/NetworkEvents.hpp"
 
 
 namespace cn::server::states
@@ -19,10 +20,18 @@ void LobbyState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _is
 {
     if (_isBeingRegistered)
     {
-    // player join events
+        _dispatcher.registerEvent<events::PeerConnectedEvent>(m_listenerId,
+            [this](const events::PeerConnectedEvent& _event){
+                (void)_event;
+                CN_LOG("Player joined..");
+                // pop();
+                // push(id::MainMenu);
+            }
+        );
     }
     else
     {
+        _dispatcher.unregisterEvent<events::PeerConnectedEvent>(m_listenerId);
     }
 }
 

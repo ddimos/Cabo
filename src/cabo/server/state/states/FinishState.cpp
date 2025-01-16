@@ -2,7 +2,6 @@
 #include "server/state/StateIds.hpp"
 
 #include "core/event/Dispatcher.hpp"
-#include "events/SystemEvents.hpp"
 
 namespace cn::server::states
 {

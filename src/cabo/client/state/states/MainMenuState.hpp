@@ -9,6 +9,11 @@ class MainMenuState final : public core::state::State
 {
 public:
     MainMenuState(core::state::Manager& _stateManagerRef);
+
+private:
+    void connect();
+
+    bool m_isConnecting = false;
 };
 
 } // namespace cn::client::states

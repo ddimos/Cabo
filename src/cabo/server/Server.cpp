@@ -6,7 +6,7 @@
 #include "core/event/Dispatcher.hpp"
 #include "core/Log.hpp"
 
-#include "events/SystemEvents.hpp"
+#include "events/InputEvents.hpp"
 
 #include "server/state/States.hpp"
 
@@ -20,8 +20,9 @@ namespace cn::server
 {
 
 Server::Server()
-    : m_stateManager(m_context)
+    : m_netManager(m_context), m_stateManager(m_context)
 {
+    m_context.insert(m_netManager);
     m_context.insert(m_eventManager.getDispatcher());
 }
 
@@ -31,11 +32,12 @@ void Server::start()
 
     m_isRunning = true;
     m_systemClock.restart();
-    sf::Clock throttlingClock;
     
+    m_netManager.init(true);
     init();
     
     sf::Clock clock;
+    sf::Clock throttlingClock;
     sf::Time accumulator = sf::Time::Zero;
 
     while (m_isRunning)
@@ -43,6 +45,8 @@ void Server::start()
         sf::Time elapsed = clock.restart();
         sf::Time elapsedLoop = throttlingClock.restart();
         accumulator += elapsed;
+
+        m_netManager.updateReceive();
 
         handleEvents();
 
@@ -52,6 +56,8 @@ void Server::start()
             fixedUpdate(TimePerFrame);
             accumulator -= TimePerFrame;
         }
+
+        m_netManager.updateSend();
 
         elapsedLoop = throttlingClock.restart();
         sf::Time t = TimePerFrame - elapsedLoop;
