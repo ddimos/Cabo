@@ -12,8 +12,6 @@ public:
 
 private:
     void connect();
-
-    bool m_isConnecting = false;
 };
 
 } // namespace cn::client::states

@@ -3,6 +3,7 @@
 
 #include "core/event/Dispatcher.hpp"
 
+#include "events/ConnectionEvents.hpp"
 #include "events/NetworkEvents.hpp"
 
 
@@ -28,10 +29,19 @@ void LobbyState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _is
                 // push(id::MainMenu);
             }
         );
+        _dispatcher.registerEvent<events::PlayerInfoUpdateEvent>(m_listenerId,
+            [this](const events::PlayerInfoUpdateEvent& _event){
+                (void)_event;
+                CN_LOG_FRM("Player info.. {}", _event.m_name);
+                // pop();
+                // push(id::MainMenu);
+            }
+        );
     }
     else
     {
         _dispatcher.unregisterEvent<events::PeerConnectedEvent>(m_listenerId);
+        _dispatcher.unregisterEvent<events::PlayerInfoUpdateEvent>(m_listenerId);
     }
 }
 

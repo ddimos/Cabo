@@ -2,33 +2,23 @@
 #include "core/event/Event.hpp"
 #include "events/EventIds.hpp"
 
-#include <nsf/Types.hpp>
+// #include <nsf/Types.hpp>
+#include <string>
 
 namespace cn::events
 {
 
-class PeerConnectedEvent final : public core::event::Event
+class PlayerInfoUpdateEvent final : public core::event::Event
 {
 public:
-    CN_EVENT(id::PeerConnected)
+    CN_EVENT(id::PlayerInfoUpdate)
 
-    PeerConnectedEvent(nsf::PeerID _peerId)
-        : core::event::Event(), m_peerId(_peerId)
+    PlayerInfoUpdateEvent() = default;
+    PlayerInfoUpdateEvent(const std::string& _name)
+        : m_name(_name)
     {}
 
-    nsf::PeerID m_peerId = nsf::PEER_ID_INVALID;
-};
-
-class PeerDisconnected final : public core::event::Event
-{
-public:
-    CN_EVENT(id::PeerDisconnected)
-
-    PeerDisconnected(nsf::PeerID _peerId)
-        : core::event::Event(), m_peerId(_peerId)
-    {}
-
-    nsf::PeerID m_peerId = nsf::PEER_ID_INVALID;
+    std::string m_name;
 };
 
 } // namespace cn::events

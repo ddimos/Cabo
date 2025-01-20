@@ -19,7 +19,7 @@ namespace cn::client
 
 Client::Client()
     : m_window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "CABOn", sf::Style::Close)
-    , m_netManager(m_context), m_stateManager(m_context)
+    , m_netManager(m_context, false), m_stateManager(m_context)
 {
     m_context.insert(m_window);
     m_context.insert(m_textureHolder);
@@ -29,6 +29,8 @@ Client::Client()
 
     m_window.setKeyRepeatEnabled(false);
     m_window.setFramerateLimit(60);
+
+    m_netManager.init();
 }
 
 void Client::start()
@@ -38,7 +40,6 @@ void Client::start()
     m_isRunning = true;
     m_systemClock.restart();
     
-    m_netManager.init(false);
     init();
     
     sf::Clock clock;
@@ -73,6 +74,7 @@ void Client::init()
 {
     m_fontHolder.load(FontIds::Main, "res/fonts/times_new_roman.ttf");
     m_textureHolder.load(TextureIds::Background, "res/textures/background.png");
+    m_textureHolder.load(TextureIds::BackButton, "res/textures/back_button.png");
     m_textureHolder.load(TextureIds::Cards, "res/textures/cards.png");
     m_textureHolder.load(TextureIds::MainMenuStartButton, "res/textures/create_menu_start_button.png");
     m_textureHolder.load(TextureIds::DecideButtons, "res/textures/decide_buttons.png");

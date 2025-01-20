@@ -47,4 +47,9 @@ void Dispatcher::unregisterEvent(ListenerId _listenerId, EventId _eventId)
     eventIt->second.erase(_listenerId);
 }
 
+void Dispatcher::sendDelayed(EventPtr&& _event)
+{
+    m_delayedEvents.emplace(std::move(_event));
+}
+
 } // namespace cn::core::event

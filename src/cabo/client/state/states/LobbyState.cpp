@@ -3,6 +3,9 @@
 
 #include "core/event/Dispatcher.hpp"
 #include "events/InputEvents.hpp"
+#include "events/NetworkEvents.hpp"
+
+#include "net/Manager.hpp"
 
 #include "LaunchTarget.hpp"
 #include "menu/item/SimpleText.hpp"
@@ -33,6 +36,10 @@ LobbyState::LobbyState(core::state::Manager& _stateManagerRef)
         sf::Color::White
     );
     getContainer(core::object::Container::Type::Menu).add(connectingText);
+
+    events::PlayerInfoUpdateEvent event("Player name");
+    auto& netMan = getContext().get<net::Manager>();
+    netMan.send(true, event);
 
     m_listenerId = core::event::getNewListenerId();
 }

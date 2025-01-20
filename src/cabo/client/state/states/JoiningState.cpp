@@ -6,7 +6,7 @@
 
 #include "net/Manager.hpp"
 
-#include "events/NetworkEvents.hpp"
+#include "events/ConnectionEvents.hpp"
 
 #include "ResourceIds.hpp"
 
@@ -21,6 +21,7 @@ JoiningState::JoiningState(core::state::Manager& _stateManagerRef)
     createContainer(core::object::Container::Type::Menu);
     
     auto& windowRef = getContext().get<sf::RenderWindow>();
+    auto& textureHolderRef = getContext().get<TextureHolder>();
     auto& fontHolderRef = getContext().get<FontHolder>();
 
 
@@ -36,17 +37,20 @@ JoiningState::JoiningState(core::state::Manager& _stateManagerRef)
     );
     getContainer(core::object::Container::Type::Menu).add(connectingText);
 
-    auto text = std::make_shared<menu::item::SimpleText>(
+    auto backButton = std::make_shared<menu::item::Button>(
         menu::Position{
             .m_position = sf::Vector2f(100.f, 200.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
             .m_specPositionX = menu::Position::Special::OFFSET_FROM_CENTER, .m_specPositionY = menu::Position::Special::OFFSET_FROM_CENTER
         },
-        "Back button TODO",
-        fontHolderRef.get(FontIds::Main),
-        20,
-        sf::Color::White
+        textureHolderRef.get(TextureIds::BackButton),
+        sf::IntRect{0,  0, 76, 28},
+        sf::IntRect{0, 28, 76, 28},
+        [this](){
+            pop();
+        },
+        sf::Mouse::Button::Left
     );
-    getContainer(core::object::Container::Type::Menu).add(text);
+    getContainer(core::object::Container::Type::Menu).add(backButton);
 
     m_listenerId = core::event::getNewListenerId();
 }

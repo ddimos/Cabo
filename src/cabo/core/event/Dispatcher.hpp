@@ -27,6 +27,7 @@ public:
     void send(Args... _args);
     template<typename TEvent, typename... Args>
     void sendDelayed(Args... _args);
+    void sendDelayed(EventPtr&& _event);
 
 private:
     friend class Manager;
@@ -83,7 +84,7 @@ void Dispatcher::send(Args... _args)
 template<typename TEvent, typename... Args>
 void Dispatcher::sendDelayed(Args... _args)
 {
-    m_delayedEvents.emplace(std::make_unique<TEvent>(_args...));
+    sendDelayed(std::move(std::make_unique<TEvent>(_args...)));
 }
 
 } // namespace cn::core::event

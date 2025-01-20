@@ -20,10 +20,12 @@ namespace cn::server
 {
 
 Server::Server()
-    : m_netManager(m_context), m_stateManager(m_context)
+    : m_netManager(m_context, true), m_stateManager(m_context)
 {
     m_context.insert(m_netManager);
     m_context.insert(m_eventManager.getDispatcher());
+
+    m_netManager.init();
 }
 
 void Server::start()
@@ -32,8 +34,7 @@ void Server::start()
 
     m_isRunning = true;
     m_systemClock.restart();
-    
-    m_netManager.init(true);
+
     init();
     
     sf::Clock clock;

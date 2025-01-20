@@ -9,6 +9,10 @@ namespace id
 
 enum : core::event::EventId
 {
+    // Connecction events
+    PeerConnected,
+    PeerDisconnected,
+
     // Input events
     KeyReleased,
     MouseButtonReleased,
@@ -17,8 +21,8 @@ enum : core::event::EventId
     // Net events
     // PlayerJoined,
     // PlayerLeft,
-    PeerConnected,
-    PeerDisconnected,
+    PlayerInfoUpdate,
+
 
     // Player action events
     LocalPlayerClickSlot,
