@@ -9,12 +9,12 @@ core::ContextObjectId core::getContextObjectId<sf::RenderWindow>()
     return context::id::Window;
 }
 template <>
-core::ContextObjectId core::getContextObjectId<TextureHolder>()
+core::ContextObjectId core::getContextObjectId<client::TextureHolder>()
 {
     return context::id::TextureHolder;
 }
 template <>
-core::ContextObjectId core::getContextObjectId<FontHolder>()
+core::ContextObjectId core::getContextObjectId<client::FontHolder>()
 {
     return context::id::FontHolder;
 }

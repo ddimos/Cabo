@@ -1,5 +1,6 @@
 #include "client/state/states/JoiningState.hpp"
 #include "client/state/StateIds.hpp"
+#include "client/ResourceIds.hpp"
 
 #include "menu/item/Button.hpp"
 #include "menu/item/SimpleText.hpp"
@@ -7,8 +8,6 @@
 #include "net/Manager.hpp"
 
 #include "events/ConnectionEvents.hpp"
-
-#include "ResourceIds.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>
 

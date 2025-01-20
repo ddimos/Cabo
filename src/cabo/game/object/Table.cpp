@@ -5,7 +5,7 @@
 
 #include "menu/Utils.hpp"
 
-#include "ResourceIds.hpp"
+#include "client/ResourceIds.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics.hpp>
@@ -91,10 +91,10 @@ namespace cn::game
 
 Table::Table(const core::Context& _context)
 {
-    auto& textureHolderRef = _context.get<TextureHolder>();
+    auto& textureHolderRef = _context.get<client::TextureHolder>();
     auto& windowRef = _context.get<sf::RenderWindow>();
 
-    m_sprite.setTexture(textureHolderRef.get(TextureIds::Table));
+    m_sprite.setTexture(textureHolderRef.get(client::TextureIds::Table));
     m_sprite.setPosition(menu::calculateCenter(sf::Vector2f(windowRef.getSize()), m_sprite.getGlobalBounds().getSize()));
 }
 

@@ -6,7 +6,7 @@
 
 #include "menu/item/Button.hpp"
 
-#include "ResourceIds.hpp"
+#include "client/ResourceIds.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>
 
@@ -19,9 +19,9 @@ Player::Player(const core::Context& _context, PlayerId _id, bool _isLocal, std::
     , m_slots(std::move(_slots))
     , m_currentNumberOfSlots(_initialNumberOfSlots)
 {
-    auto& fontHolderRef = _context.get<FontHolder>();
+    auto& fontHolderRef = _context.get<client::FontHolder>();
 
-    m_nameText.setFont(fontHolderRef.get(FontIds::Main));
+    m_nameText.setFont(fontHolderRef.get(client::FontIds::Main));
     m_nameText.setString("Player " + std::to_string(m_id));
     m_nameText.setFillColor(sf::Color::White);
     m_nameText.setCharacterSize(24);

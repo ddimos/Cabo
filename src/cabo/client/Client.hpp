@@ -6,7 +6,7 @@
 
 #include "net/Manager.hpp"
 
-#include "ResourceIds.hpp"
+#include "client/ResourceIds.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>
 

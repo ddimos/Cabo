@@ -3,7 +3,7 @@
 #include "core/event/Dispatcher.hpp"
 #include "net/Manager.hpp"
 
-#include "ResourceIds.hpp"
+#include "client/ResourceIds.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>
 
@@ -26,9 +26,9 @@ enum : core::ContextObjectId
 template <>
 core::ContextObjectId core::getContextObjectId<sf::RenderWindow>();
 template <>
-core::ContextObjectId core::getContextObjectId<TextureHolder>();
+core::ContextObjectId core::getContextObjectId<client::TextureHolder>();
 template <>
-core::ContextObjectId core::getContextObjectId<FontHolder>();
+core::ContextObjectId core::getContextObjectId<client::FontHolder>();
 template <>
 core::ContextObjectId core::getContextObjectId<core::event::Dispatcher>();
 template <>

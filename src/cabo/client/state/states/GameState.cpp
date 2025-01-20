@@ -1,5 +1,6 @@
 #include "client/state/states/GameState.hpp"
 #include "client/state/StateIds.hpp"
+#include "client/ResourceIds.hpp"
 
 #include "core/event/Dispatcher.hpp"
 #include "events/GameEvents.hpp"
@@ -15,8 +16,6 @@
 #include "menu/item/Button.hpp"
 #include "menu/item/SimpleImage.hpp"
 #include "menu/item/SimpleText.hpp"
-
-#include "ResourceIds.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>
 

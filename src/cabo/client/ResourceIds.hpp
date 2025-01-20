@@ -5,7 +5,7 @@
 
 #include "core/ResourceHolder.hpp"
 
-namespace cn
+namespace cn::client
 {
 
 enum class TextureIds 
@@ -27,4 +27,4 @@ enum class FontIds
 using TextureHolder = core::ResourceHolder<sf::Texture, TextureIds>;
 using FontHolder = core::ResourceHolder<sf::Font, FontIds>;
 
-} // namespace cn
+} // namespace cn::client

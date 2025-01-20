@@ -1,12 +1,11 @@
 #include "client/state/states/FinishState.hpp"
 #include "client/state/StateIds.hpp"
+#include "client/ResourceIds.hpp"
 
 #include "core/event/Dispatcher.hpp"
 #include "events/InputEvents.hpp"
 
 #include "menu/item/SimpleText.hpp"
-
-#include "ResourceIds.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>
 
