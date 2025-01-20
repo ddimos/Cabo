@@ -1,6 +1,6 @@
-#include "menu/component/Hoverable.hpp"
+#include "client/menu/component/Hoverable.hpp"
 
-namespace cn::menu::component
+namespace cn::client::menu::component
 {
 
 void Hoverable::setCallback(Callback _callback)
@@ -28,4 +28,4 @@ void Hoverable::onMouseMoved(sf::Event::MouseMoveEvent _event)
     }
 }
 
-} // namespace cn::menu::component
+} // namespace cn::client::menu::component

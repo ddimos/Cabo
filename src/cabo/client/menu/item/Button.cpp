@@ -1,12 +1,12 @@
-#include "menu/item/Button.hpp"
-#include "menu/Utils.hpp"
+#include "client/menu/item/Button.hpp"
+#include "client/menu/Utils.hpp"
 
 #include "events/InputEvents.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
 
-namespace cn::menu::item
+namespace cn::client::menu::item
 {
 
 Button::Button(const sf::Texture& _texture, const sf::IntRect& _textureRectDefault,
@@ -116,4 +116,4 @@ void Button::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isBein
     }
 }
 
-} // namespace cn::menu::item
+} // namespace cn::client::menu::item

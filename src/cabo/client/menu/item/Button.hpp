@@ -2,13 +2,13 @@
 
 #include "core/event/Types.hpp"
 
-#include "menu/Item.hpp"
-#include "menu/component/Clickable.hpp"
-#include "menu/component/Hoverable.hpp"
+#include "client/menu/Item.hpp"
+#include "client/menu/component/Clickable.hpp"
+#include "client/menu/component/Hoverable.hpp"
 
 #include <SFML/Graphics/Sprite.hpp>
 
-namespace cn::menu::item
+namespace cn::client::menu::item
 {
 
 class Button : public Item
@@ -41,4 +41,4 @@ protected:
     core::event::ListenerId m_listenerId = core::event::ListenerIdInvalid;
 };
 
-} // namespace cn::menu::item
+} // namespace cn::client::menu::item

@@ -2,6 +2,8 @@
 #include "client/state/StateIds.hpp"
 #include "client/ResourceIds.hpp"
 
+#include "client/menu/item/SimpleText.hpp"
+
 #include "core/event/Dispatcher.hpp"
 #include "events/InputEvents.hpp"
 #include "events/NetworkEvents.hpp"
@@ -9,7 +11,6 @@
 #include "net/Manager.hpp"
 
 #include "LaunchTarget.hpp"
-#include "menu/item/SimpleText.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>
 

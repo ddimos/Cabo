@@ -1,7 +1,7 @@
 #pragma once
 #include <SFML/Graphics/Rect.hpp>
 
-namespace cn::menu::component
+namespace cn::client::menu::component
 {
 
 class MouseInteractable 
@@ -17,4 +17,4 @@ private:
     float m_rotation{0};
 };
 
-} // namespace cn::menu::component
+} // namespace cn::client::menu::component

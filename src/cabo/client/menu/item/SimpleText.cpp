@@ -1,8 +1,8 @@
-#include "menu/item/SimpleText.hpp"
+#include "client/menu/item/SimpleText.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>
 
-namespace cn::menu::item
+namespace cn::client::menu::item
 {
 
 SimpleText::SimpleText(Position _position, const std::string& _text,
@@ -28,4 +28,4 @@ void SimpleText::onDraw(sf::RenderWindow& _window)
     _window.draw(m_text);
 }
 
-} // namespace cn::menu::item
+} // namespace cn::client::menu::item

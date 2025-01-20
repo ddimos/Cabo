@@ -2,20 +2,20 @@
 
 #include "core/Assert.hpp"
 
-#include "menu/item/Button.hpp"
+#include "client/menu/item/Button.hpp"
 
 #include <numeric>
 
 namespace cn::game
 {
 
-Deck::Deck(menu::item::ButtonPtr _button, std::vector<CardPtr>&& _cards, unsigned _seed)
+Deck::Deck(client::menu::item::ButtonPtr _button, std::vector<CardPtr>&& _cards, unsigned _seed)
     : m_button(_button)
     , m_cards(std::move(_cards))
 {
     m_randomizer.init(_seed);
 
-    m_button->setPosition(cn::menu::Position{ .m_position = sf::Vector2f(850, 400) });
+    m_button->setPosition(client::menu::Position{ .m_position = sf::Vector2f(850, 400) });
 
     shuffle();
 }

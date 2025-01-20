@@ -7,7 +7,7 @@
 #include "game/step/Step.hpp"
 
 #include "game/Types.hpp"
-#include "menu/Types.hpp"
+#include "client/menu/Types.hpp"
 
 #include <SFML/System/Time.hpp>
 
@@ -35,7 +35,7 @@ class Board
         End
     };
 public:
-    using DecideButtons = std::vector<menu::item::ButtonPtr>;
+    using DecideButtons = std::vector<client::menu::item::ButtonPtr>;
 
     Board(const core::Context& _context, DeckPtr _deck, DiscardPtr _discard, TablePtr _table,
         DecideButtons&& _decideButtons);

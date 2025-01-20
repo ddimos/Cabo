@@ -1,10 +1,10 @@
 #pragma once
 
-#include "menu/component/MouseInteractable.hpp"
+#include "client/menu/component/MouseInteractable.hpp"
 #include <SFML/Window/Event.hpp>
 #include <functional>
 
-namespace cn::menu::component
+namespace cn::client::menu::component
 {
 
 class Clickable final : public MouseInteractable
@@ -21,4 +21,4 @@ private:
     sf::Mouse::Button m_button = sf::Mouse::Button::ButtonCount;
 };
 
-} // namespace cn::menu::component
+} // namespace cn::client::menu::component

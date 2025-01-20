@@ -1,7 +1,7 @@
-#include "menu/component/Transformable.hpp"
-#include "menu/Utils.hpp"
+#include "client/menu/component/Transformable.hpp"
+#include "client/menu/Utils.hpp"
 
-namespace cn::menu::component
+namespace cn::client::menu::component
 {
 
 Position Transformable::getPosition() const
@@ -19,4 +19,4 @@ sf::Vector2f Transformable::calculateGlobalPos(sf::Vector2f _size) const
     return m_position.calculateGlobalPos(_size);
 }
 
-} // namespace cn::menu::component
+} // namespace cn::client::menu::component

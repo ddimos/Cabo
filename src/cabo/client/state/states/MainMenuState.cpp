@@ -2,8 +2,8 @@
 #include "client/state/StateIds.hpp"
 #include "client/ResourceIds.hpp"
 
-#include "menu/item/Button.hpp"
-#include "menu/item/SimpleText.hpp"
+#include "client/menu/item/Button.hpp"
+#include "client/menu/item/SimpleText.hpp"
 
 #include "net/Manager.hpp"
 

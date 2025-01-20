@@ -1,7 +1,7 @@
 #pragma once
 
 #include "game/Types.hpp"
-#include "menu/Types.hpp"
+#include "client/menu/Types.hpp"
 
 namespace cn::game
 {
@@ -9,7 +9,7 @@ namespace cn::game
 struct PlayerSlot
 {
     PlayerSlotId id;
-    menu::item::ButtonPtr m_button;
+    client::menu::item::ButtonPtr m_button;
     CardPtr card;
 };
 

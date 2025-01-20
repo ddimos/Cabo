@@ -4,7 +4,7 @@
 
 #include <memory>
 
-namespace cn::menu
+namespace cn::client::menu
 {
 
 struct Position
@@ -36,4 +36,4 @@ namespace item
     using SimpleImagePtr = std::shared_ptr<SimpleImage>;
 } // namespace item
 
-} // namespace cn::menu
+} // namespace cn::client::menu

@@ -1,6 +1,6 @@
-#include "menu/item/SimpleImage.hpp"
+#include "client/menu/item/SimpleImage.hpp"
 
-namespace cn::menu::item
+namespace cn::client::menu::item
 {
 
 SimpleImage::SimpleImage(Position _position, const sf::Texture& _texture, sf::Color _color, float _scale)
@@ -46,5 +46,5 @@ void SimpleImage::onDraw(sf::RenderWindow& _window)
     _window.draw(m_sprite);
 }
 
-} // namespace cn::menu::item
+} // namespace cn::client::menu::item
 

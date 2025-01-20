@@ -4,7 +4,7 @@
 #include "core/math/Math.hpp"
 #include "core/Context.hpp"
 
-#include "menu/item/Button.hpp"
+#include "client/menu/item/Button.hpp"
 
 #include "client/ResourceIds.hpp"
 
@@ -42,7 +42,7 @@ void Player::setSpawnPoint(PlayerSpawnPoint _spawnPoint)
     {
         sf::Vector2f localPos = sf::Vector2f(i * offsetBetweenCardsX - 165, j * offsetBetweenCardsY + 20);
         localPos = core::math::rotateVector(localPos, m_spawnPoint.angleDeg + 90.f);
-        slot.m_button->setPosition(cn::menu::Position{ .m_position = (m_spawnPoint.pos + localPos) });
+        slot.m_button->setPosition(client::menu::Position{ .m_position = (m_spawnPoint.pos + localPos) });
         slot.m_button->setRotation(m_spawnPoint.angleDeg + 90.f);
         ++i;
         if(i >= cardsInRow)

@@ -1,11 +1,11 @@
 #pragma once
 
-#include "menu/Item.hpp"
+#include "client/menu/Item.hpp"
 #include <SFML/Graphics/Text.hpp>
 
 #include <string>
 
-namespace cn::menu::item
+namespace cn::client::menu::item
 {
 
 class SimpleText : public Item
@@ -21,4 +21,4 @@ private:
     
     sf::Text m_text;
 };
-} // namespace cn::menu::item
+} // namespace cn::client::menu::item

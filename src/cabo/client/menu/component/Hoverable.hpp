@@ -1,10 +1,10 @@
 #pragma once
 
-#include "menu/component/MouseInteractable.hpp"
+#include "client/menu/component/MouseInteractable.hpp"
 #include <SFML/Window/Event.hpp>
 #include <functional>
 
-namespace cn::menu::component
+namespace cn::client::menu::component
 {
 
 class Hoverable final : public MouseInteractable
@@ -20,4 +20,4 @@ private:
     bool m_isHovered = false;
 };
 
-} // namespace cn::menu::component
+} // namespace cn::client::menu::component

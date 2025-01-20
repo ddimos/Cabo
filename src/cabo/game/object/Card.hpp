@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/object/Object.hpp"
-#include "menu/Types.hpp"
+#include "client/menu/Types.hpp"
 
 #include <utility>
 
@@ -48,7 +48,7 @@ public:
     static std::pair<Rank, Suit> getCardFromIndex(unsigned _index);
     static bool hasAbility(Card& _card);
 
-    Card(Rank _rank, Suit _suit, menu::item::SimpleImagePtr _image);
+    Card(Rank _rank, Suit _suit, client::menu::item::SimpleImagePtr _image);
 
     Rank getRank() const { return m_rank; }
     Suit getSuit() const { return m_suit; }
@@ -68,7 +68,7 @@ private:
 
     State m_state = State::InDeck;
 
-    menu::item::SimpleImagePtr m_image;
+    client::menu::item::SimpleImagePtr m_image;
 };
 
 } // namespace cn::game

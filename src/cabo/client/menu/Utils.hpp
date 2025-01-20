@@ -2,7 +2,7 @@
 
 #include <SFML/System/Vector2.hpp>
 
-namespace cn::menu
+namespace cn::client::menu
 {
 
 inline float calculateCenter(float _parentSize, float _itemSize)
@@ -15,4 +15,4 @@ inline sf::Vector2f calculateCenter(sf::Vector2f _parentSize, sf::Vector2f _item
     return _parentSize / 2.f - _itemSize / 2.f;
 }
 
-} // namespace cn::menu
+} // namespace cn::client::menu

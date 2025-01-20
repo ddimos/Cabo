@@ -2,6 +2,10 @@
 #include "client/state/StateIds.hpp"
 #include "client/ResourceIds.hpp"
 
+#include "client/menu/item/Button.hpp"
+#include "client/menu/item/SimpleImage.hpp"
+#include "client/menu/item/SimpleText.hpp"
+
 #include "core/event/Dispatcher.hpp"
 #include "events/GameEvents.hpp"
 #include "events/InputEvents.hpp"
@@ -13,9 +17,6 @@
 #include "game/object/Table.hpp"
 #include "game/Constants.hpp"
 #include "game/SpriteSheet.hpp"
-#include "menu/item/Button.hpp"
-#include "menu/item/SimpleImage.hpp"
-#include "menu/item/SimpleText.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>
 

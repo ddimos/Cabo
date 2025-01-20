@@ -3,7 +3,7 @@
 #include "core/math/Math.hpp"
 #include "core/Context.hpp"
 
-#include "menu/Utils.hpp"
+#include "client/menu/Utils.hpp"
 
 #include "client/ResourceIds.hpp"
 
@@ -95,7 +95,7 @@ Table::Table(const core::Context& _context)
     auto& windowRef = _context.get<sf::RenderWindow>();
 
     m_sprite.setTexture(textureHolderRef.get(client::TextureIds::Table));
-    m_sprite.setPosition(menu::calculateCenter(sf::Vector2f(windowRef.getSize()), m_sprite.getGlobalBounds().getSize()));
+    m_sprite.setPosition(client::menu::calculateCenter(sf::Vector2f(windowRef.getSize()), m_sprite.getGlobalBounds().getSize()));
 }
 
 std::vector<PlayerSpawnPoint> Table::generateSpawnPoints(unsigned _count, sf::Vector2f _windowHalfSize)

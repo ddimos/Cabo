@@ -1,9 +1,9 @@
 #pragma once
 
-#include "menu/Types.hpp"
+#include "client/menu/Types.hpp"
 #include <SFML/System/Vector2.hpp>
 
-namespace cn::menu::component
+namespace cn::client::menu::component
 {
 
 class Transformable
@@ -17,4 +17,4 @@ private:
     Position m_position{};
 };
 
-} // namespace cn::menu::component
+} // namespace cn::client::menu::component

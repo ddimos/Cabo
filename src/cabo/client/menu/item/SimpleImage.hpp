@@ -1,9 +1,9 @@
 #pragma once
 
-#include "menu/Item.hpp"
+#include "client/menu/Item.hpp"
 #include <SFML/Graphics/Sprite.hpp>
 
-namespace cn::menu::item
+namespace cn::client::menu::item
 {
 
 class SimpleImage : public Item
@@ -21,4 +21,4 @@ private:
     
     sf::Sprite m_sprite;
 };
-} // namespace cn::menu::item
+} // namespace cn::client::menu::item

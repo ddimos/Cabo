@@ -10,8 +10,8 @@
 
 #include "core/Assert.hpp"
 
-#include "menu/item/Button.hpp"
-#include "menu/Utils.hpp"
+#include "client/menu/item/Button.hpp"
+#include "client/menu/Utils.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>
 
@@ -29,7 +29,7 @@ Board::Board(const core::Context& _context, DeckPtr _deck, DiscardPtr _discard, 
     unsigned index = 0;
     for (auto& button : m_decideButtons)
     {
-        button->setPosition(cn::menu::Position{ .m_position = sf::Vector2f(780, 510 + index * 22) });
+        button->setPosition(cn::client::menu::Position{ .m_position = sf::Vector2f(780, 510 + index * 22) });
         button->setClickCallback([this, index](){
             onLocalPlayerClickDecideButton(index);
         });

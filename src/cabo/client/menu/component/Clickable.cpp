@@ -1,8 +1,8 @@
-#include "menu/component/Clickable.hpp"
+#include "client/menu/component/Clickable.hpp"
 
 #include "core/Assert.hpp"
 
-namespace cn::menu::component
+namespace cn::client::menu::component
 {
 
 void Clickable::setCallback(Callback _callback)
@@ -28,4 +28,4 @@ void Clickable::onMouseReleased(sf::Event::MouseButtonEvent _event)
     m_onClickCallback();
 }
 
-} // namespace cn::menu::component
+} // namespace cn::client::menu::component

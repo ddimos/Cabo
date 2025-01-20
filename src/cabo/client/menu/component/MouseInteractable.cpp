@@ -1,8 +1,8 @@
-#include "menu/component/MouseInteractable.hpp"
+#include "client/menu/component/MouseInteractable.hpp"
 
 #include "core/math/Math.hpp"
 
-namespace cn::menu::component
+namespace cn::client::menu::component
 {
 
 void MouseInteractable::setBounds(sf::FloatRect _rect)
@@ -22,4 +22,4 @@ bool MouseInteractable::contains(sf::Vector2f _mousePos) const
     return localBounds.contains(mousePositionInLocalCoord);
 }
 
-} // namespace cn::menu::component
+} // namespace cn::client::menu::component

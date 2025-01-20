@@ -5,7 +5,7 @@
 #include "game/PlayerSlot.hpp"
 #include "game/Types.hpp"
 
-#include "menu/Types.hpp"
+#include "client/menu/Types.hpp"
 
 #include <SFML/Graphics/Text.hpp>
 
