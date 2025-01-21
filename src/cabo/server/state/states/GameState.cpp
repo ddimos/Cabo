@@ -45,6 +45,8 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
     // getContainer(core::object::Container::Type::Game).add(discard);
 
     m_listenerId = core::event::getNewListenerId();
+
+    CN_LOG("Game state..");
 }
 
 void GameState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered)
@@ -61,7 +63,7 @@ void GameState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isB
 
 core::state::Return GameState::onUpdate(sf::Time _dt)
 {
-    m_board->update(_dt);
+    // m_board->update(_dt);
 
     return core::state::Return::Break;
 }

@@ -48,7 +48,7 @@ void Manager::init()
         core::event::EventId eventId = core::event::EventIdInvalid;
         _message.m_data >> eventId;
         auto& slot = m_factory.get(eventId);
-        auto eventPtr = slot.create();
+        auto eventPtr = slot.create(_message.getPeerId());
         slot.deserialize(*eventPtr, _message.m_data);
 
         eventDispatcherRef.sendDelayed(std::move(eventPtr));

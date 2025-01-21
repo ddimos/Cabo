@@ -22,6 +22,8 @@ enum : core::event::EventId
     // PlayerJoined,
     // PlayerLeft,
     PlayerInfoUpdate,
+    PlayerReady,
+    StartGame,
 
 
     // Player action events

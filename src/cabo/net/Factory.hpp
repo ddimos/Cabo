@@ -18,7 +18,7 @@ class Factory
 public:
     using SerializerCallback = std::function<void(const core::event::Event&, nsf::Buffer&)>;
     using DeserializerCallback = std::function<void(core::event::Event&, nsf::Buffer&)>;
-    using CreationCallback = std::function<std::unique_ptr<core::event::Event>()>;
+    using CreationCallback = std::function<std::unique_ptr<core::event::Event>(nsf::PeerID _peerId)>;
     
     struct Slot
     {

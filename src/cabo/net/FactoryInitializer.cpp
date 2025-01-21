@@ -18,8 +18,28 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
             auto& event = static_cast<events::PlayerInfoUpdateEvent&>(_event);
             _buffer >> event.m_name;
         },
-        [](){
-            return std::make_unique<events::PlayerInfoUpdateEvent>();
+        [](nsf::PeerID _peerId){
+            return std::make_unique<events::PlayerInfoUpdateEvent>(_peerId);
+        }
+    );
+    _factoryRef.add(
+        events::id::PlayerReady,
+        [](const core::event::Event& _event, nsf::Buffer& _buffer){
+        },
+        [](core::event::Event& _event, nsf::Buffer& _buffer){
+        },
+        [](nsf::PeerID _peerId){
+            return std::make_unique<events::PlayerReadyEvent>(_peerId);
+        }
+    );
+    _factoryRef.add(
+        events::id::StartGame,
+        [](const core::event::Event& _event, nsf::Buffer& _buffer){
+        },
+        [](core::event::Event& _event, nsf::Buffer& _buffer){
+        },
+        [](nsf::PeerID _peerId){
+            return std::make_unique<events::StartGameEvent>(_peerId);
         }
     );
 }
