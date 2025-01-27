@@ -28,5 +28,15 @@ core::ContextObjectId core::getContextObjectId<net::Manager>()
 {
     return context::id::NetManager;
 }
+template <>
+core::ContextObjectId core::getContextObjectId<client::player::Manager>()
+{
+    return context::id::PlayerManager;
+}
+template <>
+core::ContextObjectId core::getContextObjectId<server::player::Manager>()
+{
+    return context::id::PlayerManager;
+}
 
 } // namespace cn

@@ -4,6 +4,9 @@
 #include "net/Manager.hpp"
 
 #include "client/ResourceIds.hpp"
+#include "client/player/Manager.hpp"
+
+#include "server/player/Manager.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>
 
@@ -17,6 +20,7 @@ enum : core::ContextObjectId
     EventDispatcher,
     FontHolder,
     NetManager,
+    PlayerManager,
     TextureHolder,
     Window
 };
@@ -33,5 +37,10 @@ template <>
 core::ContextObjectId core::getContextObjectId<core::event::Dispatcher>();
 template <>
 core::ContextObjectId core::getContextObjectId<net::Manager>();
+// TODO to fix this, create two version of this file
+template <>
+core::ContextObjectId core::getContextObjectId<client::player::Manager>();
+template <>
+core::ContextObjectId core::getContextObjectId<server::player::Manager>();
 
 } // namespace cn

@@ -56,7 +56,7 @@ LobbyState::LobbyState(core::state::Manager& _stateManagerRef)
     );
     getContainer(core::object::Container::Type::Menu).add(startButton);
 
-    events::PlayerInfoUpdateEvent event("Player name");
+    events::PlayerInfoUpdateEvent event({ Player{PlayerIdInvalid, "Player Name"} });
     netManRef.send(true, event);
 
     m_listenerId = core::event::getNewListenerId();

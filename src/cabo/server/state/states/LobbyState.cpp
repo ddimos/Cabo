@@ -31,14 +31,6 @@ void LobbyState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _is
                 // push(id::MainMenu);
             }
         );
-        _dispatcher.registerEvent<events::PlayerInfoUpdateEvent>(m_listenerId,
-            [this](const events::PlayerInfoUpdateEvent& _event){
-                (void)_event;
-                CN_LOG_FRM("Player info.. {}", _event.m_name);
-                // pop();
-                // push(id::MainMenu);
-            }
-        );
         _dispatcher.registerEvent<events::PlayerReadyEvent>(m_listenerId,
             [this](const events::PlayerReadyEvent& _event){
                 (void)_event;
@@ -51,16 +43,16 @@ void LobbyState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _is
                     events::StartGameEvent event;
                     auto& netManRef = getContext().get<net::Manager>();
                     netManRef.send(true, event);
+                
+                    pop();
+                    push(id::Game);
                 }
-                pop();
-                push(id::Game);
             }
         );
     }
     else
     {
         _dispatcher.unregisterEvent<events::PeerConnectedEvent>(m_listenerId);
-        _dispatcher.unregisterEvent<events::PlayerInfoUpdateEvent>(m_listenerId);
         _dispatcher.unregisterEvent<events::PlayerReadyEvent>(m_listenerId);
     }
 }

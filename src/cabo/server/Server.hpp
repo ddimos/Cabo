@@ -6,6 +6,8 @@
 
 #include "net/Manager.hpp"
 
+#include "server/player/Manager.hpp"
+
 namespace cn::server
 {
 
@@ -28,6 +30,7 @@ private:
     net::Manager m_netManager;
     core::event::Manager m_eventManager;
     core::state::Manager m_stateManager;
+    player::Manager m_playerManager;
 
     bool m_isRunning = false;
 };

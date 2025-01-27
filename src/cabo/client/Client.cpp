@@ -26,6 +26,7 @@ Client::Client()
     m_context.insert(m_fontHolder);
     m_context.insert(m_netManager);
     m_context.insert(m_eventManager.getDispatcher());
+    m_context.insert(m_playerManager);
 
     m_window.setKeyRepeatEnabled(false);
     m_window.setFramerateLimit(60);

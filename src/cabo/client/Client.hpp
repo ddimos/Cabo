@@ -6,6 +6,7 @@
 
 #include "net/Manager.hpp"
 
+#include "client/player/Manager.hpp"
 #include "client/ResourceIds.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -37,6 +38,7 @@ private:
     net::Manager m_netManager;
     core::event::Manager m_eventManager;
     core::state::Manager m_stateManager;
+    player::Manager m_playerManager;
 
     bool m_isRunning = false;
 };

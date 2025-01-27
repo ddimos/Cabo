@@ -2,8 +2,10 @@
 #include "core/event/Event.hpp"
 #include "events/EventIds.hpp"
 
+#include "Types.hpp"
 #include <nsf/Types.hpp>
 #include <string>
+#include <vector>
 
 namespace cn::events
 {
@@ -14,15 +16,15 @@ public:
     CN_EVENT(id::PlayerInfoUpdate)
 
     PlayerInfoUpdateEvent() = default;
-    PlayerInfoUpdateEvent(const std::string& _name)
-        : m_name(_name)
+    PlayerInfoUpdateEvent(std::vector<Player>&& _players)
+        : m_players(std::move(_players))
     {}
     PlayerInfoUpdateEvent(nsf::PeerID _peerId)
         : m_peerId(_peerId)
     {}
 
-    nsf::PeerID m_peerId = nsf::PEER_ID_INVALID;
-    std::string m_name;
+    nsf::PeerID m_peerId = nsf::PEER_ID_INVALID; // TODO senderPeerId
+    std::vector<Player> m_players;
 };
 
 class PlayerReadyEvent final : public core::event::Event
