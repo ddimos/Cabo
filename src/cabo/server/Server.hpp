@@ -4,7 +4,7 @@
 #include "core/state/Manager.hpp"
 #include "core/Context.hpp"
 
-#include "net/Manager.hpp"
+#include "shared/net/Manager.hpp"
 
 #include "server/player/Manager.hpp"
 

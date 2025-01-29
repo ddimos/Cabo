@@ -3,10 +3,9 @@
 
 #include "core/event/Dispatcher.hpp"
 
-#include "events/ConnectionEvents.hpp"
-#include "events/NetworkEvents.hpp"
-
-#include "net/Manager.hpp"
+#include "shared/events/ConnectionEvents.hpp"
+#include "shared/events/NetworkEvents.hpp"
+#include "shared/net/Manager.hpp"
 
 namespace cn::server::states
 {

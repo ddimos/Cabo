@@ -23,6 +23,8 @@ enum : core::event::EventId
     // PlayerLeft,
     PlayerInfoUpdate,
     PlayerReady,
+    RequestSeeOwnCard,
+    ResponseSeeOwnCard,
     StartGame,
 
 

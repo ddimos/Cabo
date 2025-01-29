@@ -6,7 +6,7 @@
 #include "core/event/Dispatcher.hpp"
 #include "core/Log.hpp"
 
-#include "events/InputEvents.hpp"
+#include "shared/events/InputEvents.hpp"
 
 #include "server/state/States.hpp"
 

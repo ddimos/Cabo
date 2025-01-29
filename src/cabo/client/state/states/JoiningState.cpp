@@ -5,9 +5,8 @@
 #include "client/menu/item/Button.hpp"
 #include "client/menu/item/SimpleText.hpp"
 
-#include "net/Manager.hpp"
-
-#include "events/ConnectionEvents.hpp"
+#include "shared/events/ConnectionEvents.hpp"
+#include "shared/net/Manager.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>
 

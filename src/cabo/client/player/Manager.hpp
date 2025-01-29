@@ -2,7 +2,7 @@
 
 #include "core/event/Dispatcher.hpp"
 
-#include "Types.hpp"
+#include "shared/player/Types.hpp"
 
 #include <vector>
 
@@ -23,6 +23,5 @@ private:
     core::event::ListenerId m_listenerId = core::event::ListenerIdInvalid;
     std::vector<Player> m_players;
 };
-
 
 } // namespace cn::client::player

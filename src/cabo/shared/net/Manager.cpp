@@ -1,11 +1,13 @@
-#include "net/Manager.hpp"
+#include "shared/net/Manager.hpp"
+
+#include "shared/events/ConnectionEvents.hpp"
+#include "shared/events/NetworkEvents.hpp"
 
 #include "core/event/Dispatcher.hpp"
-#include "events/ConnectionEvents.hpp"
-#include "events/NetworkEvents.hpp"
-
 #include "core/Assert.hpp"
 #include "core/Log.hpp"
+
+#include <algorithm>
 
 namespace
 {
@@ -34,14 +36,22 @@ void Manager::init()
 
     config.port = (m_isServer) ? SERVER_PORT : CLIENT_PORT;
     config.isServer = m_isServer;
-
-    callbacks.onConnected = [&eventDispatcherRef](nsf::PeerID _peerId){
+    
+    callbacks.onConnected = [this, &eventDispatcherRef](nsf::PeerID _peerId){
         CN_LOG_FRM("Peer connected: {}", _peerId);
+        m_connectedPeers.push_back(NetPlayer{ .peerId = _peerId });
         eventDispatcherRef.send<events::PeerConnectedEvent>(_peerId);
     };
-    callbacks.onDisconnected = [&eventDispatcherRef](nsf::PeerID _peerId){
+    callbacks.onDisconnected = [this, &eventDispatcherRef](nsf::PeerID _peerId){
         CN_LOG_FRM("Peer disconnected: {}", _peerId);
-        eventDispatcherRef.send<events::PeerDisconnected>(_peerId);
+        eventDispatcherRef.send<events::PeerDisconnectedEvent>(_peerId);
+        m_connectedPeers.erase( 
+            std::remove_if(m_connectedPeers.begin(), m_connectedPeers.end(),
+            [_peerId](NetPlayer _player){
+                return _player.peerId == _peerId;
+            }),
+            m_connectedPeers.end()
+        );
     };
     callbacks.onReceived = [this, &eventDispatcherRef](nsf::NetworkMessage&& _message){
         CN_LOG_FRM("Received from: {}", _message.getPeerId());

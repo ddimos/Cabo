@@ -1,5 +1,5 @@
-#include "net/Factory.hpp"
-#include "net/FactoryInitializer.hpp"
+#include "shared/net/Factory.hpp"
+#include "shared/net/FactoryInitializer.hpp"
 
 #include "core/Assert.hpp"
 

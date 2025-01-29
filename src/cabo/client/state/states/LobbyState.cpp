@@ -6,10 +6,11 @@
 #include "client/menu/item/SimpleText.hpp"
 
 #include "core/event/Dispatcher.hpp"
-#include "events/InputEvents.hpp"
-#include "events/NetworkEvents.hpp"
 
-#include "net/Manager.hpp"
+#include "shared/events/InputEvents.hpp"
+#include "shared/events/NetworkEvents.hpp"
+#include "shared/net/Manager.hpp"
+#include "shared/player/Types.hpp"
 
 #include "LaunchTarget.hpp"
 
@@ -56,7 +57,7 @@ LobbyState::LobbyState(core::state::Manager& _stateManagerRef)
     );
     getContainer(core::object::Container::Type::Menu).add(startButton);
 
-    events::PlayerInfoUpdateEvent event({ Player{PlayerIdInvalid, "Player Name"} });
+    events::PlayerInfoUpdateEvent event({ Player{ .name = "Player Name"} });
     netManRef.send(true, event);
 
     m_listenerId = core::event::getNewListenerId();

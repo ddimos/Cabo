@@ -1,8 +1,10 @@
 #pragma once
 #include "core/event/Event.hpp"
-#include "events/EventIds.hpp"
 
-#include "Types.hpp"
+#include "shared/events/EventIds.hpp"
+#include "shared/game/Card.hpp"
+#include "shared/player/Types.hpp"
+
 #include <nsf/Types.hpp>
 #include <string>
 #include <vector>

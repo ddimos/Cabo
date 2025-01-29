@@ -1,6 +1,6 @@
 #pragma once
 #include "core/event/Event.hpp"
-#include "events/EventIds.hpp"
+#include "shared/events/EventIds.hpp"
 
 #include <nsf/Types.hpp>
 

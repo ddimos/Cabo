@@ -12,8 +12,9 @@ constexpr PlayerId PlayerIdInvalid = nsf::PEER_ID_INVALID;
 
 struct Player
 {
-    PlayerId id = PlayerIdInvalid;
     std::string name;
+    PlayerId id = PlayerIdInvalid;
+    bool isLocal = false;
 };
 
 } // namespace cn

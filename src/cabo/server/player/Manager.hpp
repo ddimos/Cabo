@@ -2,7 +2,7 @@
 
 #include "core/event/Dispatcher.hpp"
 
-#include "Types.hpp"
+#include "shared/player/Types.hpp"
 
 #include <vector>
 

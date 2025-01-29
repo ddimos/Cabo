@@ -1,7 +1,7 @@
 #include "server/player/Manager.hpp"
 
-#include "events/ConnectionEvents.hpp"
-#include "events/NetworkEvents.hpp"
+#include "shared/events/ConnectionEvents.hpp"
+#include "shared/events/NetworkEvents.hpp"
 
 #include "core/Assert.hpp"
 #include "core/Log.hpp"

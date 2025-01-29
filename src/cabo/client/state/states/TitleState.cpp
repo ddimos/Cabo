@@ -5,7 +5,7 @@
 #include "client/menu/item/SimpleText.hpp"
 
 #include "core/event/Dispatcher.hpp"
-#include "events/InputEvents.hpp"
+#include "shared/events/InputEvents.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>
 

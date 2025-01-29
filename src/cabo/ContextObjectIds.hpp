@@ -1,7 +1,7 @@
 #pragma once
 #include "core/Context.hpp"
 #include "core/event/Dispatcher.hpp"
-#include "net/Manager.hpp"
+#include "shared/net/Manager.hpp"
 
 #include "client/ResourceIds.hpp"
 #include "client/player/Manager.hpp"

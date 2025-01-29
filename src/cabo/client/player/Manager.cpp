@@ -1,6 +1,6 @@
 #include "client/player/Manager.hpp"
 
-#include "events/NetworkEvents.hpp"
+#include "shared/events/NetworkEvents.hpp"
 
 #include "core/Assert.hpp"
 #include "core/Log.hpp"

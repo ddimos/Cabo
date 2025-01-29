@@ -1,8 +1,9 @@
 #pragma once
 #include "core/event/Event.hpp"
-#include "events/EventIds.hpp"
 
-#include "game/Types.hpp"
+#include "shared/events/EventIds.hpp"
+#include "shared/game/Types.hpp"
+#include "shared/player/Types.hpp"
 
 #include <SFML/Window/Event.hpp>
 
@@ -24,12 +25,12 @@ class LocalPlayerClickSlotEvent final : public core::event::Event
 public:
     CN_EVENT(id::LocalPlayerClickSlot)
 
-    LocalPlayerClickSlotEvent(game::PlayerSlotId _slotId, game::PlayerId _playerId)
+    LocalPlayerClickSlotEvent(shared::game::PlayerSlotId _slotId, PlayerId _playerId)
         : core::event::Event(), slotId(_slotId), playerId(_playerId)
     {}
 
-    game::PlayerSlotId slotId = game::PlayerSlotIdInvalid;
-    game::PlayerId playerId = game::PlayerIdInvalid;
+    shared::game::PlayerSlotId slotId = shared::game::PlayerSlotIdInvalid;
+    PlayerId playerId = PlayerIdInvalid;
 };
 
 } // namespace cn::events
