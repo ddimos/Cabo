@@ -2,6 +2,7 @@
 
 #include "shared/events/ConnectionEvents.hpp"
 #include "shared/events/NetworkEvents.hpp"
+#include "shared/net/Manager.hpp"
 
 #include "core/Assert.hpp"
 #include "core/Log.hpp"
@@ -11,7 +12,8 @@
 namespace cn::server::player
 {
 
-Manager::Manager()
+Manager::Manager(core::Context& _contextRef)
+    : m_contextRef(_contextRef)
 {
     m_listenerId = core::event::getNewListenerId();
 }
@@ -27,7 +29,11 @@ void Manager::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeing
             [this](const events::PeerConnectedEvent& _event){
                 (void)_event;
                 CN_LOG_FRM("Player joined.. id: {}", _event.m_peerId);
-                m_players.emplace_back(Player{ .id = _event.m_peerId });
+                auto& player = m_players.emplace_back(Player{ .id = _event.m_peerId });
+
+                auto& netManRef = m_contextRef.get<net::Manager>();
+                events::PlayerJoinAcceptEvent event(player.id);
+                netManRef.send(event, _event.m_peerId);
             }
         );
 
@@ -48,13 +54,17 @@ void Manager::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeing
             [this](const events::PlayerInfoUpdateEvent& _event){
                 auto it = std::find_if(m_players.begin(), m_players.end(),
                     [_event](const Player& _player){
-                        return _player.id == _event.m_peerId;
+                        return _player.id == _event.m_senderPeerId;
                     }
                 );
                 CN_ASSERT(m_players.end() != it);
                 CN_ASSERT(!m_players.empty());
                 it->name = _event.m_players.front().name;
-                CN_LOG_FRM("Player info.. if: {}, name: {}", it->id, it->name);
+                CN_LOG_FRM("Player info.. id: {}, name: {}", it->id, it->name);
+
+                auto& netManRef = m_contextRef.get<net::Manager>();
+                events::PlayerInfoUpdateEvent event(m_players);
+                netManRef.send(event);
             }
         );        
     }

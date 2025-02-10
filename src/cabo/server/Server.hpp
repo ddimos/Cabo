@@ -20,6 +20,7 @@ public:
 
 private:
     void init();
+    void deinit();
     void handleEvents();
     void update(sf::Time _dt);
     void fixedUpdate(sf::Time _dt);

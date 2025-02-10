@@ -12,7 +12,7 @@ include(FetchContent)
 
 FetchContent_Declare(nsf
     GIT_REPOSITORY https://github.com/ddimos/nsf.git
-    GIT_TAG v0.1.1)
+    GIT_TAG v0.1.2)
 
 option(NSF_BUILD_EXAMPLE "Build the nsf example" OFF)
 FetchContent_MakeAvailable(nsf)

@@ -24,24 +24,21 @@ void LobbyState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _is
         _dispatcher.registerEvent<events::PeerConnectedEvent>(m_listenerId,
             [this](const events::PeerConnectedEvent& _event){
                 (void)_event;
-                CN_LOG("Player joined..");
                 m_players.insert(_event.m_peerId);
-                // pop();
-                // push(id::MainMenu);
             }
         );
         _dispatcher.registerEvent<events::PlayerReadyEvent>(m_listenerId,
             [this](const events::PlayerReadyEvent& _event){
                 (void)_event;
-                CN_LOG_FRM("Player ready.. {}", _event.m_peerId);
-                m_players.erase(_event.m_peerId);
+                CN_LOG_FRM("Player ready.. {}", _event.m_senderPeerId);
+                m_players.erase(_event.m_senderPeerId);
 
                 if (m_players.empty())
                 {
                     CN_LOG("All players ready..");
                     events::StartGameEvent event;
                     auto& netManRef = getContext().get<net::Manager>();
-                    netManRef.send(true, event);
+                    netManRef.send(event);
                 
                     pop();
                     push(id::Game);

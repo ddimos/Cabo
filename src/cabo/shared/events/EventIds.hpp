@@ -22,6 +22,7 @@ enum : core::event::EventId
     // PlayerJoined,
     // PlayerLeft,
     PlayerInfoUpdate,
+    PlayerJoinAccept,
     PlayerReady,
     RequestSeeOwnCard,
     ResponseSeeOwnCard,

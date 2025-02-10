@@ -51,14 +51,14 @@ LobbyState::LobbyState(core::state::Manager& _stateManagerRef)
         sf::IntRect{200, 0, 200, 62},
         [&netManRef](){
             events::PlayerReadyEvent event;
-            netManRef.send(true, event);
+            netManRef.send(event);
         },
         sf::Mouse::Button::Left
     );
     getContainer(core::object::Container::Type::Menu).add(startButton);
 
     events::PlayerInfoUpdateEvent event({ Player{ .name = "Player Name"} });
-    netManRef.send(true, event);
+    netManRef.send(event);
 
     m_listenerId = core::event::getNewListenerId();
 }

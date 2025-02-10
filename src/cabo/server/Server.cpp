@@ -20,7 +20,7 @@ namespace cn::server
 {
 
 Server::Server()
-    : m_netManager(m_context, true), m_stateManager(m_context)
+    : m_netManager(m_context, true), m_stateManager(m_context), m_playerManager(m_context)
 {
     m_context.insert(m_netManager);
     m_context.insert(m_eventManager.getDispatcher());
@@ -66,6 +66,8 @@ void Server::start()
         if (t.asMilliseconds() > 0)
             sf::sleep(t);
     }
+
+    deinit();
 }
 
 void Server::init()
@@ -76,6 +78,13 @@ void Server::init()
     m_stateManager.registerState<states::FinishState>(states::id::Finish);
 
     m_stateManager.pushState(states::id::Loading);
+
+    m_playerManager.registerEvents(m_eventManager.getDispatcher(), true);
+}
+
+void Server::deinit()
+{
+    m_playerManager.registerEvents(m_eventManager.getDispatcher(), false);
 }
 
 void Server::handleEvents()

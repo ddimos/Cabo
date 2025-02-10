@@ -69,6 +69,8 @@ void Client::start()
 
         m_netManager.updateSend();
     }
+
+    deinit();
 }
 
 void Client::init()
@@ -91,6 +93,13 @@ void Client::init()
     m_stateManager.registerState<states::FinishState>(states::id::Finish);
 
     m_stateManager.pushState(states::id::Title);
+
+    m_playerManager.registerEvents(m_eventManager.getDispatcher(), true);
+}
+
+void Client::deinit()
+{
+    m_playerManager.registerEvents(m_eventManager.getDispatcher(), false);
 }
 
 void Client::handleEvents()

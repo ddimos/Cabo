@@ -26,7 +26,10 @@ public:
 
     void connect(nsf::NetworkAddress _address);
 
-    void send(bool _isReliable, const core::event::Event& _event);
+    void send(const core::event::Event& _event);
+    void send(const core::event::Event& _event, bool _isReliable);
+    void send(const core::event::Event& _event, nsf::PeerID _unicastPeerId);
+    void send(const core::event::Event& _event, bool _isReliable, nsf::PeerID _unicastPeerId);
 
     void updateReceive();
     void updateSend();

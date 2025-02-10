@@ -77,10 +77,29 @@ void Manager::connect(nsf::NetworkAddress _address)
     m_network->connect(_address);
 }
 
-void Manager::send(bool _isReliable, const core::event::Event& _event)
+void Manager::send(const core::event::Event& _event)
+{
+    send(_event, true, nsf::PEER_ID_INVALID);
+}
+
+void Manager::send(const core::event::Event& _event, bool _isReliable)
+{
+    send(_event, _isReliable, nsf::PEER_ID_INVALID);
+}
+
+void Manager::send(const core::event::Event& _event, nsf::PeerID _unicastPeerId)
+{
+    send(_event, true, _unicastPeerId);
+}
+
+void Manager::send(const core::event::Event& _event, bool _isReliable, nsf::PeerID _unicastPeerId)
 {
     nsf::NetworkMessage message;
-    message.m_info = nsf::MessageInfo(_isReliable);
+    message.m_info = nsf::MessageInfo(
+        _unicastPeerId == nsf::PEER_ID_INVALID ? nsf::MessageInfo::Type::BRODCAST : nsf::MessageInfo::Type::UNICAST,
+        _unicastPeerId,
+        _isReliable
+    );
     core::event::EventId eventId = _event.getId();
     auto& slot = m_factory.get(eventId);
     message.m_data << eventId;
