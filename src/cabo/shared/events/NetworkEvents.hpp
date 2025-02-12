@@ -14,9 +14,6 @@ class BaseNetEvent : public core::event::Event
 {
 public:
     BaseNetEvent() = default;
-    BaseNetEvent(nsf::PeerID _senderPeerId)
-        : m_senderPeerId(_senderPeerId)
-    {}
 
     nsf::PeerID m_senderPeerId = nsf::PEER_ID_INVALID;
 };
@@ -27,8 +24,8 @@ public:
     CN_EVENT(id::PlayerJoinAccept)
 
     PlayerJoinAcceptEvent() = default;
-    PlayerJoinAcceptEvent(nsf::PeerID _senderPeerId)
-        : BaseNetEvent(_senderPeerId)
+    PlayerJoinAcceptEvent(PlayerId _playerId)
+        : m_playerId(_playerId)
     {}
 
     PlayerId m_playerId = PlayerIdInvalid; 
@@ -43,9 +40,6 @@ public:
     PlayerInfoUpdateEvent(const std::vector<Player>& _players)
         : m_players(_players)
     {}
-    PlayerInfoUpdateEvent(nsf::PeerID _senderPeerId)
-        : BaseNetEvent(_senderPeerId)
-    {}
 
     std::vector<Player> m_players;
 };
@@ -56,9 +50,6 @@ public:
     CN_EVENT(id::PlayerReady)
 
     PlayerReadyEvent() = default;
-    PlayerReadyEvent(nsf::PeerID _senderPeerId)
-        : BaseNetEvent(_senderPeerId)
-    {}
 };
 
 class StartGameEvent final : public BaseNetEvent
@@ -67,9 +58,6 @@ public:
     CN_EVENT(id::StartGame)
 
     StartGameEvent() = default;
-    StartGameEvent(nsf::PeerID _senderPeerId)
-        : BaseNetEvent(_senderPeerId)
-    {}
 };
 
 } // namespace cn::events

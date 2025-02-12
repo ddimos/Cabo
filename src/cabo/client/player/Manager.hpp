@@ -19,6 +19,7 @@ public:
 
     const std::vector<Player>& getPlayers() const { return m_players; }
     PlayerId getLocalPlayerId() const { return m_localPlayerId; }
+    size_t getIndexOfLocalPlayer() const;
     
 private:
     core::event::ListenerId m_listenerId = core::event::ListenerIdInvalid;

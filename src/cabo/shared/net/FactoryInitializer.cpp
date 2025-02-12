@@ -19,7 +19,9 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
             _buffer >> event.m_playerId;
         },
         [](nsf::PeerID _peerId){
-            return std::make_unique<events::PlayerJoinAcceptEvent>(_peerId);
+            auto event = std::make_unique<events::PlayerJoinAcceptEvent>();
+            event->m_senderPeerId = _peerId;
+            return std::move(event);
         }
     );
     _factoryRef.add(
@@ -47,7 +49,9 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
             }
         },
         [](nsf::PeerID _peerId){
-            return std::make_unique<events::PlayerInfoUpdateEvent>(_peerId);
+            auto event = std::make_unique<events::PlayerInfoUpdateEvent>();
+            event->m_senderPeerId = _peerId;
+            return std::move(event); 
         }
     );
     _factoryRef.add(
@@ -57,7 +61,9 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
         [](core::event::Event& _event, nsf::Buffer& _buffer){
         },
         [](nsf::PeerID _peerId){
-            return std::make_unique<events::PlayerReadyEvent>(_peerId);
+            auto event = std::make_unique<events::PlayerReadyEvent>();
+            event->m_senderPeerId = _peerId;
+            return std::move(event); 
         }
     );
     _factoryRef.add(
@@ -67,7 +73,9 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
         [](core::event::Event& _event, nsf::Buffer& _buffer){
         },
         [](nsf::PeerID _peerId){
-            return std::make_unique<events::StartGameEvent>(_peerId);
+            auto event = std::make_unique<events::StartGameEvent>();
+            event->m_senderPeerId = _peerId;
+            return std::move(event); 
         }
     );
 

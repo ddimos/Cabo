@@ -1,6 +1,7 @@
 #include "client/player/Manager.hpp"
 
 #include "shared/events/NetworkEvents.hpp"
+#include "shared/player/Types.hpp"
 
 #include "core/Assert.hpp"
 #include "core/Log.hpp"
@@ -42,4 +43,16 @@ void Manager::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeing
     }
 }
 
+size_t Manager::getIndexOfLocalPlayer() const
+{
+    CN_ASSERT(m_localPlayerId != PlayerIdInvalid);
+    
+    for (size_t i = 0; i < m_players.size(); ++i)
+    {
+        if (m_players[i].id == m_localPlayerId)
+            return i;
+    }
+    CN_ASSERT_FRM(false, "No player with a local id: {}", m_localPlayerId);
+    return 0;
+}
 } // namespace cn::client::player

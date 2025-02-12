@@ -23,12 +23,11 @@ namespace cn::server::game
 class Participant final : public core::object::Object
 {
 public:
-    Participant(const core::Context& _context, PlayerId _id, bool _isLocal,
+    Participant(const core::Context& _context, PlayerId _id,
         std::map<ParticipantSlotId, ParticipantSlot>&& _slots,
         unsigned short _initialNumberOfSlots);
 
     PlayerId getId() const { return m_id; }
-    bool isLocal() const { return m_isLocal; }
 
     void addSlot();
     void removeSlot(ParticipantSlotId _id);
@@ -42,7 +41,6 @@ public:
 
 private:
     PlayerId m_id = PlayerIdInvalid;
-    bool m_isLocal = false;
 
     std::map<ParticipantSlotId, ParticipantSlot> m_slots;
     unsigned short m_currentNumberOfSlots = 0;

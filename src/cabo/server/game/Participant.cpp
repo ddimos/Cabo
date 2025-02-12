@@ -6,9 +6,8 @@
 namespace cn::server::game
 {
 
-Participant::Participant(const core::Context& _context, PlayerId _id, bool _isLocal, std::map<ParticipantSlotId, ParticipantSlot>&& _slots, unsigned short _initialNumberOfSlots)
+Participant::Participant(const core::Context& _context, PlayerId _id, std::map<ParticipantSlotId, ParticipantSlot>&& _slots, unsigned short _initialNumberOfSlots)
     : m_id(_id)
-    , m_isLocal(_isLocal)
     , m_slots(std::move(_slots))
     , m_currentNumberOfSlots(_initialNumberOfSlots)
 {

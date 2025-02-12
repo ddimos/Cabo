@@ -2,8 +2,7 @@
 
 #include "core/event/Types.hpp"
 #include "core/state/State.hpp"
-#include "game/Board.hpp"
-#include "game/Types.hpp"
+#include "client/game/Board.hpp"
 
 namespace cn::client::states
 {
@@ -19,7 +18,6 @@ private:
 
     std::unique_ptr<game::Board> m_board;
     core::event::ListenerId m_listenerId = core::event::ListenerIdInvalid;
-    game::PlayerId m_playerIdGenerator = 0;
 };
 
 } // namespace cn::client::states

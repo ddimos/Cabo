@@ -30,7 +30,11 @@ Participant::Participant(const core::Context& _context, PlayerId _id, bool _isLo
 void Participant::setSpawnPoint(PlayerSpawnPoint _spawnPoint)
 {
     m_spawnPoint = _spawnPoint;
-    m_nameText.setPosition(_spawnPoint.pos);
+    {
+        sf::Vector2f localPos = sf::Vector2f(0, 15);
+        localPos = core::math::rotateVector(localPos, m_spawnPoint.angleDeg + 90.f);
+        m_nameText.setPosition(_spawnPoint.pos + localPos);
+    }
 
     float offsetBetweenCardsX = 85;
     float offsetBetweenCardsY = 115;
