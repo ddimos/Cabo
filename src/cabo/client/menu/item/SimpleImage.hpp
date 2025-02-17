@@ -13,6 +13,7 @@ public:
     SimpleImage(Position _position, const sf::Texture& _texture, sf::IntRect _rectangle);
     SimpleImage(Position _position, const sf::Texture& _texture);
 
+    void setTextureRect(sf::IntRect _rectangle);
     void setPosition(Position _position);
     void setRotation(float _angleDeg);
 

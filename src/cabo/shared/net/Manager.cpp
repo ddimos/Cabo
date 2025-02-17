@@ -54,13 +54,13 @@ void Manager::init()
         );
     };
     callbacks.onReceived = [this, &eventDispatcherRef](nsf::NetworkMessage&& _message){
-        CN_LOG_FRM("Received from: {}", _message.getPeerId());
         core::event::EventId eventId = core::event::EventIdInvalid;
         _message.m_data >> eventId;
         auto& slot = m_factory.get(eventId);
         auto eventPtr = slot.create(_message.getPeerId());
         slot.deserialize(*eventPtr, _message.m_data);
-
+        
+        CN_LOG_FRM("Received from: {}, event: {}", _message.getPeerId(), eventId);
         eventDispatcherRef.sendDelayed(std::move(eventPtr));
     };
 
@@ -79,32 +79,42 @@ void Manager::connect(nsf::NetworkAddress _address)
 
 void Manager::send(const core::event::Event& _event)
 {
-    send(_event, true, nsf::PEER_ID_INVALID);
+    send(_event, nsf::MessageInfo::Type::BRODCAST, true, nsf::PEER_ID_INVALID);
 }
 
 void Manager::send(const core::event::Event& _event, bool _isReliable)
 {
-    send(_event, _isReliable, nsf::PEER_ID_INVALID);
+    send(_event, nsf::MessageInfo::Type::BRODCAST, _isReliable, nsf::PEER_ID_INVALID);
 }
 
 void Manager::send(const core::event::Event& _event, nsf::PeerID _unicastPeerId)
 {
-    send(_event, true, _unicastPeerId);
+    send(_event, nsf::MessageInfo::Type::UNICAST, true, _unicastPeerId);
 }
 
-void Manager::send(const core::event::Event& _event, bool _isReliable, nsf::PeerID _unicastPeerId)
+void Manager::send(const core::event::Event& _event, nsf::MessageInfo::Type _type, bool _isReliable, nsf::PeerID _peerId)
 {
+    CN_ASSERT(
+        (_type == nsf::MessageInfo::Type::BRODCAST && _peerId == nsf::PEER_ID_INVALID) ||
+        (_type == nsf::MessageInfo::Type::UNICAST && _peerId != nsf::PEER_ID_INVALID) ||
+        (_type == nsf::MessageInfo::Type::EXCLUDE_BRODCAST && _peerId != nsf::PEER_ID_INVALID)
+    );
+
     nsf::NetworkMessage message;
     message.m_info = nsf::MessageInfo(
-        _unicastPeerId == nsf::PEER_ID_INVALID ? nsf::MessageInfo::Type::BRODCAST : nsf::MessageInfo::Type::UNICAST,
-        _unicastPeerId,
+        _type,
+        _peerId,
         _isReliable
     );
     core::event::EventId eventId = _event.getId();
     auto& slot = m_factory.get(eventId);
     message.m_data << eventId;
     slot.serialize(_event, message.m_data);
-
+    
+    CN_LOG_FRM("Send {} to: {}, event: {}", 
+        (_type == nsf::MessageInfo::Type::BRODCAST ? 'b' : (_type == nsf::MessageInfo::Type::UNICAST ? 'u' : 'e')),
+        _peerId, eventId
+    );
     m_network->send(std::move(message));
 }
 

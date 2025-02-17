@@ -29,7 +29,7 @@ public:
     void send(const core::event::Event& _event);
     void send(const core::event::Event& _event, bool _isReliable);
     void send(const core::event::Event& _event, nsf::PeerID _unicastPeerId);
-    void send(const core::event::Event& _event, bool _isReliable, nsf::PeerID _unicastPeerId);
+    void send(const core::event::Event& _event, nsf::MessageInfo::Type _type, bool _isReliable, nsf::PeerID _peerId);
 
     void updateReceive();
     void updateSend();

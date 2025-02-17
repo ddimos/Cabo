@@ -24,14 +24,16 @@ enum : core::event::EventId
     PlayerInfoUpdate,
     PlayerJoinAccept,
     PlayerReady,
-    RequestSeeOwnCard,
-    ResponseSeeOwnCard,
+    PlayerStepUpdate,
+    RemotePlayerClickSlot,
+    SeeCardInSlot,
     StartGame,
 
 
     // Player action events
     LocalPlayerClickSlot,
-    PlayerClickDeck
+    LocalPlayerClickDeck,
+    LocalPlayerClickDiscard
 };
 
 } // namespace id

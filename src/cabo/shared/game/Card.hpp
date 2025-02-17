@@ -1,12 +1,11 @@
 #pragma once
 
-#include "core/object/Object.hpp"
 #include <utility>
 
 namespace cn::shared::game
 {
 
-class Card: public core::object::Object 
+class Card
 {
 public:
     enum class Rank
@@ -46,6 +45,7 @@ public:
     static std::pair<Rank, Suit> getCardFromIndex(unsigned _index);
     static bool hasAbility(Card& _card);
 
+    Card() = default;
     Card(Rank _rank, Suit _suit);
 
     Rank getRank() const { return m_rank; }
@@ -56,8 +56,8 @@ public:
     void discard();
 
 private:
-    Rank m_rank;
-    Suit m_suit;
+    Rank m_rank = Rank::Ace;
+    Suit m_suit = Suit::Clubs;
 
     State m_state = State::InDeck;
 };

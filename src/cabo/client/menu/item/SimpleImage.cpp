@@ -30,6 +30,12 @@ SimpleImage::SimpleImage(Position _position, const sf::Texture& _texture)
     m_sprite.setPosition(m_transformable.calculateGlobalPos(m_sprite.getGlobalBounds().getSize()));
 }
 
+void SimpleImage::setTextureRect(sf::IntRect _rectangle)
+{
+    m_sprite.setTextureRect(_rectangle);
+    // should I recalculate the position?
+}
+
 void SimpleImage::setPosition(Position _position)
 {
     m_transformable.setPosition(_position);

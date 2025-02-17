@@ -19,4 +19,12 @@ struct ParticipantSlot
     ParticipantSlotId id;
 };
 
+enum class BoardState
+{
+    Start,
+    Peek,
+    Game,
+    Cabo
+};
+
 } // namespace cn::shared::game

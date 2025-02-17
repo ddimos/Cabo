@@ -1,5 +1,6 @@
 #include "client/game/Participant.hpp"
 #include "client/game/Card.hpp"
+#include "client/game/SpriteSheet.hpp"
 
 #include "client/menu/item/Button.hpp"
 #include "client/ResourceIds.hpp"
@@ -25,6 +26,9 @@ Participant::Participant(const core::Context& _context, PlayerId _id, bool _isLo
     m_nameText.setFillColor(sf::Color::White);
     m_nameText.setCharacterSize(24);
     m_nameText.setOrigin(m_nameText.getGlobalBounds().getSize() / 2.f);
+
+    for (unsigned i = 0; i < m_currentNumberOfSlots; ++i)
+        m_slots[i].button->requestActivated();
 }
 
 void Participant::setSpawnPoint(PlayerSpawnPoint _spawnPoint)
@@ -47,6 +51,8 @@ void Participant::setSpawnPoint(PlayerSpawnPoint _spawnPoint)
         localPos = core::math::rotateVector(localPos, m_spawnPoint.angleDeg + 90.f);
         slot.button->setPosition(client::menu::Position{ .m_position = (m_spawnPoint.pos + localPos) });
         slot.button->setRotation(m_spawnPoint.angleDeg + 90.f);
+        slot.cardImage->setPosition(client::menu::Position{ .m_position = (m_spawnPoint.pos + localPos - sf::Vector2f{70, 100}) });
+        // slot.cardImage->setRotation(m_spawnPoint.angleDeg + 90.f);
         ++i;
         if(i >= cardsInRow)
         {
@@ -79,23 +85,30 @@ void Participant::removeSlot(ParticipantSlotId _id)
     m_slots.at(_id).button->requestDeactivated();
 }
 
-void Participant::showCardInSlot(ParticipantSlotId _id)
+void Participant::onStartShowingCardInSlot(ParticipantSlotId _id)
 {
-    auto slot = getSlot(_id);
-    slot.card->requestActivated();
+    const auto& slot = getSlot(_id);
     slot.button->requestDeactivated();
+    // TODO if card is valid - show card
 
-    // TODO think about a better position
-    sf::Vector2f localPos = sf::Vector2f(50, 200);
-    localPos = core::math::rotateVector(localPos, m_spawnPoint.angleDeg + 90.f);
-    
-    slot.card->setPosition(m_spawnPoint.pos + localPos);
+    // TODO start an animation
 }
 
-void Participant::hideCardInSlot(ParticipantSlotId _id)
+void Participant::onCardRecievedInSlot(ParticipantSlotId _id, Card _card)
+{
+    auto& slot = getSlot(_id);
+
+    slot.card = _card;
+    slot.cardImage->setTextureRect(game::spriteSheet::getCardTextureRect(_card.getRank(), _card.getSuit()));
+    slot.isCardValid = true;
+
+    slot.cardImage->requestActivated();
+}
+
+void Participant::onFinishShowingCardInSlot(ParticipantSlotId _id)
 {
     auto slot = getSlot(_id);
-    slot.card->requestDeactivated();
+    slot.cardImage->requestDeactivated();
     slot.button->requestActivated();
 }
 
@@ -105,33 +118,10 @@ const ParticipantSlot& Participant::getSlot(ParticipantSlotId _id) const
     return m_slots.at(_id);
 }
 
-Card* Participant::getCard(ParticipantSlotId _id) const
+ParticipantSlot& Participant::getSlot(ParticipantSlotId _id)
 {
-    return getSlot(_id).card;
-}
-
-Card* Participant::replace(ParticipantSlotId _id, Card* _card)
-{
-    auto prevCard = m_slots.at(_id).card;
-    m_slots.at(_id).card = _card;
-    return prevCard;
-}
-
-void Participant::deal(Card* _card)
-{
-    bool assigned = false;
-
-    for (auto& [id, slot] : m_slots)
-    {
-        if (slot.card)
-            continue;
-
-        slot.card = _card;
-        slot.button->requestActivated();
-        assigned = true;
-        break;
-    }
-    CN_ASSERT(assigned);
+    CN_ASSERT(m_slots.contains(_id));
+    return m_slots.at(_id);
 }
 
 void Participant::onDraw(sf::RenderWindow& _window)

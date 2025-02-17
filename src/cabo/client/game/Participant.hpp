@@ -1,13 +1,12 @@
 #pragma once
 
-#include "core/object/Object.hpp"
+#include "client/game/Card.hpp"
+#include "client/game/Types.hpp"
+#include "client/menu/Types.hpp"
 
 #include "shared/player/Types.hpp"
 
-#include "client/game/Card.hpp"
-#include "client/game/Types.hpp"
-
-#include "client/menu/Types.hpp"
+#include "core/object/Object.hpp"
 
 #include <SFML/Graphics/Text.hpp>
 
@@ -37,18 +36,16 @@ public:
     void addSlot();
     void removeSlot(ParticipantSlotId _id);
 
-    void showCardInSlot(ParticipantSlotId _id);
-    void hideCardInSlot(ParticipantSlotId _id);
+    void onStartShowingCardInSlot(ParticipantSlotId _id);
+    void onCardRecievedInSlot(ParticipantSlotId _id, Card _card);
+    void onFinishShowingCardInSlot(ParticipantSlotId _id);
 
     const ParticipantSlot& getSlot(ParticipantSlotId _id) const;
-    Card* getCard(ParticipantSlotId _id) const;
-
-    Card* replace(ParticipantSlotId _id, Card* _card);
-
-    void deal(Card* _card);
 
 private:
     void onDraw(sf::RenderWindow& _window) override;
+
+    ParticipantSlot& getSlot(ParticipantSlotId _id);
 
     sf::Text m_nameText; // TODO simpleText
 

@@ -1,10 +1,10 @@
 #pragma once
 
-#include "shared/game/Card.hpp"
+#include "shared/game/Step.hpp"
 
 namespace cn::client::game
 {
 
-using shared::game::Card;
+using shared::game::Step;
 
 } // namespace cn::client::game

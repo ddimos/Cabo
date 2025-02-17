@@ -12,6 +12,7 @@
 
 #include "core/event/Dispatcher.hpp"
 
+#include "shared/events/NetworkEvents.hpp"
 #include "shared/events/GameEvents.hpp"
 
 // #include "shared/net/Manager.hpp"
@@ -52,7 +53,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
     );
 
     // // // getContainer(core::object::Container::Type::Game).add(table);
-    // // // getContainer(core::object::Container::Type::Game).add(deck);
+    getContainer(core::object::Container::Type::Game).add(deck);
     // // // getContainer(core::object::Container::Type::Game).add(discard);
 
     std::vector<game::Participant*> participants;
@@ -63,7 +64,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
         unsigned short numberOfSlots = shared::game::MaxNumberOfParticipantSlots;
         for (game::ParticipantSlotId slotId = 0; slotId < numberOfSlots; ++slotId)
         {
-            slots.emplace(slotId, game::ParticipantSlot{ slotId, nullptr });
+            slots.emplace(slotId, game::ParticipantSlot{ slotId, deck->getNextCard() });
         }
         auto playerId = player.id;
         auto participant = std::make_shared<game::Participant>(
@@ -74,7 +75,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
         participants.push_back(participant.get());
     }
 
-    m_board = std::make_unique<game::Board>(getContext(), deck.get(), std::move(participants));
+    m_board = std::make_unique<game::Board>(getContext(), *(deck.get()), std::move(participants));
 
     m_listenerId = core::event::getNewListenerId();
 
@@ -85,17 +86,15 @@ void GameState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isB
 {
     if (_isBeingRegistered)
     {
-  
     }
     else
     {
-
     }
 }
 
 core::state::Return GameState::onUpdate(sf::Time _dt)
 {
-    // m_board->update(_dt);
+    m_board->update(_dt);
 
     return core::state::Return::Break;
 }
