@@ -9,45 +9,45 @@
 namespace cn::client::game::step
 {
 
-SeeOwnCard::SeeOwnCard(Board& _board, PlayerId _localPlayerId)
-    : shared::game::Step({
-        {Id::WaitInput, {}},
-        {Id::RequestSeeCard, {            
-            .onEnter = [this](){
-                auto* participant = m_boardRef.getParticipant(m_localPlayerId);
-                participant->onStartShowingCardInSlot(m_slotId);
-                
-                events::RemotePlayerClickSlotEvent event(m_localPlayerId, m_slotId);
-                m_boardRef.getContext().get<net::Manager>().send(event);
-            },
-            .onUpdate = [this](sf::Time){
-            }
-        }},
-        {Id::SeeCard, {
-            .onEnter = [this](){
-                auto* participant = m_boardRef.getParticipant(m_localPlayerId);
-                participant->onCardRecievedInSlot(m_slotId, Card(m_rank, m_suit));
-            },
-            .onUpdate = [this](sf::Time _dt){
-                m_seeCardTimeDt -= _dt;
-                if (m_seeCardTimeDt.asSeconds() <= 0.f)
-                    requestFollowingState();
-            }
-        }},
-        {Id::Finished, {
-            .onEnter = [this](){
-                auto* participant = m_boardRef.getParticipant(m_localPlayerId);
-                participant->onFinishShowingCardInSlot(m_slotId);
-            },
-            .onUpdate = [this](sf::Time){
-                // for debugging
-                // requestState(Id::WaitInput);
-                // m_seeCardTimeDt = m_seeCardTime;
-            }
-        }},
-    })
+SeeOwnCard::SeeOwnCard(Board& _board, PlayerId _managedPlayerId)
+    : Step(_managedPlayerId,
+        {
+            {Id::WaitInput, {}},
+            {Id::RequestSeeCard, {            
+                .onEnter = [this](){
+                    auto* participant = m_boardRef.getParticipant(getManagedPlayerId());
+                    participant->onStartShowingCardInSlot(m_slotId);
+                    
+                    events::RemotePlayerClickSlotEvent event(getManagedPlayerId(), m_slotId);
+                    m_boardRef.getContext().get<net::Manager>().send(event);
+                },
+                .onUpdate = [this](sf::Time){
+                }
+            }},
+            {Id::SeeCard, {
+                .onEnter = [this](){
+                    auto* participant = m_boardRef.getParticipant(getManagedPlayerId());
+                    participant->onCardRecievedInSlot(m_slotId, Card(m_rank, m_suit));
+                },
+                .onUpdate = [this](sf::Time _dt){
+                    m_seeCardTimeDt -= _dt;
+                    if (m_seeCardTimeDt.asSeconds() <= 0.f)
+                        requestFollowingState();
+                }
+            }},
+            {Id::Finished, {
+                .onEnter = [this](){
+                    auto* participant = m_boardRef.getParticipant(getManagedPlayerId());
+                    participant->onFinishShowingCardInSlot(m_slotId);
+                },
+                .onUpdate = [this](sf::Time){
+                    // for debugging
+                    // requestState(Id::WaitInput);
+                    // m_seeCardTimeDt = m_seeCardTime;
+                }
+            }},
+        })
     , m_boardRef(_board)
-    , m_localPlayerId(_localPlayerId)
 {
 }
 
@@ -60,7 +60,7 @@ void SeeOwnCard::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBe
             {
                 if (getCurrentStateId() != Id::WaitInput)
                     return;
-                if (_event.slotOwnerId != m_localPlayerId) // TODO give feedback to the player
+                if (_event.slotOwnerId != getManagedPlayerId()) // TODO give feedback to the player
                     return;
 
                 requestFollowingState();
@@ -72,7 +72,7 @@ void SeeOwnCard::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBe
             {    
                 if (getCurrentStateId() != Id::RequestSeeCard)
                     return;
-                CN_ASSERT(_event.m_slotOwnerId == m_localPlayerId);
+                CN_ASSERT(_event.m_slotOwnerId == getManagedPlayerId());
                 CN_ASSERT(_event.m_slotId == m_slotId);
 
                 requestFollowingState();

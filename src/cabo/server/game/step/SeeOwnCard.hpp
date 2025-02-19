@@ -26,8 +26,6 @@ private:
     };
 
     Board& m_boardRef;
-
-    PlayerId m_managedPlayerId = PlayerIdInvalid;
     
     ParticipantSlotId m_slotId = shared::game::ParticipantSlotIdInvalid;
     Card::Rank m_rank;

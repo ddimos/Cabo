@@ -1,5 +1,7 @@
 #pragma once
 
+#include "shared/player/Types.hpp"
+
 #include "core/event/Dispatcher.hpp"
 
 #include <SFML/System/Time.hpp>
@@ -25,7 +27,7 @@ public:
     };
     using StateMap = std::map<StateId, State>;
 
-    Step(StateMap&& _states);
+    Step(PlayerId _managedPlayerId, StateMap&& _states);
     virtual ~Step() = default;
     virtual void registerEvents(core::event::Dispatcher&, bool) {}
     void update(sf::Time);
@@ -33,6 +35,7 @@ public:
 protected:
     core::event::ListenerId getListenerId() const { return m_listenerId; }
     StateId getCurrentStateId() const { return m_stateId; }
+    PlayerId getManagedPlayerId() const { return m_managedPlayerId; }
 
     void requestFollowingState();
     void requestState(StateId _id);
@@ -41,6 +44,7 @@ private:
     std::map<StateId, State> m_states;
     StateId m_stateId = StateIdInvalid;
     StateId m_nextStateId = StateIdInvalid;
+    PlayerId m_managedPlayerId = PlayerIdInvalid;
 };
 
 } // namespace cn::shared::game

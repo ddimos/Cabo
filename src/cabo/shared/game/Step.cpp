@@ -6,8 +6,9 @@
 namespace cn::shared::game
 {
 
-Step::Step(StateMap&& _states)
-    : m_states(std::move(_states))
+Step::Step(PlayerId _managedPlayerId, StateMap&& _states)
+    : m_managedPlayerId(_managedPlayerId)
+    , m_states(std::move(_states))
 {
     m_listenerId = core::event::getNewListenerId();
     m_nextStateId = m_states.begin()->first;

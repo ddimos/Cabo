@@ -3,7 +3,6 @@
 #include "client/game/Board.hpp"
 #include "client/game/Card.hpp"
 #include "client/game/Step.hpp"
-#include "shared/player/Types.hpp"
 
 namespace cn::client::game::step
 {
@@ -11,7 +10,7 @@ namespace cn::client::game::step
 class SeeOwnCard : public Step
 {
 public:
-    SeeOwnCard(Board& _board, PlayerId _localPlayerId);
+    SeeOwnCard(Board& _board, PlayerId _managedPlayerId);
 
 private:
     void registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered) override;
@@ -27,7 +26,6 @@ private:
     Board& m_boardRef;
 
     ParticipantSlotId m_slotId = shared::game::ParticipantSlotIdInvalid;
-    PlayerId m_localPlayerId = PlayerIdInvalid;
 
     Card::Rank m_rank;
     Card::Suit m_suit;
