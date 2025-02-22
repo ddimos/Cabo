@@ -1,5 +1,6 @@
 #pragma once
 
+#include "shared/game/StepId.hpp"
 #include "shared/player/Types.hpp"
 
 #include "core/event/Dispatcher.hpp"
@@ -30,6 +31,8 @@ public:
     Step(PlayerId _managedPlayerId, StateMap&& _states);
     virtual ~Step() = default;
     virtual void registerEvents(core::event::Dispatcher&, bool) {}
+    virtual bool isFinished() const { return true; } // TODO  = 0
+    virtual StepId getNextStepId() const { return StepId::Idle; } // = 0
     void update(sf::Time);
 
 protected:

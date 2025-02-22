@@ -60,7 +60,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
     for (const auto& player : playerManagerRef.getPlayers())
     {
         std::map<game::ParticipantSlotId, game::ParticipantSlot> slots;
-
+        
         unsigned short numberOfSlots = shared::game::MaxNumberOfParticipantSlots;
         for (game::ParticipantSlotId slotId = 0; slotId < numberOfSlots; ++slotId)
         {
@@ -71,11 +71,13 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
             getContext(), playerId, std::move(slots), shared::game::DefaultInitNumberOfParticipantSlots
         );
         getContainer(core::object::Container::Type::Game).add(participant);
-
+        
         participants.push_back(participant.get());
     }
-
-    m_board = std::make_unique<game::Board>(getContext(), *(deck.get()), std::move(participants));
+    // TODO to randomize for the first play, then the player who won  
+    PlayerId firstParticipantTurn = playerManagerRef.getPlayers().front().id;
+    
+    m_board = std::make_unique<game::Board>(getContext(), *(deck.get()), std::move(participants), firstParticipantTurn);
 
     m_listenerId = core::event::getNewListenerId();
 

@@ -21,14 +21,6 @@ namespace cn::client::game
 
 class Board final
 {
-    enum class State
-    {
-        None,
-        LookingCard,
-        Playing,
-        Finishing
-    };
-
 public:
     using DecideButtons = std::vector<client::menu::item::ButtonPtr>;
 
@@ -39,8 +31,9 @@ public:
 
     const core::Context& getContext() const { return m_contextRef; };
     Participant* getParticipant(PlayerId _id);
-    
+
 private:
+    void changeStep(StepId _nextStepId);
 
     const core::Context& m_contextRef;
     
@@ -48,7 +41,11 @@ private:
 
     core::event::ListenerId m_listenerId = core::event::ListenerIdInvalid;
     PlayerId m_localPlayerId = PlayerIdInvalid;
-    std::unique_ptr<Step> m_localPlayerStep = {}; 
+    std::unique_ptr<Step> m_localPlayerStep = {}; //participantStep
+
+    BoardState m_boardState = BoardState::Start;
+    StepId m_localPlayerStepId = StepId::Idle;
+    StepId m_desiredPlayerStepId = StepId::Idle;
 };
    
 } // namespace cn::client::game

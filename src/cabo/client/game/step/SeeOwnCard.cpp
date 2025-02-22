@@ -88,4 +88,14 @@ void SeeOwnCard::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBe
     }
 }
 
+bool SeeOwnCard::isFinished() const
+{
+    return getCurrentStateId() == Id::Finished;
+} 
+
+StepId SeeOwnCard::getNextStepId() const
+{
+    return StepId::Idle;
+}
+
 } // namespace cn::client::game::step

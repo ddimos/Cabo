@@ -43,4 +43,16 @@ public:
     PlayerId slotOwnerId = PlayerIdInvalid;
 };
 
+class LocalPlayerClickDecideButtonEvent final : public core::event::Event
+{
+public:
+    CN_EVENT(id::LocalPlayerClickDecideButton)
+
+    LocalPlayerClickDecideButtonEvent(shared::game::DecideButton _button)
+        : m_button(_button)
+    {}
+
+    shared::game::DecideButton m_button = shared::game::DecideButton::Action;
+};
+
 } // namespace cn::events

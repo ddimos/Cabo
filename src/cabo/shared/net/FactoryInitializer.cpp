@@ -79,21 +79,37 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
         }
     );
     _factoryRef.add(
-        events::id::PlayerStepUpdate,
+        events::id::BoardStateUpdate,
         [](const core::event::Event& _event, nsf::Buffer& _buffer){
-            auto& event = static_cast<const events::PlayerStepUpdateEvent&>(_event);
-            _buffer << event.m_playerId;
-            _buffer << static_cast<uint8_t>(event.m_stepId); //  TODO underlying?
+            auto& event = static_cast<const events::BoardStateUpdateEvent&>(_event);
+            _buffer << static_cast<uint8_t>(event.m_boardState); //  TODO underlying?
         },
         [](core::event::Event& _event, nsf::Buffer& _buffer){
-            auto& event = static_cast<events::PlayerStepUpdateEvent&>(_event);
-            _buffer >> event.m_playerId;
-            uint8_t stepId = 0;
-            _buffer >> stepId;
-            event.m_stepId = static_cast<shared::game::StepId>(stepId);
+            auto& event = static_cast<events::BoardStateUpdateEvent&>(_event);
+            uint8_t boardState = 0;
+            _buffer >> boardState;
+            event.m_boardState = static_cast<shared::game::BoardState>(boardState);
         },
         [](nsf::PeerID _peerId){
-            auto event = std::make_unique<events::PlayerStepUpdateEvent>();
+            auto event = std::make_unique<events::BoardStateUpdateEvent>();
+            event->m_senderPeerId = _peerId;
+            return std::move(event); 
+        }
+    );
+    _factoryRef.add(
+        events::id::PlayerTurnUpdate,
+        [](const core::event::Event& _event, nsf::Buffer& _buffer){
+            auto& event = static_cast<const events::PlayerTurnUpdateEvent&>(_event);
+            _buffer << event.m_playerId;
+            _buffer << event.m_hasTurnStarted;
+        },
+        [](core::event::Event& _event, nsf::Buffer& _buffer){
+            auto& event = static_cast<events::PlayerTurnUpdateEvent&>(_event);
+            _buffer >> event.m_playerId;
+            _buffer >> event.m_hasTurnStarted;
+        },
+        [](nsf::PeerID _peerId){
+            auto event = std::make_unique<events::PlayerTurnUpdateEvent>();
             event->m_senderPeerId = _peerId;
             return std::move(event); 
         }
@@ -138,6 +154,44 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
         },
         [](nsf::PeerID _peerId){
             auto event = std::make_unique<events::SeeCardInSlotEvent>();
+            event->m_senderPeerId = _peerId;
+            return std::move(event); 
+        }
+    );
+    _factoryRef.add(
+        events::id::DrawCard,
+        [](const core::event::Event& _event, nsf::Buffer& _buffer){
+            auto& event = static_cast<const events::DrawCardEvent&>(_event);
+            _buffer << static_cast<uint8_t>(event.m_rank);
+            _buffer << static_cast<uint8_t>(event.m_suit);
+        },
+        [](core::event::Event& _event, nsf::Buffer& _buffer){
+            auto& event = static_cast<events::DrawCardEvent&>(_event);
+            uint8_t rank;
+            uint8_t suit;
+            _buffer >> rank;
+            _buffer >> suit;
+            event.m_rank = static_cast<shared::game::Card::Rank>(rank);
+            event.m_suit = static_cast<shared::game::Card::Suit>(suit);
+        },
+        [](nsf::PeerID _peerId){
+            auto event = std::make_unique<events::DrawCardEvent>();
+            event->m_senderPeerId = _peerId;
+            return std::move(event); 
+        }
+    );
+    _factoryRef.add(
+        events::id::RemotePlayerClickPile,
+        [](const core::event::Event& _event, nsf::Buffer& _buffer){
+            auto& event = static_cast<const events::RemotePlayerClickPileEvent&>(_event);
+            _buffer << event.m_playerClickedOnDeck;
+        },
+        [](core::event::Event& _event, nsf::Buffer& _buffer){
+            auto& event = static_cast<events::RemotePlayerClickPileEvent&>(_event);
+            _buffer >> event.m_playerClickedOnDeck;
+        },
+        [](nsf::PeerID _peerId){
+            auto event = std::make_unique<events::RemotePlayerClickPileEvent>();
             event->m_senderPeerId = _peerId;
             return std::move(event); 
         }

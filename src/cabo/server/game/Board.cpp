@@ -1,6 +1,8 @@
 #include "server/game/Board.hpp"
+#include "server/game/step/DrawCard.hpp"
 #include "server/game/step/SeeOwnCard.hpp"
 
+#include "shared/game/Board.hpp"
 #include "shared/events/NetworkEvents.hpp"
 #include "shared/net/Manager.hpp"
 
@@ -12,12 +14,24 @@
 namespace cn::server::game
 {
 
-Board::Board(const core::Context& _context, Deck& _deck, std::vector<Participant*>&& _participants)
+Board::Board(const core::Context& _context, Deck& _deck, std::vector<Participant*>/**/&& _participants, PlayerId _firstParticipantTurn)
     : m_contextRef(_context)
     , m_deckRef(_deck)
 {
     for (auto* p : _participants)
         m_participants.emplace_back(BoardParticipant{ .participantRef = *p, .currentStep = {} });
+
+    size_t index = 0;
+    const size_t lastIndex = m_participants.size() - 1;
+    for (const auto& p : m_participants)
+    {
+        if (p.participantRef.getId() == _firstParticipantTurn)
+        {
+            m_indexOfCurrentParticipantTurn = index == 0 ? lastIndex : (index == lastIndex ? 0 : index - 1);
+            break;
+        }
+        ++index;
+    }
 
     m_listenerId = core::event::getNewListenerId();
     m_newStateRequested = true;
@@ -59,6 +73,11 @@ void Board::update(sf::Time _dt)
             }
             m_state = newState;
         }
+        CN_LOG_FRM("Board state {}", (int)m_state);
+
+        auto& netManRef = getContext().get<net::Manager>();
+        events::BoardStateUpdateEvent event(m_state);
+        netManRef.send(event);
 
         // On Enter
         switch (m_state)
@@ -67,7 +86,7 @@ void Board::update(sf::Time _dt)
             break;
         case BoardState::Peek:
             for (auto& participant : m_participants)
-                setParticipantStep(StepId::SeeOwnCard, participant);
+                participantStartsTurn(participant);
             break;
         case BoardState::Game:
             break;
@@ -75,7 +94,30 @@ void Board::update(sf::Time _dt)
             break;
         }
     }
+    if (m_state == BoardState::Peek)
+    {
+        bool allParticipantFinished = true;
+        for (auto& participant : m_participants)
+        {
+            if (!participant.currentStep->isFinished())
+                allParticipantFinished = false;
+        }
+        if (allParticipantFinished)
+        {
+            m_newStateRequested = true;
+            m_currentParticipantFinishedTurn = true;
+        }
+    }
+    else if (m_state == BoardState::Game || m_state == BoardState::Cabo)
+    {
+        if (m_currentParticipantFinishedTurn)
+        {
+            m_currentParticipantFinishedTurn = false;
 
+            m_indexOfCurrentParticipantTurn = getIndexOfNextParticipantTurn(m_indexOfCurrentParticipantTurn);
+            participantStartsTurn(m_participants.at(m_indexOfCurrentParticipantTurn));
+        }
+    }
     for (auto& participant : m_participants)
     {
         if (participant.currentStep)
@@ -99,27 +141,56 @@ Board::BoardParticipant& Board::getBoardParticipant(PlayerId _id)
     return (*it);
 }
 
-void Board::setParticipantStep(StepId _stepId, BoardParticipant& _participantRef)
-{   
-    CN_ASSERT(_participantRef.currentStepId != _stepId);
+size_t Board::getIndexOfNextParticipantTurn(size_t _currentIndex) const
+{
+    _currentIndex++;
+    if (_currentIndex >= m_participants.size())
+        _currentIndex = 0;
+    return _currentIndex;
+}
 
-    PlayerId playerId = _participantRef.participantRef.getId();
-    _participantRef.currentStepId = _stepId;
+void Board::participantStartsTurn(BoardParticipant& _participant)
+{
+    PlayerId playerId = _participant.participantRef.getId();
+    CN_LOG_FRM("Participant {} starts turn", playerId);
+
+    auto& netManRef = getContext().get<net::Manager>();
+    events::PlayerTurnUpdateEvent event(playerId, true);
+    netManRef.send(event);
+
+    StepId nextStepId = shared::game::getFirstStepId(m_state);
+    setParticipantStep(nextStepId, _participant);
+}
+
+void Board::setParticipantStep(StepId _stepId, BoardParticipant& _participant)
+{   
+    CN_ASSERT(_participant.currentStepId != _stepId);
+
+    PlayerId playerId = _participant.participantRef.getId();
+    _participant.currentStepId = _stepId;
+
+    auto& eventDispatcherRef = getContext().get<core::event::Dispatcher>();
+    if (_participant.currentStep)
+        _participant.currentStep->registerEvents(eventDispatcherRef, false);
 
     switch (_stepId)
     {
+    case StepId::Idle:
+        _participant.currentStep.reset();
+        break;
     case StepId::SeeOwnCard:
-        _participantRef.currentStep = std::make_unique<step::SeeOwnCard>(*this, playerId);
-        _participantRef.currentStep->registerEvents(getContext().get<core::event::Dispatcher>(), true);
+        _participant.currentStep = std::make_unique<step::SeeOwnCard>(*this, playerId);
+        break;
+    case StepId::DrawCard:
+        _participant.currentStep = std::make_unique<step::DrawCard>(*this, playerId);
         break;
     default:
         break;
     }
-    CN_LOG_FRM("Set step {} to participant {}", (unsigned)_stepId, playerId);
+    if (_participant.currentStep)
+        _participant.currentStep->registerEvents(eventDispatcherRef, true);
 
-    auto& netManRef = getContext().get<net::Manager>();
-    events::PlayerStepUpdateEvent event(playerId, _stepId);
-    netManRef.send(event);
+    CN_LOG_FRM("Set step {} to participant {}", (unsigned)_stepId, playerId);
 }
 
 } // namespace cn::server::game

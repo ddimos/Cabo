@@ -8,6 +8,7 @@
 #include "core/event/Types.hpp"
 #include "core/Context.hpp"
 
+#include <map>
 #include <vector>
 
 namespace cn::server::game
@@ -16,7 +17,7 @@ namespace cn::server::game
 class Board final
 {
 public:
-    Board(const core::Context& _context, Deck& _deck, std::vector<Participant*>&& _participants);
+    Board(const core::Context& _context, Deck& _deck, std::vector<Participant*>&& _participants, PlayerId _firstParticipantTurn);
     ~Board();
 
     Deck& getDeck() const { return m_deckRef; }
@@ -36,13 +37,18 @@ private:
         std::unique_ptr<Step> currentStep;
     };
     BoardParticipant& getBoardParticipant(PlayerId _id);
+    void participantStartsTurn(BoardParticipant& _participant);
     void setParticipantStep(StepId _stepId, BoardParticipant& _participantRef);
+    size_t getIndexOfNextParticipantTurn(size_t _currentIndex) const;
 
     const core::Context& m_contextRef;
+    core::event::ListenerId m_listenerId = core::event::ListenerIdInvalid;
 
     Deck& m_deckRef;
     std::vector<BoardParticipant> m_participants;
-    core::event::ListenerId m_listenerId = core::event::ListenerIdInvalid;
+
+    size_t m_indexOfCurrentParticipantTurn = 0;
+    bool m_currentParticipantFinishedTurn = false;
 
     BoardState m_state = BoardState::Start;
     bool m_newStateRequested = false;

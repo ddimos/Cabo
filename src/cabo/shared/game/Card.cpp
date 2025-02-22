@@ -39,12 +39,20 @@ std::pair<Card::Rank, Card::Suit> Card::getCardFromIndex(unsigned _index)
 
 bool Card::hasAbility(Card& _card)
 {
-    return _card.m_rank == Rank::_7
-        || _card.m_rank == Rank::_8
-        || _card.m_rank == Rank::_9
-        || _card.m_rank == Rank::_10
-        || _card.m_rank == Rank::Jack
-        || _card.m_rank == Rank::Queen;
+    return getAbility(_card) != Ability::None;
+}
+
+Card::Ability Card::getAbility(Card& _card)
+{
+    if (_card.m_rank == Rank::_7 || _card.m_rank == Rank::_8)
+        return Ability::Peek;
+    if (_card.m_rank == Rank::_9 || _card.m_rank == Rank::_10)
+        return Ability::Spy;
+    if (_card.m_rank == Rank::Jack)
+        return Ability::SwapBlindly;
+    if (_card.m_rank == Rank::Queen)
+        return Ability::SwapOpenly;
+    return Ability::None;
 }
 
 Card::Card(Rank _rank, Suit _suit)

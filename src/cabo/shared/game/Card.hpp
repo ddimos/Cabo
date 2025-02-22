@@ -34,6 +34,15 @@ public:
         Diamonds    // (♦)
     }; 
 
+    enum class Ability
+    {
+        None,
+        Peek,
+        Spy,
+        SwapBlindly,
+        SwapOpenly
+    };
+
     enum class State
     {
         InDeck,
@@ -44,6 +53,7 @@ public:
 
     static std::pair<Rank, Suit> getCardFromIndex(unsigned _index);
     static bool hasAbility(Card& _card);
+    static Ability getAbility(Card& _card);
 
     Card() = default;
     Card(Rank _rank, Suit _suit);

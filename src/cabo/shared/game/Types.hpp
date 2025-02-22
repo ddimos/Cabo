@@ -27,4 +27,12 @@ enum class BoardState
     Cabo
 };
 
+enum class DecideButton
+{
+    Action,
+    Discard,
+    Match,
+    Take
+};
+
 } // namespace cn::shared::game

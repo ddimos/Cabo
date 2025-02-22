@@ -29,5 +29,7 @@ struct ParticipantSlot : public shared::game::ParticipantSlot
 };
 
 using shared::game::StepId;
+using shared::game::BoardState;
+using shared::game::DecideButton;
 
 } // namespace cn::client::game

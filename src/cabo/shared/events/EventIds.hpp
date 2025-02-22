@@ -21,19 +21,23 @@ enum : core::event::EventId
     // Net events
     // PlayerJoined,
     // PlayerLeft,
+    DrawCard,
+    BoardStateUpdate,
     PlayerInfoUpdate,
     PlayerJoinAccept,
     PlayerReady,
-    PlayerStepUpdate,
+    PlayerTurnUpdate,
+    RemotePlayerClickPile,
     RemotePlayerClickSlot,
     SeeCardInSlot,
     StartGame,
 
 
     // Player action events
-    LocalPlayerClickSlot,
+    LocalPlayerClickDecideButton,
     LocalPlayerClickDeck,
-    LocalPlayerClickDiscard
+    LocalPlayerClickDiscard,
+    LocalPlayerClickSlot,
 };
 
 } // namespace id

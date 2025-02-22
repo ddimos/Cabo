@@ -64,18 +64,31 @@ public:
     StartGameEvent() = default;
 };
 
-class PlayerStepUpdateEvent final : public BaseNetEvent
+class BoardStateUpdateEvent final : public BaseNetEvent
 {
 public:
-    CN_EVENT(id::PlayerStepUpdate)
+    CN_EVENT(id::BoardStateUpdate)
 
-    PlayerStepUpdateEvent() = default;
-    PlayerStepUpdateEvent(PlayerId _playerId, shared::game::StepId _stepId)
-        : m_playerId(_playerId), m_stepId(_stepId)
+    BoardStateUpdateEvent() = default;
+    BoardStateUpdateEvent(shared::game::BoardState _boardState)
+        : m_boardState(_boardState)
+    {}
+
+    shared::game::BoardState m_boardState = shared::game::BoardState::Start;
+};
+
+class PlayerTurnUpdateEvent final : public BaseNetEvent
+{
+public:
+    CN_EVENT(id::PlayerTurnUpdate)
+
+    PlayerTurnUpdateEvent() = default;
+    PlayerTurnUpdateEvent(PlayerId _playerId, bool _hasTurnStarted)
+        : m_playerId(_playerId), m_hasTurnStarted(_hasTurnStarted)
     {}
 
     PlayerId m_playerId = PlayerIdInvalid;
-    shared::game::StepId m_stepId = shared::game::StepId::Idle;
+    bool m_hasTurnStarted = true;
 };
 
 class RemotePlayerClickSlotEvent final : public BaseNetEvent
@@ -106,6 +119,33 @@ public:
     shared::game::ParticipantSlotId m_slotId = shared::game::ParticipantSlotIdInvalid;
     shared::game::Card::Rank m_rank = shared::game::Card::Rank::Ace;
     shared::game::Card::Suit m_suit = shared::game::Card::Suit::Clubs;
+};
+
+class DrawCardEvent final : public BaseNetEvent
+{
+public:
+    CN_EVENT(id::DrawCard)
+
+    DrawCardEvent() = default;
+    DrawCardEvent(shared::game::Card::Rank _rank, shared::game::Card::Suit _suit)
+        : m_rank(_rank), m_suit(_suit)
+    {}
+
+    shared::game::Card::Rank m_rank = shared::game::Card::Rank::Ace;
+    shared::game::Card::Suit m_suit = shared::game::Card::Suit::Clubs;
+};
+
+class RemotePlayerClickPileEvent final : public BaseNetEvent
+{
+public:
+    CN_EVENT(id::RemotePlayerClickPile)
+
+    RemotePlayerClickPileEvent() = default;
+    RemotePlayerClickPileEvent(bool _playerClickedOnDeck)
+        : m_playerClickedOnDeck(_playerClickedOnDeck)
+    {}
+
+    bool m_playerClickedOnDeck = false;
 };
 
 } // namespace cn::events

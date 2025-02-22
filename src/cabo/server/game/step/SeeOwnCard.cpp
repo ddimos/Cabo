@@ -33,8 +33,10 @@ SeeOwnCard::SeeOwnCard(Board& _board, PlayerId _playerId)
                         netManRef.send(event, nsf::MessageInfo::Type::EXCLUDE_BRODCAST, true, getManagedPlayerId());
                     }
                 },
-                .onUpdate = [this](sf::Time){
-                    requestFollowingState();
+                .onUpdate = [this](sf::Time _dt){
+                    m_seeCardTimeDt -= _dt;
+                    if (m_seeCardTimeDt.asSeconds() <= 0.f)
+                        requestFollowingState();
                 }
             }},
             {Id::Finished, {
@@ -70,6 +72,16 @@ void SeeOwnCard::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBe
     {
         _dispatcher.unregisterEvent<events::RemotePlayerClickSlotEvent>(getListenerId());
     }
+}
+
+bool SeeOwnCard::isFinished() const
+{
+    return getCurrentStateId() == Id::Finished;
+} 
+
+StepId SeeOwnCard::getNextStepId() const
+{
+    return StepId::Idle;
 }
 
 } // namespace cn::server::game::step
