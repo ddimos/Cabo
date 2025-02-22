@@ -47,6 +47,11 @@ sf::Vector2f calculateSpecialPosition(cn::client::menu::Position _position, sf::
 namespace cn::client::menu
 {
 
+sf::Vector2f Position::calculateGlobalPos() const
+{
+    return calculateSpecialPosition(*this, sf::Vector2f{0.f, 0.f}, m_parentPos, m_parentSize);
+}
+
 sf::Vector2f Position::calculateGlobalPos(sf::Vector2f _size) const
 {
     return calculateSpecialPosition(*this, _size, m_parentPos, m_parentSize);

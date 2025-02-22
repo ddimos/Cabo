@@ -18,6 +18,9 @@ struct Position
         OFFSET_FROM_END
     };
 
+    // For elements with the origin at the center
+    sf::Vector2f calculateGlobalPos() const;
+    // For elements with the origin at the top left corner pass a normal size
     sf::Vector2f calculateGlobalPos(sf::Vector2f _size) const;
 
     sf::Vector2f m_position{0.f, 0.f};
