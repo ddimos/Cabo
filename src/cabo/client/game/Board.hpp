@@ -3,6 +3,7 @@
 #include "client/game/Participant.hpp"
 #include "client/game/Step.hpp"
 #include "client/menu/Types.hpp"
+#include "client/menu/item/NotificationQueue.hpp"
 
 #include "shared/player/Types.hpp"
 
@@ -24,7 +25,7 @@ class Board final
 public:
     using DecideButtons = std::vector<client::menu::item::ButtonPtr>;
 
-    Board(const core::Context& _context, std::vector<game::Participant*>&& _participants);
+    Board(const core::Context& _context, std::vector<game::Participant*>&& _participants, menu::item::NotificationQueue& _queueRef);
 
     void registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered);
     void update(sf::Time _dt);
@@ -38,6 +39,7 @@ private:
     const core::Context& m_contextRef;
     
     std::vector<Participant*> m_participants;
+    menu::item::NotificationQueue& m_queueRef;
 
     core::event::ListenerId m_listenerId = core::event::ListenerIdInvalid;
     PlayerId m_localPlayerId = PlayerIdInvalid;

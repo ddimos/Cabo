@@ -14,9 +14,10 @@
 namespace cn::client::game
 {
 
-Board::Board(const core::Context& _context, std::vector<game::Participant*>&& _participants)
+Board::Board(const core::Context& _context, std::vector<game::Participant*>&& _participants, menu::item::NotificationQueue& _queueRef)
     : m_contextRef(_context)
     , m_participants(std::move(_participants))
+    , m_queueRef(_queueRef)
 {
     auto& eventDispatcherRef = getContext().get<core::event::Dispatcher>();
     auto& playerManagerRef = getContext().get<player::Manager>();

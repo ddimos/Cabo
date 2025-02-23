@@ -46,9 +46,37 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
     getContainer(core::object::Container::Type::Game).add(table);
     auto spawnPoints = table->generateSpawnPoints(playerManagerRef.getPlayers().size(), sf::Vector2f(windowRef.getSize()) / 2.f);
 
+    std::vector<menu::item::SimpleText*> images;
+    {
+        constexpr unsigned NumberOfTextElements = 5;
+        for (unsigned num = NumberOfTextElements; num > 0; --num)
+        {
+            auto text = std::make_shared<menu::item::SimpleText>(
+                menu::Position{},
+                "",
+                fontHolderRef.get(FontIds::Main),
+                24,
+                sf::Color::White
+            );
+            text->setActivationOption(core::object::Object::ActivationOption::Manually);
+            getContainer(core::object::Container::Type::Menu).add(text);
+            images.push_back(text.get());
+        }    
+    }
+
+    auto queue = std::make_shared<menu::item::NotificationQueue>(
+        menu::Position{
+            .m_position = sf::Vector2f(0.f, 0.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
+            .m_specPositionX = menu::Position::Special::CENTER_ALLIGNED, .m_specPositionY = menu::Position::Special::OFFSET_FROM_CENTER
+        },
+        sf::Time(sf::seconds(5.f)),
+        50.f,
+        images
+    );
+    getContainer(core::object::Container::Type::Menu).add(queue);
+    
     std::vector<game::Participant*> participants;
     {
-        
         const auto& players = playerManagerRef.getPlayers();
         size_t playerIndex = playerManagerRef.getIndexOfLocalPlayer();
         size_t countLeft = players.size();
@@ -106,7 +134,6 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
             countLeft--;
         }
         while (countLeft != 0);
-
     }
 
     auto deckButton = std::make_shared<menu::item::Button>(
@@ -140,7 +167,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
     getContainer(core::object::Container::Type::Menu).add(discardButton);
 
     m_board = std::make_unique<game::Board>(
-        getContext(), std::move(participants)
+        getContext(), std::move(participants), *queue
     );
 
     m_listenerId = core::event::getNewListenerId();

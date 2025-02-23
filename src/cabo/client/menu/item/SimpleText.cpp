@@ -17,6 +17,17 @@ SimpleText::SimpleText(Position _position, const std::string& _text,
     m_text.setPosition(m_transformable.calculateGlobalPos(m_text.getGlobalBounds().getSize()));
 }
 
+Position SimpleText::getPosition() const
+{
+    return m_transformable.getPosition();
+}
+
+void SimpleText::setPosition(Position _position)
+{
+    m_transformable.setPosition(_position);
+    m_text.setPosition(m_transformable.calculateGlobalPos(m_text.getLocalBounds().getSize()));
+}
+
 void SimpleText::updateText(const std::string& _text)
 {
     m_text.setString(_text);
