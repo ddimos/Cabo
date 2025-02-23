@@ -76,7 +76,7 @@ void Board::update(sf::Time _dt)
         CN_LOG_FRM("Board state {}", (int)m_state);
 
         auto& netManRef = getContext().get<net::Manager>();
-        events::BoardStateUpdateEvent event(m_state);
+        events::BoardStateUpdateNetEvent event(m_state);
         netManRef.send(event);
 
         // On Enter
@@ -155,7 +155,7 @@ void Board::participantStartsTurn(BoardParticipant& _participant)
     CN_LOG_FRM("Participant {} starts turn", playerId);
 
     auto& netManRef = getContext().get<net::Manager>();
-    events::PlayerTurnUpdateEvent event(playerId, true);
+    events::PlayerTurnUpdateNetEvent event(playerId, true);
     netManRef.send(event);
 
     StepId nextStepId = shared::game::getFirstStepId(m_state);

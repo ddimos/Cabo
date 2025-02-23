@@ -37,8 +37,8 @@ void DecideCard::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBe
 {
     if (_isBeingRegistered)
     {
-        _dispatcher.registerEvent<events::DrawCardEvent>(getListenerId(),
-            [this](const events::DrawCardEvent& _event)
+        _dispatcher.registerEvent<events::DrawCardNetEvent>(getListenerId(),
+            [this](const events::DrawCardNetEvent& _event)
             {    
                 if (getCurrentStateId() != Id::WaitInput)
                     return;
@@ -58,7 +58,7 @@ void DecideCard::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBe
     }
     else
     {
-        _dispatcher.unregisterEvent<events::DrawCardEvent>(getListenerId());
+        _dispatcher.unregisterEvent<events::DrawCardNetEvent>(getListenerId());
         _dispatcher.unregisterEvent<events::LocalPlayerClickDecideButtonEvent>(getListenerId());
     }
 }

@@ -50,14 +50,14 @@ LobbyState::LobbyState(core::state::Manager& _stateManagerRef)
         sf::IntRect{0,   0, 200, 62},
         sf::IntRect{200, 0, 200, 62},
         [&netManRef](){
-            events::PlayerReadyEvent event;
+            events::PlayerReadyNetEvent event;
             netManRef.send(event);
         },
         sf::Mouse::Button::Left
     );
     getContainer(core::object::Container::Type::Menu).add(startButton);
 
-    events::PlayerInfoUpdateEvent event({ Player{ .name = "Player Name"} });
+    events::PlayerInfoUpdateNetEvent event({ Player{ .name = "Player Name"} });
     netManRef.send(event);
 
     m_listenerId = core::event::getNewListenerId();
@@ -67,8 +67,8 @@ void LobbyState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _is
 {
     if (_isBeingRegistered)
     {
-        _dispatcher.registerEvent<events::StartGameEvent>(m_listenerId,
-            [this](const events::StartGameEvent& _event){
+        _dispatcher.registerEvent<events::StartGameNetEvent>(m_listenerId,
+            [this](const events::StartGameNetEvent& _event){
                 (void)_event;
                 pop();
                 push(id::Game);
@@ -77,7 +77,7 @@ void LobbyState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _is
     }
     else
     {
-        _dispatcher.unregisterEvent<events::StartGameEvent>(m_listenerId);
+        _dispatcher.unregisterEvent<events::StartGameNetEvent>(m_listenerId);
     }
 }
 

@@ -31,15 +31,15 @@ void Board::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRe
 {
     if (_isBeingRegistered)
     {
-        _dispatcher.registerEvent<events::BoardStateUpdateEvent>(m_listenerId,
-            [&_dispatcher, this](const events::BoardStateUpdateEvent& _event){
+        _dispatcher.registerEvent<events::BoardStateUpdateNetEvent>(m_listenerId,
+            [&_dispatcher, this](const events::BoardStateUpdateNetEvent& _event){
                 CN_LOG_FRM("Board {} ", (unsigned)_event.m_boardState);
 
                 m_boardState = _event.m_boardState;
             }
         );
-        _dispatcher.registerEvent<events::PlayerTurnUpdateEvent>(m_listenerId,
-            [&_dispatcher, this](const events::PlayerTurnUpdateEvent& _event){
+        _dispatcher.registerEvent<events::PlayerTurnUpdateNetEvent>(m_listenerId,
+            [&_dispatcher, this](const events::PlayerTurnUpdateNetEvent& _event){
                 CN_LOG_FRM("Turn {} started {}", (unsigned)_event.m_playerId, _event.m_hasTurnStarted);
 
                 if (_event.m_playerId != m_localPlayerId)
@@ -59,8 +59,8 @@ void Board::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRe
     }
     else
     {
-        _dispatcher.unregisterEvent<events::BoardStateUpdateEvent>(m_listenerId);
-        _dispatcher.unregisterEvent<events::PlayerTurnUpdateEvent>(m_listenerId);
+        _dispatcher.unregisterEvent<events::BoardStateUpdateNetEvent>(m_listenerId);
+        _dispatcher.unregisterEvent<events::PlayerTurnUpdateNetEvent>(m_listenerId);
     }
 }
 
@@ -81,7 +81,7 @@ void Board::update(sf::Time _dt)
             {
                 // there is no really need for the client to sent it
                 // auto& netManRef = getContext().get<net::Manager>();
-                // events::PlayerTurnUpdateEvent event(m_localPlayerId, false);
+                // events::PlayerTurnUpdateNetEvent event(m_localPlayerId, false);
                 // netManRef.send(event);
             }
         }

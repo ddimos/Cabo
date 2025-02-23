@@ -14,7 +14,7 @@ DrawCard::DrawCard(Board& _board, PlayerId _managedPlayerId)
             {Id::WaitRequest, {}},
             {Id::SendCard, {            
                 .onEnter = [this](){                   
-                    events::RemotePlayerClickPileEvent event(m_requestedCardFromDeck);
+                    events::RemotePlayerClickPileNetEvent event(m_requestedCardFromDeck);
                     m_boardRef.getContext().get<net::Manager>().send(event);
 
                     requestFollowingState();
@@ -33,8 +33,8 @@ void DrawCard::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBein
 {
     if (_isBeingRegistered)
     {
-        _dispatcher.registerEvent<events::RemotePlayerClickPileEvent>(getListenerId(),
-            [this](const events::RemotePlayerClickPileEvent& _event)
+        _dispatcher.registerEvent<events::RemotePlayerClickPileNetEvent>(getListenerId(),
+            [this](const events::RemotePlayerClickPileNetEvent& _event)
             {    
                 if (getCurrentStateId() != Id::WaitRequest)
                     return;
@@ -47,7 +47,7 @@ void DrawCard::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBein
     }
     else
     {
-        _dispatcher.unregisterEvent<events::RemotePlayerClickPileEvent>(getListenerId());
+        _dispatcher.unregisterEvent<events::RemotePlayerClickPileNetEvent>(getListenerId());
     }
 }
 

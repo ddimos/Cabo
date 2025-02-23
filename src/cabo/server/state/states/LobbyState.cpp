@@ -27,8 +27,8 @@ void LobbyState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _is
                 m_players.insert(_event.m_peerId);
             }
         );
-        _dispatcher.registerEvent<events::PlayerReadyEvent>(m_listenerId,
-            [this](const events::PlayerReadyEvent& _event){
+        _dispatcher.registerEvent<events::PlayerReadyNetEvent>(m_listenerId,
+            [this](const events::PlayerReadyNetEvent& _event){
                 (void)_event;
                 CN_LOG_FRM("Player ready.. {}", _event.m_senderPeerId);
                 m_players.erase(_event.m_senderPeerId);
@@ -36,7 +36,7 @@ void LobbyState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _is
                 if (m_players.empty())
                 {
                     CN_LOG("All players ready..");
-                    events::StartGameEvent event;
+                    events::StartGameNetEvent event;
                     auto& netManRef = getContext().get<net::Manager>();
                     netManRef.send(event);
                 
@@ -49,7 +49,7 @@ void LobbyState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _is
     else
     {
         _dispatcher.unregisterEvent<events::PeerConnectedEvent>(m_listenerId);
-        _dispatcher.unregisterEvent<events::PlayerReadyEvent>(m_listenerId);
+        _dispatcher.unregisterEvent<events::PlayerReadyNetEvent>(m_listenerId);
     }
 }
 

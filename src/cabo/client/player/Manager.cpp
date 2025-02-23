@@ -22,14 +22,14 @@ void Manager::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeing
 {
     if (_isBeingRegistered)
     {
-        _dispatcher.registerEvent<events::PlayerJoinAcceptEvent>(m_listenerId,
-            [this](const events::PlayerJoinAcceptEvent& _event){
+        _dispatcher.registerEvent<events::PlayerJoinAcceptNetEvent>(m_listenerId,
+            [this](const events::PlayerJoinAcceptNetEvent& _event){
                 CN_LOG_FRM("Player id: {}", _event.m_playerId);
                 m_localPlayerId = _event.m_playerId;
             }
         );
-        _dispatcher.registerEvent<events::PlayerInfoUpdateEvent>(m_listenerId,
-            [this](const events::PlayerInfoUpdateEvent& _event){
+        _dispatcher.registerEvent<events::PlayerInfoUpdateNetEvent>(m_listenerId,
+            [this](const events::PlayerInfoUpdateNetEvent& _event){
                 CN_LOG_FRM("Player info.. players count: {}", _event.m_players.size());
                 m_players.clear();
                 m_players = _event.m_players;
@@ -38,8 +38,8 @@ void Manager::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeing
     }
     else
     {
-        _dispatcher.unregisterEvent<events::PlayerJoinAcceptEvent>(m_listenerId);
-        _dispatcher.unregisterEvent<events::PlayerInfoUpdateEvent>(m_listenerId);
+        _dispatcher.unregisterEvent<events::PlayerJoinAcceptNetEvent>(m_listenerId);
+        _dispatcher.unregisterEvent<events::PlayerInfoUpdateNetEvent>(m_listenerId);
     }
 }
 

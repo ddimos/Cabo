@@ -24,12 +24,12 @@ SeeOwnCard::SeeOwnCard(Board& _board, PlayerId _playerId)
                     auto& netManRef = m_boardRef.getContext().get<net::Manager>();
 
                     {
-                        events::SeeCardInSlotEvent event(getManagedPlayerId(), m_slotId, card->getRank(), card->getSuit());
+                        events::SeeCardInSlotNetEvent event(getManagedPlayerId(), m_slotId, card->getRank(), card->getSuit());
                         netManRef.send(event, getManagedPlayerId());
                     }
 
                     {
-                        events::RemotePlayerClickSlotEvent event(getManagedPlayerId(), m_slotId);
+                        events::RemotePlayerClickSlotNetEvent event(getManagedPlayerId(), m_slotId);
                         netManRef.send(event, nsf::MessageInfo::Type::EXCLUDE_BRODCAST, true, getManagedPlayerId());
                     }
                 },
@@ -56,8 +56,8 @@ void SeeOwnCard::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBe
 {
     if (_isBeingRegistered)
     {
-        _dispatcher.registerEvent<events::RemotePlayerClickSlotEvent>(getListenerId(),
-            [this](const events::RemotePlayerClickSlotEvent& _event)
+        _dispatcher.registerEvent<events::RemotePlayerClickSlotNetEvent>(getListenerId(),
+            [this](const events::RemotePlayerClickSlotNetEvent& _event)
             {    
                 if (getCurrentStateId() != Id::WaitRequest)
                     return;
@@ -70,7 +70,7 @@ void SeeOwnCard::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBe
     }
     else
     {
-        _dispatcher.unregisterEvent<events::RemotePlayerClickSlotEvent>(getListenerId());
+        _dispatcher.unregisterEvent<events::RemotePlayerClickSlotNetEvent>(getListenerId());
     }
 }
 

@@ -22,68 +22,68 @@ public:
     nsf::PeerID m_senderPeerId = nsf::PEER_ID_INVALID;
 };
 
-class PlayerJoinAcceptEvent final: public BaseNetEvent
+class PlayerJoinAcceptNetEvent final: public BaseNetEvent
 {
 public:
     CN_EVENT(id::PlayerJoinAccept)
 
-    PlayerJoinAcceptEvent() = default;
-    PlayerJoinAcceptEvent(PlayerId _playerId)
+    PlayerJoinAcceptNetEvent() = default;
+    PlayerJoinAcceptNetEvent(PlayerId _playerId)
         : m_playerId(_playerId)
     {}
 
     PlayerId m_playerId = PlayerIdInvalid; 
 };
 
-class PlayerInfoUpdateEvent final : public BaseNetEvent
+class PlayerInfoUpdateNetEvent final : public BaseNetEvent
 {
 public:
     CN_EVENT(id::PlayerInfoUpdate)
 
-    PlayerInfoUpdateEvent() = default;
-    PlayerInfoUpdateEvent(const std::vector<Player>& _players)
+    PlayerInfoUpdateNetEvent() = default;
+    PlayerInfoUpdateNetEvent(const std::vector<Player>& _players)
         : m_players(_players)
     {}
 
     std::vector<Player> m_players;
 };
 
-class PlayerReadyEvent final : public BaseNetEvent
+class PlayerReadyNetEvent final : public BaseNetEvent
 {
 public:
     CN_EVENT(id::PlayerReady)
 
-    PlayerReadyEvent() = default;
+    PlayerReadyNetEvent() = default;
 };
 
-class StartGameEvent final : public BaseNetEvent
+class StartGameNetEvent final : public BaseNetEvent
 {
 public:
     CN_EVENT(id::StartGame)
     
-    StartGameEvent() = default;
+    StartGameNetEvent() = default;
 };
 
-class BoardStateUpdateEvent final : public BaseNetEvent
+class BoardStateUpdateNetEvent final : public BaseNetEvent
 {
 public:
     CN_EVENT(id::BoardStateUpdate)
 
-    BoardStateUpdateEvent() = default;
-    BoardStateUpdateEvent(shared::game::BoardState _boardState)
+    BoardStateUpdateNetEvent() = default;
+    BoardStateUpdateNetEvent(shared::game::BoardState _boardState)
         : m_boardState(_boardState)
     {}
 
     shared::game::BoardState m_boardState = shared::game::BoardState::Start;
 };
 
-class PlayerTurnUpdateEvent final : public BaseNetEvent
+class PlayerTurnUpdateNetEvent final : public BaseNetEvent
 {
 public:
     CN_EVENT(id::PlayerTurnUpdate)
 
-    PlayerTurnUpdateEvent() = default;
-    PlayerTurnUpdateEvent(PlayerId _playerId, bool _hasTurnStarted)
+    PlayerTurnUpdateNetEvent() = default;
+    PlayerTurnUpdateNetEvent(PlayerId _playerId, bool _hasTurnStarted)
         : m_playerId(_playerId), m_hasTurnStarted(_hasTurnStarted)
     {}
 
@@ -91,13 +91,13 @@ public:
     bool m_hasTurnStarted = true;
 };
 
-class RemotePlayerClickSlotEvent final : public BaseNetEvent
+class RemotePlayerClickSlotNetEvent final : public BaseNetEvent
 {
 public:
     CN_EVENT(id::RemotePlayerClickSlot)
 
-    RemotePlayerClickSlotEvent() = default;
-    RemotePlayerClickSlotEvent(PlayerId _slotOwnerId, shared::game::ParticipantSlotId _slotId)
+    RemotePlayerClickSlotNetEvent() = default;
+    RemotePlayerClickSlotNetEvent(PlayerId _slotOwnerId, shared::game::ParticipantSlotId _slotId)
         : m_slotOwnerId(_slotOwnerId), m_slotId(_slotId)
     {}
 
@@ -105,13 +105,13 @@ public:
     shared::game::ParticipantSlotId m_slotId = shared::game::ParticipantSlotIdInvalid;
 };
 
-class SeeCardInSlotEvent final : public BaseNetEvent
+class SeeCardInSlotNetEvent final : public BaseNetEvent
 {
 public:
     CN_EVENT(id::SeeCardInSlot)
 
-    SeeCardInSlotEvent() = default;
-    SeeCardInSlotEvent(PlayerId _slotOwnerId, shared::game::ParticipantSlotId _slotId, shared::game::Card::Rank _rank, shared::game::Card::Suit _suit)
+    SeeCardInSlotNetEvent() = default;
+    SeeCardInSlotNetEvent(PlayerId _slotOwnerId, shared::game::ParticipantSlotId _slotId, shared::game::Card::Rank _rank, shared::game::Card::Suit _suit)
         : m_slotOwnerId(_slotOwnerId), m_slotId(_slotId), m_rank(_rank), m_suit(_suit)
     {}
 
@@ -121,13 +121,13 @@ public:
     shared::game::Card::Suit m_suit = shared::game::Card::Suit::Clubs;
 };
 
-class DrawCardEvent final : public BaseNetEvent
+class DrawCardNetEvent final : public BaseNetEvent
 {
 public:
     CN_EVENT(id::DrawCard)
 
-    DrawCardEvent() = default;
-    DrawCardEvent(shared::game::Card::Rank _rank, shared::game::Card::Suit _suit)
+    DrawCardNetEvent() = default;
+    DrawCardNetEvent(shared::game::Card::Rank _rank, shared::game::Card::Suit _suit)
         : m_rank(_rank), m_suit(_suit)
     {}
 
@@ -135,13 +135,13 @@ public:
     shared::game::Card::Suit m_suit = shared::game::Card::Suit::Clubs;
 };
 
-class RemotePlayerClickPileEvent final : public BaseNetEvent
+class RemotePlayerClickPileNetEvent final : public BaseNetEvent
 {
 public:
     CN_EVENT(id::RemotePlayerClickPile)
 
-    RemotePlayerClickPileEvent() = default;
-    RemotePlayerClickPileEvent(bool _playerClickedOnDeck)
+    RemotePlayerClickPileNetEvent() = default;
+    RemotePlayerClickPileNetEvent(bool _playerClickedOnDeck)
         : m_playerClickedOnDeck(_playerClickedOnDeck)
     {}
 
