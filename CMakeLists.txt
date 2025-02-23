@@ -19,7 +19,23 @@ FetchContent_MakeAvailable(nsf)
 
 set(CMAKE_CXX_STANDARD 20)
 
-file(GLOB_RECURSE TARGET_SRC "./src/cabo/*.cpp" )
+set(LAUNCH_TARGET "Client" CACHE STRING "Set the launch target. Possible values [Client, Server]")
+
+message("Generated launch type: ${LAUNCH_TARGET}")
+
+if (LAUNCH_TARGET STREQUAL "Client")
+    file(GLOB_RECURSE TARGET_SRC 
+                                "./src/cabo/client/*.cpp"
+                                "./src/cabo/core/*.cpp"
+                                "./src/cabo/shared/*.cpp"
+    )
+else ()
+    file(GLOB_RECURSE TARGET_SRC 
+                                "./src/cabo/server/*.cpp"
+                                "./src/cabo/core/*.cpp"
+                                "./src/cabo/shared/*.cpp"
+    )
+endif ()
 
 add_executable(Cabo ${TARGET_SRC} "./src/main.cpp")
 
@@ -31,10 +47,6 @@ target_include_directories(Cabo PUBLIC
                             )
 
 set(CMAKE_COMPILE_WARNING_AS_ERROR ON)
-
-set(LAUNCH_TARGET "Client" CACHE STRING "Set the launch target. Possible values [Client, Server]")
-
-message("Generated launch type: ${LAUNCH_TARGET}")
 
 if (LAUNCH_TARGET STREQUAL "Client")
     set(TARGET_OUTPUT_NAME "Cabo_Client")
