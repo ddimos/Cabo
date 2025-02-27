@@ -22,4 +22,6 @@ sf::IntRect getTakeButtonTextureRect(Hover _hover = Hover::No);
 sf::IntRect getActionButtonTextureRect(Hover _hover = Hover::No);
 sf::IntRect getDiscardButtonTextureRect(Hover _hover = Hover::No);
 
+sf::IntRect getFinishButtonTextureRect(Hover _hover = Hover::No);
+
 } // namespace cn::client::game::spriteSheet

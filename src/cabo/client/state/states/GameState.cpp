@@ -166,6 +166,21 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
     );
     getContainer(core::object::Container::Type::Menu).add(discardButton);
 
+    auto finishButton = std::make_shared<menu::item::Button>(
+        menu::Position{
+            .m_position = sf::Vector2f(100.f, 100.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
+            .m_specPositionX = menu::Position::Special::OFFSET_FROM_END, .m_specPositionY = menu::Position::Special::OFFSET_FROM_END
+        },
+        textureHolderRef.get(TextureIds::FinishButton),
+        game::spriteSheet::getFinishButtonTextureRect(),
+        game::spriteSheet::getFinishButtonTextureRect(game::spriteSheet::Hover::Yes),
+        [this, &eventDispatcherRef](){
+            eventDispatcherRef.send<events::LocalPlayerClickFinishButtonEvent>();
+        },
+        sf::Mouse::Button::Left
+    );
+    getContainer(core::object::Container::Type::Menu).add(finishButton);
+
     m_board = std::make_unique<game::Board>(
         getContext(), std::move(participants), *queue
     );

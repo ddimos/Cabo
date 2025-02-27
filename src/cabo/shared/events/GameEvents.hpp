@@ -55,4 +55,14 @@ public:
     shared::game::DecideButton m_button = shared::game::DecideButton::Action;
 };
 
+class LocalPlayerClickFinishButtonEvent final : public core::event::Event
+{
+public:
+    CN_EVENT(id::LocalPlayerClickFinishButton)
+
+    LocalPlayerClickFinishButtonEvent()
+    {}
+};
+
+
 } // namespace cn::events

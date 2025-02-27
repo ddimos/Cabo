@@ -37,6 +37,7 @@ enum : core::event::EventId
     LocalPlayerClickDecideButton,
     LocalPlayerClickDeck,
     LocalPlayerClickDiscard,
+    LocalPlayerClickFinishButton,
     LocalPlayerClickSlot,
 };
 
