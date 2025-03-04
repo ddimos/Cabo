@@ -45,35 +45,6 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
     auto table = std::make_shared<game::Table>(getContext());
     getContainer(core::object::Container::Type::Game).add(table);
     auto spawnPoints = table->generateSpawnPoints(playerManagerRef.getPlayers().size(), sf::Vector2f(windowRef.getSize()) / 2.f);
-
-    std::vector<menu::item::SimpleText*> images;
-    {
-        constexpr unsigned NumberOfTextElements = 5;
-        for (unsigned num = NumberOfTextElements; num > 0; --num)
-        {
-            auto text = std::make_shared<menu::item::SimpleText>(
-                menu::Position{},
-                "",
-                fontHolderRef.get(FontIds::Main),
-                24,
-                sf::Color::White
-            );
-            text->setActivationOption(core::object::Object::ActivationOption::Manually);
-            getContainer(core::object::Container::Type::Menu).add(text);
-            images.push_back(text.get());
-        }    
-    }
-
-    auto queue = std::make_shared<menu::item::NotificationQueue>(
-        menu::Position{
-            .m_position = sf::Vector2f(0.f, 0.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
-            .m_specPositionX = menu::Position::Special::CENTER_ALLIGNED, .m_specPositionY = menu::Position::Special::OFFSET_FROM_CENTER
-        },
-        sf::Time(sf::seconds(5.f)),
-        50.f,
-        images
-    );
-    getContainer(core::object::Container::Type::Menu).add(queue);
     
     std::vector<game::Participant*> participants;
     {
@@ -179,10 +150,110 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
         },
         sf::Mouse::Button::Left
     );
+    finishButton->setActivationOption(core::object::Object::ActivationOption::Manually);
     getContainer(core::object::Container::Type::Menu).add(finishButton);
 
+    game::Board::DecideButtons buttons;
+    {
+        auto matchButton = std::make_shared<menu::item::Button>(
+            menu::Position{
+                .m_position = sf::Vector2f(-150.f, 150.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
+                .m_specPositionX = menu::Position::Special::OFFSET_FROM_CENTER, .m_specPositionY = menu::Position::Special::OFFSET_FROM_CENTER
+            },
+            textureHolderRef.get(TextureIds::DecideButtons),
+            game::spriteSheet::getMatchButtonTextureRect(),
+            game::spriteSheet::getMatchButtonTextureRect(game::spriteSheet::Hover::Yes),
+            [this, &eventDispatcherRef](){
+                eventDispatcherRef.send<events::LocalPlayerClickDecideButtonEvent>(game::DecideButton::Match);
+            },
+            sf::Mouse::Button::Left
+        );
+        matchButton->setActivationOption(core::object::Object::ActivationOption::Manually);
+        getContainer(core::object::Container::Type::Menu).add(matchButton);
+        buttons.push_back(matchButton.get());
+
+        auto takeButton = std::make_shared<menu::item::Button>(
+            menu::Position{
+                .m_position = sf::Vector2f(-70.f, 150.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
+                .m_specPositionX = menu::Position::Special::OFFSET_FROM_CENTER, .m_specPositionY = menu::Position::Special::OFFSET_FROM_CENTER
+            },
+            textureHolderRef.get(TextureIds::DecideButtons),
+            game::spriteSheet::getTakeButtonTextureRect(),
+            game::spriteSheet::getTakeButtonTextureRect(game::spriteSheet::Hover::Yes),
+            [this, &eventDispatcherRef](){
+                eventDispatcherRef.send<events::LocalPlayerClickDecideButtonEvent>(game::DecideButton::Take);
+            },
+            sf::Mouse::Button::Left
+        );
+        takeButton->setActivationOption(core::object::Object::ActivationOption::Manually);
+        getContainer(core::object::Container::Type::Menu).add(takeButton);
+        buttons.push_back(takeButton.get());
+
+        auto actionButton = std::make_shared<menu::item::Button>(
+            menu::Position{
+                .m_position = sf::Vector2f(70.f, 150.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
+                .m_specPositionX = menu::Position::Special::OFFSET_FROM_CENTER, .m_specPositionY = menu::Position::Special::OFFSET_FROM_CENTER
+            },
+            textureHolderRef.get(TextureIds::DecideButtons),
+            game::spriteSheet::getActionButtonTextureRect(),
+            game::spriteSheet::getActionButtonTextureRect(game::spriteSheet::Hover::Yes),
+            [this, &eventDispatcherRef](){
+                eventDispatcherRef.send<events::LocalPlayerClickDecideButtonEvent>(game::DecideButton::Action);
+            },
+            sf::Mouse::Button::Left
+        );
+        actionButton->setActivationOption(core::object::Object::ActivationOption::Manually);
+        getContainer(core::object::Container::Type::Menu).add(actionButton);
+        buttons.push_back(actionButton.get());
+
+        auto discardButton = std::make_shared<menu::item::Button>(
+            menu::Position{
+                .m_position = sf::Vector2f(150.f, 150.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
+                .m_specPositionX = menu::Position::Special::OFFSET_FROM_CENTER, .m_specPositionY = menu::Position::Special::OFFSET_FROM_CENTER
+            },
+            textureHolderRef.get(TextureIds::DecideButtons),
+            game::spriteSheet::getDiscardButtonTextureRect(),
+            game::spriteSheet::getDiscardButtonTextureRect(game::spriteSheet::Hover::Yes),
+            [this, &eventDispatcherRef](){
+                eventDispatcherRef.send<events::LocalPlayerClickDecideButtonEvent>(game::DecideButton::Discard);
+            },
+            sf::Mouse::Button::Left
+        );
+        discardButton->setActivationOption(core::object::Object::ActivationOption::Manually);
+        getContainer(core::object::Container::Type::Menu).add(discardButton);
+        buttons.push_back(discardButton.get());
+    }
+
+    std::vector<menu::item::SimpleText*> images;
+    {
+        constexpr unsigned NumberOfTextElements = 5;
+        for (unsigned num = NumberOfTextElements; num > 0; --num)
+        {
+            auto text = std::make_shared<menu::item::SimpleText>(
+                menu::Position{},
+                "",
+                fontHolderRef.get(FontIds::Main),
+                24,
+                sf::Color::White
+            );
+            text->setActivationOption(core::object::Object::ActivationOption::Manually);
+            getContainer(core::object::Container::Type::Menu).add(text);
+            images.push_back(text.get());
+        }    
+    }
+    auto queue = std::make_shared<menu::item::NotificationQueue>(
+        menu::Position{
+            .m_position = sf::Vector2f(0.f, 0.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
+            .m_specPositionX = menu::Position::Special::CENTER_ALLIGNED, .m_specPositionY = menu::Position::Special::OFFSET_FROM_CENTER
+        },
+        sf::Time(sf::seconds(5.f)),
+        50.f,
+        images
+    );
+    getContainer(core::object::Container::Type::Menu).add(queue);
+
     m_board = std::make_unique<game::Board>(
-        getContext(), std::move(participants), *queue
+        getContext(), std::move(participants), *queue, *finishButton, std::move(buttons)
     );
 
     m_listenerId = core::event::getNewListenerId();

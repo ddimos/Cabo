@@ -20,12 +20,20 @@ DecideCard::DecideCard(Board& _board, PlayerId _managedPlayerId)
             }},
             {Id::WaitInput, {         
                 .onEnter = [this](){
-                    // TODo
+                    m_boardRef.onParticipantStartDeciding();
                 },
                 .onUpdate = [this](sf::Time){
                 }
             }},
-            {Id::Finished, {}},
+            {Id::Finished, {
+                .onEnter = [this](){
+                    m_boardRef.onParticipantFinishDeciding();
+                    events::RemotePlayerInputNetEvent event(getManagedPlayerId(), InputType::DecideButton, m_button);
+                    m_boardRef.getContext().get<net::Manager>().send(event);
+                },
+                .onUpdate = [this](sf::Time){
+                }
+            }},
         }
     )
     , m_boardRef(_board)
@@ -37,10 +45,10 @@ void DecideCard::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBe
 {
     if (_isBeingRegistered)
     {
-        _dispatcher.registerEvent<events::DrawCardNetEvent>(getListenerId(),
-            [this](const events::DrawCardNetEvent& _event)
+        _dispatcher.registerEvent<events::ProvideCardNetEvent>(getListenerId(),
+            [this](const events::ProvideCardNetEvent& _event)
             {    
-                if (getCurrentStateId() != Id::WaitInput)
+                if (getCurrentStateId() != Id::WaitCard)
                     return;
 
                 requestFollowingState();
@@ -58,7 +66,7 @@ void DecideCard::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBe
     }
     else
     {
-        _dispatcher.unregisterEvent<events::DrawCardNetEvent>(getListenerId());
+        _dispatcher.unregisterEvent<events::ProvideCardNetEvent>(getListenerId());
         _dispatcher.unregisterEvent<events::LocalPlayerClickDecideButtonEvent>(getListenerId());
     }
 }

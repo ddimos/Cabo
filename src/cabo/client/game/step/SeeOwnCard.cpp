@@ -18,7 +18,7 @@ SeeOwnCard::SeeOwnCard(Board& _board, PlayerId _managedPlayerId)
                     auto* participant = m_boardRef.getParticipant(getManagedPlayerId());
                     participant->onStartShowingCardInSlot(m_slotId);
                     
-                    events::RemotePlayerClickSlotNetEvent event(getManagedPlayerId(), m_slotId);
+                    events::RemotePlayerInputNetEvent event(getManagedPlayerId(), InputType::ClickSlot, m_slotId);
                     m_boardRef.getContext().get<net::Manager>().send(event);
                 },
                 .onUpdate = [this](sf::Time){
@@ -67,13 +67,11 @@ void SeeOwnCard::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBe
                 m_slotId = _event.slotId;
             }
         );
-        _dispatcher.registerEvent<events::SeeCardInSlotNetEvent>(getListenerId(),
-            [this](const events::SeeCardInSlotNetEvent& _event)
+        _dispatcher.registerEvent<events::ProvideCardNetEvent>(getListenerId(),
+            [this](const events::ProvideCardNetEvent& _event)
             {    
                 if (getCurrentStateId() != Id::RequestSeeCard)
                     return;
-                CN_ASSERT(_event.m_slotOwnerId == getManagedPlayerId());
-                CN_ASSERT(_event.m_slotId == m_slotId);
 
                 requestFollowingState();
                 m_rank = _event.m_rank;
@@ -84,7 +82,7 @@ void SeeOwnCard::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBe
     else
     {
         _dispatcher.unregisterEvent<events::LocalPlayerClickSlotEvent>(getListenerId());
-        _dispatcher.unregisterEvent<events::SeeCardInSlotNetEvent>(getListenerId());
+        _dispatcher.unregisterEvent<events::ProvideCardNetEvent>(getListenerId());
     }
 }
 
@@ -95,7 +93,7 @@ bool SeeOwnCard::isFinished() const
 
 StepId SeeOwnCard::getNextStepId() const
 {
-    return StepId::Idle;
+    return StepId::FinishTurn;
 }
 
 } // namespace cn::client::game::step

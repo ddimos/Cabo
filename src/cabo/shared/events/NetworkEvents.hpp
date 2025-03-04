@@ -7,6 +7,8 @@
 #include "shared/game/Types.hpp"
 #include "shared/player/Types.hpp"
 
+#include "SFML/System/Time.hpp"
+
 #include <nsf/Types.hpp>
 #include <string>
 #include <vector>
@@ -20,6 +22,8 @@ public:
     BaseNetEvent() = default;
     
     nsf::PeerID m_senderPeerId = nsf::PEER_ID_INVALID;
+    sf::Time m_receivedTime{};
+    sf::Time m_sentTimeRttBased{};
 };
 
 class PlayerJoinAcceptNetEvent final: public BaseNetEvent
@@ -91,61 +95,36 @@ public:
     bool m_hasTurnStarted = true;
 };
 
-class RemotePlayerClickSlotNetEvent final : public BaseNetEvent
+class RemotePlayerInputNetEvent final : public BaseNetEvent
 {
 public:
-    CN_EVENT(id::RemotePlayerClickSlot)
+    CN_EVENT(id::RemotePlayerInput)
 
-    RemotePlayerClickSlotNetEvent() = default;
-    RemotePlayerClickSlotNetEvent(PlayerId _slotOwnerId, shared::game::ParticipantSlotId _slotId)
-        : m_slotOwnerId(_slotOwnerId), m_slotId(_slotId)
+    RemotePlayerInputNetEvent() = default;
+    RemotePlayerInputNetEvent(PlayerId _playerId, shared::game::InputType _inputType)
+        : m_playerId(_playerId), m_inputType(_inputType)
+    {}
+    RemotePlayerInputNetEvent(PlayerId _playerId, shared::game::InputType _inputType, shared::game::InputDataVariant _data)
+        : m_playerId(_playerId), m_inputType(_inputType), m_data(_data)
     {}
 
-    PlayerId m_slotOwnerId = PlayerIdInvalid;
-    shared::game::ParticipantSlotId m_slotId = shared::game::ParticipantSlotIdInvalid;
+    PlayerId m_playerId = PlayerIdInvalid;
+    shared::game::InputType m_inputType = shared::game::InputType::Cabo;
+    shared::game::InputDataVariant m_data = std::monostate();
 };
 
-class SeeCardInSlotNetEvent final : public BaseNetEvent
+class ProvideCardNetEvent final : public BaseNetEvent
 {
 public:
-    CN_EVENT(id::SeeCardInSlot)
+    CN_EVENT(id::ProvideCard)
 
-    SeeCardInSlotNetEvent() = default;
-    SeeCardInSlotNetEvent(PlayerId _slotOwnerId, shared::game::ParticipantSlotId _slotId, shared::game::Card::Rank _rank, shared::game::Card::Suit _suit)
-        : m_slotOwnerId(_slotOwnerId), m_slotId(_slotId), m_rank(_rank), m_suit(_suit)
-    {}
-
-    PlayerId m_slotOwnerId = PlayerIdInvalid;
-    shared::game::ParticipantSlotId m_slotId = shared::game::ParticipantSlotIdInvalid;
-    shared::game::Card::Rank m_rank = shared::game::Card::Rank::Ace;
-    shared::game::Card::Suit m_suit = shared::game::Card::Suit::Clubs;
-};
-
-class DrawCardNetEvent final : public BaseNetEvent
-{
-public:
-    CN_EVENT(id::DrawCard)
-
-    DrawCardNetEvent() = default;
-    DrawCardNetEvent(shared::game::Card::Rank _rank, shared::game::Card::Suit _suit)
+    ProvideCardNetEvent() = default;
+    ProvideCardNetEvent(shared::game::Card::Rank _rank, shared::game::Card::Suit _suit)
         : m_rank(_rank), m_suit(_suit)
     {}
 
     shared::game::Card::Rank m_rank = shared::game::Card::Rank::Ace;
     shared::game::Card::Suit m_suit = shared::game::Card::Suit::Clubs;
-};
-
-class RemotePlayerClickPileNetEvent final : public BaseNetEvent
-{
-public:
-    CN_EVENT(id::RemotePlayerClickPile)
-
-    RemotePlayerClickPileNetEvent() = default;
-    RemotePlayerClickPileNetEvent(bool _playerClickedOnDeck)
-        : m_playerClickedOnDeck(_playerClickedOnDeck)
-    {}
-
-    bool m_playerClickedOnDeck = false;
 };
 
 } // namespace cn::events

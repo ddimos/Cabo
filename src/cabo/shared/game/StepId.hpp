@@ -10,6 +10,7 @@ enum class StepId : uint8_t
     DecideCard,
     DiscardCard,
     DrawCard,
+    FinishTurn,
     Idle,
     MatchCard,
     SeeOwnCard, // ? SeeCardInSlot

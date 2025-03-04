@@ -27,6 +27,7 @@ Client::Client()
     m_context.insert(m_netManager);
     m_context.insert(m_eventManager.getDispatcher());
     m_context.insert(m_playerManager);
+    m_context.insert(m_systemClock);
 
     m_window.setKeyRepeatEnabled(false);
     m_window.setFramerateLimit(60);
@@ -79,6 +80,7 @@ void Client::init()
     m_textureHolder.load(TextureIds::Background, "res/textures/background.png");
     m_textureHolder.load(TextureIds::BackButton, "res/textures/back_button.png");
     m_textureHolder.load(TextureIds::Cards, "res/textures/cards.png");
+    m_textureHolder.load(TextureIds::FinishButton, "res/textures/finish_button.png");
     m_textureHolder.load(TextureIds::MainMenuStartButton, "res/textures/create_menu_start_button.png");
     m_textureHolder.load(TextureIds::DecideButtons, "res/textures/decide_buttons.png");
     m_textureHolder.load(TextureIds::MainMenuJoinButton, "res/textures/join_menu_join_button.png");

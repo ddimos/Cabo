@@ -9,6 +9,7 @@
 #include "server/player/Manager.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/System/Clock.hpp>
 
 namespace cn
 {
@@ -21,6 +22,7 @@ enum : core::ContextObjectId
     FontHolder,
     NetManager,
     PlayerManager,
+    SystemClock,
     TextureHolder,
     Window
 };
@@ -37,6 +39,8 @@ template <>
 core::ContextObjectId core::getContextObjectId<core::event::Dispatcher>();
 template <>
 core::ContextObjectId core::getContextObjectId<net::Manager>();
+template <>
+core::ContextObjectId core::getContextObjectId<sf::Clock>();
 // TODO to fix this, create two version of this file
 template <>
 core::ContextObjectId core::getContextObjectId<client::player::Manager>();

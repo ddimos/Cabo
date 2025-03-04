@@ -12,7 +12,7 @@ include(FetchContent)
 
 FetchContent_Declare(nsf
     GIT_REPOSITORY https://github.com/ddimos/nsf.git
-    GIT_TAG v0.1.2)
+    GIT_TAG v0.2.0)
 
 option(NSF_BUILD_EXAMPLE "Build the nsf example" OFF)
 FetchContent_MakeAvailable(nsf)
@@ -28,12 +28,14 @@ if (LAUNCH_TARGET STREQUAL "Client")
                                 "./src/cabo/client/*.cpp"
                                 "./src/cabo/core/*.cpp"
                                 "./src/cabo/shared/*.cpp"
+                                "./src/cabo/ContextObjectIds.cpp"
     )
 else ()
     file(GLOB_RECURSE TARGET_SRC 
                                 "./src/cabo/server/*.cpp"
                                 "./src/cabo/core/*.cpp"
                                 "./src/cabo/shared/*.cpp"
+                                "./src/cabo/ContextObjectIds.cpp"
     )
 endif ()
 

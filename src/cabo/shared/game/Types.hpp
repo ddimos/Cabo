@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <limits>
 #include <memory>
+#include <variant>
 
 namespace cn::shared::game
 {
@@ -34,5 +35,22 @@ enum class DecideButton
     Match,
     Take
 };
+
+enum class PileType
+{
+    Deck,
+    Discard
+};
+
+enum class InputType
+{
+    Cabo,
+    ClickPile,
+    ClickSlot,
+    DecideButton,
+    Finish
+};
+
+using InputDataVariant = std::variant<DecideButton, ParticipantSlotId, PileType, std::monostate>;
 
 } // namespace cn::shared::game

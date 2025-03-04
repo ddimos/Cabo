@@ -29,6 +29,11 @@ core::ContextObjectId core::getContextObjectId<net::Manager>()
     return context::id::NetManager;
 }
 template <>
+core::ContextObjectId core::getContextObjectId<sf::Clock>()
+{
+    return context::id::SystemClock;
+}
+template <>
 core::ContextObjectId core::getContextObjectId<client::player::Manager>()
 {
     return context::id::PlayerManager;

@@ -30,6 +30,7 @@ Manager::~Manager() = default;
 void Manager::init()
 {
     auto& eventDispatcherRef = m_contextRef.get<core::event::Dispatcher>();
+    auto& systemClockRef = m_contextRef.get<sf::Clock>();
 
     nsf::Config config;
     nsf::NSFCallbacks callbacks;
@@ -53,14 +54,23 @@ void Manager::init()
             m_connectedPeers.end()
         );
     };
-    callbacks.onReceived = [this, &eventDispatcherRef](nsf::NetworkMessage&& _message){
+    callbacks.onReceived = [this, &eventDispatcherRef, &systemClockRef](nsf::NetworkMessage&& _message){
         core::event::EventId eventId = core::event::EventIdInvalid;
         _message.m_data >> eventId;
         auto& slot = m_factory.get(eventId);
-        auto eventPtr = slot.create(_message.getPeerId());
-        slot.deserialize(*eventPtr, _message.m_data);
+        auto eventPtr = slot.create();
+        {
+            auto receivedTime = systemClockRef.getElapsedTime();
+            float rtt = m_network->getRtt(_message.getPeerId());
+            auto& netEvent = static_cast<events::BaseNetEvent&>(*eventPtr);
+            netEvent.m_senderPeerId = _message.getPeerId();
+            netEvent.m_receivedTime = receivedTime;
+            netEvent.m_sentTimeRttBased = receivedTime - sf::Time(sf::seconds(rtt / 2.f));
         
-        CN_LOG_FRM("Received from: {}, event: {}", _message.getPeerId(), eventId);
+            CN_LOG_FRM("Received from: {}, event: {}, time: {}, rtt: {}", _message.getPeerId(), eventId, netEvent.m_receivedTime.asSeconds(), rtt);
+        }
+        
+        slot.deserialize(*eventPtr, _message.m_data);
         eventDispatcherRef.sendDelayed(std::move(eventPtr));
     };
 

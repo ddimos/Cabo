@@ -21,15 +21,13 @@ enum : core::event::EventId
     // Net events
     // PlayerJoined,
     // PlayerLeft,
-    DrawCard,
     BoardStateUpdate,
     PlayerInfoUpdate,
     PlayerJoinAccept,
     PlayerReady,
     PlayerTurnUpdate,
-    RemotePlayerClickPile,
-    RemotePlayerClickSlot,
-    SeeCardInSlot,
+    ProvideCard,
+    RemotePlayerInput,
     StartGame,
 
 

@@ -86,12 +86,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
 
 void GameState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered)
 {
-    if (_isBeingRegistered)
-    {
-    }
-    else
-    {
-    }
+    m_board->registerEvents(_dispatcher, _isBeingRegistered);
 }
 
 core::state::Return GameState::onUpdate(sf::Time _dt)

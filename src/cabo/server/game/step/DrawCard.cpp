@@ -14,8 +14,8 @@ DrawCard::DrawCard(Board& _board, PlayerId _managedPlayerId)
             {Id::WaitRequest, {}},
             {Id::SendCard, {            
                 .onEnter = [this](){                   
-                    events::RemotePlayerClickPileNetEvent event(m_requestedCardFromDeck);
-                    m_boardRef.getContext().get<net::Manager>().send(event);
+                    // events::RemotePlayerClickPileNetEvent event(m_requestedCardFromDeck);
+                    // m_boardRef.getContext().get<net::Manager>().send(event);
 
                     requestFollowingState();
                 },
@@ -33,21 +33,21 @@ void DrawCard::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBein
 {
     if (_isBeingRegistered)
     {
-        _dispatcher.registerEvent<events::RemotePlayerClickPileNetEvent>(getListenerId(),
-            [this](const events::RemotePlayerClickPileNetEvent& _event)
-            {    
-                if (getCurrentStateId() != Id::WaitRequest)
-                    return;
-                if (getManagedPlayerId() != _event.m_senderPeerId)
-                    return;
-                m_requestedCardFromDeck = true;
-                requestFollowingState();
-            }
-        );
+        // _dispatcher.registerEvent<events::RemotePlayerClickPileNetEvent>(getListenerId(),
+        //     [this](const events::RemotePlayerClickPileNetEvent& _event)
+        //     {    
+        //         if (getCurrentStateId() != Id::WaitRequest)
+        //             return;
+        //         if (getManagedPlayerId() != _event.m_senderPeerId)
+        //             return;
+        //         m_requestedCardFromDeck = true;
+        //         requestFollowingState();
+        //     }
+        // );
     }
     else
     {
-        _dispatcher.unregisterEvent<events::RemotePlayerClickPileNetEvent>(getListenerId());
+        // _dispatcher.unregisterEvent<events::RemotePlayerClickPileNetEvent>(getListenerId());
     }
 }
 

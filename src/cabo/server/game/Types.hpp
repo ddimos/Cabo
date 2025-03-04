@@ -16,5 +16,8 @@ struct ParticipantSlot : public shared::game::ParticipantSlot
 
 using shared::game::BoardState;
 using shared::game::StepId;
+using shared::game::DecideButton;
+using shared::game::PileType;
+using shared::game::InputType;
 
 } // namespace cn::server::game

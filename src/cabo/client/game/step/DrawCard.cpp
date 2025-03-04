@@ -14,7 +14,7 @@ DrawCard::DrawCard(Board& _board, PlayerId _managedPlayerId)
             {Id::WaitInput, {}},
             {Id::RequestCard, {            
                 .onEnter = [this](){                    
-                    events::RemotePlayerClickPileNetEvent event(m_requestedCardFromDeck);
+                    events::RemotePlayerInputNetEvent event(getManagedPlayerId(), InputType::ClickPile, m_requestedCardFromDeck ? PileType::Deck : PileType::Discard);
                     m_boardRef.getContext().get<net::Manager>().send(event);
 
                     requestFollowingState();

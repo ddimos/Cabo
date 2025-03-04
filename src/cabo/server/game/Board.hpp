@@ -8,6 +8,8 @@
 #include "core/event/Types.hpp"
 #include "core/Context.hpp"
 
+#include "shared/events/NetworkEvents.hpp"
+
 #include <map>
 #include <vector>
 
@@ -34,12 +36,12 @@ private:
     {
         Participant& participantRef;
         StepId currentStepId = StepId::Idle;
-        std::unique_ptr<Step> currentStep;
     };
     BoardParticipant& getBoardParticipant(PlayerId _id);
     void participantStartsTurn(BoardParticipant& _participant);
     void setParticipantStep(StepId _stepId, BoardParticipant& _participantRef);
     size_t getIndexOfNextParticipantTurn(size_t _currentIndex) const;
+    void processInputEvent(const events::RemotePlayerInputNetEvent& _event);
 
     const core::Context& m_contextRef;
     core::event::ListenerId m_listenerId = core::event::ListenerIdInvalid;
@@ -52,6 +54,8 @@ private:
 
     BoardState m_state = BoardState::Start;
     bool m_newStateRequested = false;
+
+    std::map<int32_t, events::RemotePlayerInputNetEvent> m_inputBuffer;
 };
 
 } // namespace cn::server::game
