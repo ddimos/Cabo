@@ -1,6 +1,7 @@
 #pragma once
 
 #include "server/game/Deck.hpp"
+#include "server/game/Discard.hpp"
 #include "server/game/Participant.hpp"
 #include "server/game/Step.hpp"
 #include "server/game/Types.hpp"
@@ -15,11 +16,12 @@
 
 namespace cn::server::game
 {
+class Card;
 
 class Board final
 {
 public:
-    Board(const core::Context& _context, Deck& _deck, std::vector<Participant*>&& _participants, PlayerId _firstParticipantTurn);
+    Board(const core::Context& _context, Deck& _deck, Discard& _discard, std::vector<Participant*>&& _participants, PlayerId _firstParticipantTurn);
     ~Board();
 
     Deck& getDeck() const { return m_deckRef; }
@@ -47,6 +49,7 @@ private:
     core::event::ListenerId m_listenerId = core::event::ListenerIdInvalid;
 
     Deck& m_deckRef;
+    Discard& m_discardRef;
     std::vector<BoardParticipant> m_participants;
 
     size_t m_indexOfCurrentParticipantTurn = 0;
@@ -56,6 +59,8 @@ private:
     bool m_newStateRequested = false;
 
     std::map<int32_t, events::RemotePlayerInputNetEvent> m_inputBuffer;
+
+    Card* m_drawnCardPtr = nullptr;
 };
 
 } // namespace cn::server::game

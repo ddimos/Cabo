@@ -14,9 +14,10 @@
 namespace cn::server::game
 {
 
-Board::Board(const core::Context& _context, Deck& _deck, std::vector<Participant*>/**/&& _participants, PlayerId _firstParticipantTurn)
+Board::Board(const core::Context& _context, Deck& _deck, Discard& _discard, std::vector<Participant*>/**/&& _participants, PlayerId _firstParticipantTurn)
     : m_contextRef(_context)
     , m_deckRef(_deck)
+    , m_discardRef(_discard)
 {
     for (auto* p : _participants)
         m_participants.emplace_back(BoardParticipant{ .participantRef = *p });
@@ -117,6 +118,9 @@ void Board::update(sf::Time _dt)
     }
     else if (m_state == BoardState::Game || m_state == BoardState::Cabo)
     {
+        if (m_participants.at(m_indexOfCurrentParticipantTurn).currentStepId == StepId::Idle)
+            m_currentParticipantFinishedTurn = true;
+
         if (m_currentParticipantFinishedTurn)
         {
             m_currentParticipantFinishedTurn = false;
@@ -215,7 +219,20 @@ void Board::processInputEvent(const events::RemotePlayerInputNetEvent& _event)
         } 
         break;
     case BoardState::Game:
-        if (participant.currentStepId == StepId::DrawCard)
+        if (participant.currentStepId == StepId::DecideCard)
+        {
+            if (_event.m_inputType != InputType::DecideButton)
+            {
+                CN_ASSERT(false);
+                // TODO punish?
+                break;
+            }
+            DecideButton button = std::get<DecideButton>(_event.m_data);
+            participant.currentStepId = shared::game::getNextStepId(button, Card::Ability::None);
+
+            CN_LOG_FRM("Decide button, participant: {}, button: {}", _event.m_senderPeerId, (int)button);
+        }
+        else if (participant.currentStepId == StepId::DrawCard)
         {
             if (_event.m_inputType != InputType::ClickPile)
             {
@@ -228,6 +245,7 @@ void Board::processInputEvent(const events::RemotePlayerInputNetEvent& _event)
             if (pileType == PileType::Deck)
             {
                 card = m_deckRef.getNextCard();
+                m_drawnCardPtr = card;
                 participant.currentStepId = StepId::DecideCard;
                 events::ProvideCardNetEvent event(card->getRank(), card->getSuit());
                 netManRef.send(event, _event.m_senderPeerId); 
@@ -243,9 +261,39 @@ void Board::processInputEvent(const events::RemotePlayerInputNetEvent& _event)
                 _event.m_senderPeerId, (int)pileType, (int)card->getRank(), (int)card->getSuit()
             );
         }
-        else if (participant.currentStepId == StepId::DecideCard)
+        else if (participant.currentStepId == StepId::FinishTurn)
         {
-            CN_ASSERT(false);
+            if (_event.m_inputType != InputType::Finish)
+            {
+                CN_ASSERT(false);
+                break;
+            }
+            CN_ASSERT(_event.m_senderPeerId == _event.m_playerId);
+            CN_LOG_FRM("Participant {} finishes turn.", _event.m_senderPeerId);
+            participant.currentStepId = StepId::Idle;
+        }
+        else if (participant.currentStepId == StepId::TakeCard)
+        {
+            if (_event.m_inputType != InputType::ClickSlot)
+            {
+                CN_ASSERT(false);
+                // TODO punish?
+                break;
+            }
+
+            ParticipantSlotId slotId = std::get<ParticipantSlotId>(_event.m_data);
+            auto* card = participant.participantRef.replace(slotId, m_drawnCardPtr);
+            m_discardRef.discard(card);
+
+            events::DiscardCardNetEvent event(card->getRank(), card->getSuit());
+            netManRef.send(event); 
+
+            participant.currentStepId = StepId::FinishTurn;
+
+            CN_LOG_FRM("Take card, participant: {}, slot: {}, drawn card: {} {}, discarded card: {} {}", 
+                _event.m_senderPeerId, slotId, (int)m_drawnCardPtr->getRank(), (int)m_drawnCardPtr->getSuit(),
+                (int)card->getRank(), (int)card->getSuit() 
+            );
         }
         else
         {

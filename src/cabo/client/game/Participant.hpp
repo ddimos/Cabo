@@ -39,6 +39,9 @@ public:
     void onStartShowingCardInSlot(ParticipantSlotId _id);
     void onCardRecievedInSlot(ParticipantSlotId _id, Card _card);
     void onFinishShowingCardInSlot(ParticipantSlotId _id);
+    
+    // TODO to think how to unite with onCardRecievedInSlot
+    void onProvideCardInSlot(ParticipantSlotId _id, Card _card); 
 
     const ParticipantSlot& getSlot(ParticipantSlotId _id) const;
 

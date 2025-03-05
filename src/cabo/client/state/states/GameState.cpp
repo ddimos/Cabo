@@ -109,7 +109,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
 
     auto deckButton = std::make_shared<menu::item::Button>(
         menu::Position{
-            .m_position = sf::Vector2f(75.f, 0.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
+            .m_position = sf::Vector2f(75.f-45.f, 0.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
             .m_specPositionX = menu::Position::Special::OFFSET_FROM_CENTER, .m_specPositionY = menu::Position::Special::CENTER_ALLIGNED
         },
         textureHolderRef.get(TextureIds::Cards),
@@ -124,7 +124,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
 
     auto discardButton = std::make_shared<menu::item::Button>(
         menu::Position{
-            .m_position = sf::Vector2f(-75.f, 0.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
+            .m_position = sf::Vector2f(-75.f-45.f, 0.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
             .m_specPositionX = menu::Position::Special::OFFSET_FROM_CENTER, .m_specPositionY = menu::Position::Special::CENTER_ALLIGNED
         },
         textureHolderRef.get(TextureIds::Cards),
@@ -153,11 +153,34 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
     finishButton->setActivationOption(core::object::Object::ActivationOption::Manually);
     getContainer(core::object::Container::Type::Menu).add(finishButton);
 
+    auto cardPair = shared::game::Card::getCardFromIndex(0);
+    auto deckCardImage = std::make_shared<menu::item::SimpleImage>(
+        menu::Position{
+            .m_position = sf::Vector2f(0.f, 80.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
+            .m_specPositionX = menu::Position::Special::CENTER_ALLIGNED, .m_specPositionY = menu::Position::Special::OFFSET_FROM_CENTER
+        },
+        textureHolderRef.get(TextureIds::Cards),
+        game::spriteSheet::getCardTextureRect(cardPair.first, cardPair.second)
+    );
+    deckCardImage->setActivationOption(core::object::Object::ActivationOption::Manually);
+    getContainer(core::object::Container::Type::Menu).add(deckCardImage);
+
+    auto discardCardImage = std::make_shared<menu::item::SimpleImage>(
+        menu::Position{
+            .m_position = sf::Vector2f(-75.f-45.f, 0.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
+            .m_specPositionX = menu::Position::Special::OFFSET_FROM_CENTER, .m_specPositionY = menu::Position::Special::CENTER_ALLIGNED
+        },
+        textureHolderRef.get(TextureIds::Cards),
+        game::spriteSheet::getCardTextureRect(cardPair.first, cardPair.second)
+    );
+    discardCardImage->setActivationOption(core::object::Object::ActivationOption::Manually);
+    getContainer(core::object::Container::Type::Menu).add(discardCardImage);
+
     game::Board::DecideButtons buttons;
     {
         auto matchButton = std::make_shared<menu::item::Button>(
             menu::Position{
-                .m_position = sf::Vector2f(-150.f, 150.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
+                .m_position = sf::Vector2f(-150.f-45.f, 200.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
                 .m_specPositionX = menu::Position::Special::OFFSET_FROM_CENTER, .m_specPositionY = menu::Position::Special::OFFSET_FROM_CENTER
             },
             textureHolderRef.get(TextureIds::DecideButtons),
@@ -174,7 +197,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
 
         auto takeButton = std::make_shared<menu::item::Button>(
             menu::Position{
-                .m_position = sf::Vector2f(-70.f, 150.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
+                .m_position = sf::Vector2f(-70.f-45.f, 200.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
                 .m_specPositionX = menu::Position::Special::OFFSET_FROM_CENTER, .m_specPositionY = menu::Position::Special::OFFSET_FROM_CENTER
             },
             textureHolderRef.get(TextureIds::DecideButtons),
@@ -191,7 +214,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
 
         auto actionButton = std::make_shared<menu::item::Button>(
             menu::Position{
-                .m_position = sf::Vector2f(70.f, 150.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
+                .m_position = sf::Vector2f(70.f-45.f, 200.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
                 .m_specPositionX = menu::Position::Special::OFFSET_FROM_CENTER, .m_specPositionY = menu::Position::Special::OFFSET_FROM_CENTER
             },
             textureHolderRef.get(TextureIds::DecideButtons),
@@ -206,9 +229,9 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
         getContainer(core::object::Container::Type::Menu).add(actionButton);
         buttons.push_back(actionButton.get());
 
-        auto discardButton = std::make_shared<menu::item::Button>(
+        auto discardDecideButton = std::make_shared<menu::item::Button>(
             menu::Position{
-                .m_position = sf::Vector2f(150.f, 150.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
+                .m_position = sf::Vector2f(150.f-45.f, 200.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
                 .m_specPositionX = menu::Position::Special::OFFSET_FROM_CENTER, .m_specPositionY = menu::Position::Special::OFFSET_FROM_CENTER
             },
             textureHolderRef.get(TextureIds::DecideButtons),
@@ -219,9 +242,9 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
             },
             sf::Mouse::Button::Left
         );
-        discardButton->setActivationOption(core::object::Object::ActivationOption::Manually);
-        getContainer(core::object::Container::Type::Menu).add(discardButton);
-        buttons.push_back(discardButton.get());
+        discardDecideButton->setActivationOption(core::object::Object::ActivationOption::Manually);
+        getContainer(core::object::Container::Type::Menu).add(discardDecideButton);
+        buttons.push_back(discardDecideButton.get());
     }
 
     std::vector<menu::item::SimpleText*> images;
@@ -253,7 +276,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
     getContainer(core::object::Container::Type::Menu).add(queue);
 
     m_board = std::make_unique<game::Board>(
-        getContext(), std::move(participants), *queue, *finishButton, std::move(buttons)
+        getContext(), std::move(participants), *queue, *finishButton, *deckCardImage, *discardCardImage, std::move(buttons)
     );
 
     m_listenerId = core::event::getNewListenerId();

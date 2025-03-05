@@ -164,6 +164,26 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
             return std::make_unique<events::ProvideCardNetEvent>();
         }
     );
+    _factoryRef.add(
+        events::id::DiscardCard,
+        [](const core::event::Event& _event, nsf::Buffer& _buffer){
+            auto& event = static_cast<const events::DiscardCardNetEvent&>(_event);
+            _buffer << static_cast<uint8_t>(event.m_rank);
+            _buffer << static_cast<uint8_t>(event.m_suit);
+        },
+        [](core::event::Event& _event, nsf::Buffer& _buffer){
+            auto& event = static_cast<events::DiscardCardNetEvent&>(_event);
+            uint8_t rank;
+            uint8_t suit;
+            _buffer >> rank;
+            _buffer >> suit;
+            event.m_rank = static_cast<shared::game::Card::Rank>(rank);
+            event.m_suit = static_cast<shared::game::Card::Suit>(suit);
+        },
+        [](){
+            return std::make_unique<events::DiscardCardNetEvent>();
+        }
+    );
 }
 
 } // namespace cn::net

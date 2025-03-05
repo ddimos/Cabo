@@ -19,8 +19,7 @@ DrawCard::DrawCard(Board& _board, PlayerId _managedPlayerId)
 
                     requestFollowingState();
                 },
-                .onUpdate = [this](sf::Time){
-                }
+                .onUpdate = {}
             }},
             {Id::Finished, {}}
         }

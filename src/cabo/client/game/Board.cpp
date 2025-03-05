@@ -1,9 +1,12 @@
 #include "client/game/Board.hpp"
+#include "client/game/SpriteSheet.hpp"
+#include "client/game/Types.hpp"
+
 #include "client/game/step/DecideCard.hpp"
 #include "client/game/step/DrawCard.hpp"
 #include "client/game/step/Finish.hpp"
 #include "client/game/step/SeeOwnCard.hpp"
-#include "client/game/Types.hpp"
+#include "client/game/step/TakeCard.hpp"
 
 #include "client/player/Manager.hpp"
 
@@ -17,12 +20,15 @@
 namespace cn::client::game
 {
 
-Board::Board(const core::Context& _context, std::vector<game::Participant*>&& _participants, menu::item::NotificationQueue& _queueRef, 
-             menu::item::Button& _finishButtonRef, DecideButtons&& _decideButtons)
+Board::Board(const core::Context& _context, std::vector<game::Participant*>&& _participants, menu::item::NotificationQueue& _queue,
+             menu::item::Button& _finishButton, menu::item::SimpleImage& _deckCardImage, menu::item::SimpleImage& _discardCardImage,
+             DecideButtons&& _decideButtons)
     : m_contextRef(_context)
     , m_participants(std::move(_participants))
-    , m_queueRef(_queueRef)
-    , m_finishButtonRef(_finishButtonRef)
+    , m_queueRef(_queue)
+    , m_finishButtonRef(_finishButton)
+    , m_deckCardImageRef(_deckCardImage)
+    , m_discardCardImageRef(_discardCardImage)
     , m_decideButtons(std::move(_decideButtons))
 {
     auto& eventDispatcherRef = getContext().get<core::event::Dispatcher>();
@@ -47,7 +53,7 @@ void Board::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRe
         _dispatcher.registerEvent<events::PlayerTurnUpdateNetEvent>(m_listenerId,
             [&_dispatcher, this](const events::PlayerTurnUpdateNetEvent& _event){
                 CN_LOG_FRM("Turn {} started {}", (unsigned)_event.m_playerId, _event.m_hasTurnStarted);
-
+                
                 if (_event.m_playerId != m_localPlayerId)
                 {
                     m_queueRef.push("Remote player starts turn");
@@ -55,13 +61,21 @@ void Board::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRe
                     return;
                 }
                 m_queueRef.push("Your turn");
-
+                
                 CN_ASSERT(_event.m_hasTurnStarted); // TODO to implement the turn timeout
-
+                
                 StepId nextStepId = shared::game::getFirstStepId(m_boardState);
                 CN_ASSERT(nextStepId != m_localPlayerStepId);
-
+                
                 changeStep(nextStepId);
+            }
+        );
+        _dispatcher.registerEvent<events::DiscardCardNetEvent>(m_listenerId,
+            [&_dispatcher, this](const events::DiscardCardNetEvent& _event){
+                m_discardCardImageRef.setTextureRect(game::spriteSheet::getCardTextureRect(_event.m_rank, _event.m_suit));
+                if (m_numberOfDiscardCards == 0)
+                    m_discardCardImageRef.requestActivated();
+                ++m_numberOfDiscardCards;
             }
         );
     }
@@ -69,6 +83,7 @@ void Board::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRe
     {
         _dispatcher.unregisterEvent<events::BoardStateUpdateNetEvent>(m_listenerId);
         _dispatcher.unregisterEvent<events::PlayerTurnUpdateNetEvent>(m_listenerId);
+        _dispatcher.unregisterEvent<events::DiscardCardNetEvent>(m_listenerId);
     }
 }
 
@@ -107,14 +122,18 @@ Participant* Board::getParticipant(PlayerId _id)
     return nullptr;
 }
 
-void Board::onParticipantStartDeciding()
+void Board::onParticipantStartDeciding(Card _card)
 {
+    m_drawnCard = _card;
+    m_deckCardImageRef.setTextureRect(game::spriteSheet::getCardTextureRect(_card.getRank(), _card.getSuit()));
+    m_deckCardImageRef.requestActivated();
     for (auto& button : m_decideButtons)
         button->requestActivated();
 }
 
 void Board::onParticipantFinishDeciding()
 {
+    m_deckCardImageRef.requestDeactivated();
     for (auto& button : m_decideButtons)
         button->requestDeactivated();
 }
@@ -159,6 +178,10 @@ void Board::changeStep(StepId _nextStepId)
     case StepId::SeeOwnCard:
         m_queueRef.push("You can peek any of your card");
         m_localPlayerStep = std::make_unique<step::SeeOwnCard>(*this, m_localPlayerId);
+        break;
+    case StepId::TakeCard:
+        m_queueRef.push("You can pick any of your card");
+        m_localPlayerStep = std::make_unique<step::TakeCard>(*this, m_localPlayerId);
         break;
     default:
         break;

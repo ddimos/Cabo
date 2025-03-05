@@ -112,6 +112,15 @@ void Participant::onFinishShowingCardInSlot(ParticipantSlotId _id)
     slot.button->requestActivated();
 }
 
+void Participant::onProvideCardInSlot(ParticipantSlotId _id, Card _card)
+{
+    auto& slot = getSlot(_id);
+
+    slot.card = _card;
+    slot.cardImage->setTextureRect(game::spriteSheet::getCardTextureRect(_card.getRank(), _card.getSuit()));
+    slot.isCardValid = true;
+}
+
 const ParticipantSlot& Participant::getSlot(ParticipantSlotId _id) const
 {
     CN_ASSERT(m_slots.contains(_id));

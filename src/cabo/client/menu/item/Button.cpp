@@ -83,6 +83,13 @@ void Button::setClickCallback(component::Clickable::Callback _onClickCallback)
     m_clickable.setCallback(_onClickCallback);
 }
 
+void Button::setTextureRectPosition(sf::Vector2i _posDefault, sf::Vector2i _posHover)
+{
+    m_textureRectDefault = sf::IntRect(_posDefault, m_textureRectDefault.getSize());
+    m_textureRectHover = sf::IntRect(_posHover, m_textureRectHover.getSize());
+    m_sprite.setTextureRect(m_textureRectDefault);
+}
+
 void Button::onDraw(sf::RenderWindow& _windowRef)
 {
     _windowRef.draw(m_sprite);

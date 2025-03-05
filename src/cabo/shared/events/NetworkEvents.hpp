@@ -127,4 +127,18 @@ public:
     shared::game::Card::Suit m_suit = shared::game::Card::Suit::Clubs;
 };
 
+class DiscardCardNetEvent final : public BaseNetEvent
+{
+public:
+    CN_EVENT(id::DiscardCard)
+
+    DiscardCardNetEvent() = default;
+    DiscardCardNetEvent(shared::game::Card::Rank _rank, shared::game::Card::Suit _suit)
+        : m_rank(_rank), m_suit(_suit)
+    {}
+
+    shared::game::Card::Rank m_rank = shared::game::Card::Rank::Ace;
+    shared::game::Card::Suit m_suit = shared::game::Card::Suit::Clubs;
+};
+
 } // namespace cn::events

@@ -22,6 +22,7 @@ enum : core::event::EventId
     // PlayerJoined,
     // PlayerLeft,
     BoardStateUpdate,
+    DiscardCard,
     PlayerInfoUpdate,
     PlayerJoinAccept,
     PlayerReady,

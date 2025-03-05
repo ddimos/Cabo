@@ -17,8 +17,7 @@ Finish::Finish(Board& _board, PlayerId _managedPlayerId)
                 .onEnter = [this](){                    
                     m_boardRef.onParticipantFinishesTurn(getManagedPlayerId());
                 },
-                .onUpdate = [this](sf::Time){
-                }
+                .onUpdate = {}
             }},
             {Id::Finished, {            
                 .onEnter = [this](){                    
@@ -27,8 +26,7 @@ Finish::Finish(Board& _board, PlayerId _managedPlayerId)
 
                     m_boardRef.onParticipantFinishedTurn(getManagedPlayerId());
                 },
-                .onUpdate = [this](sf::Time){
-                }
+                .onUpdate = {}
             }}
         }
     )

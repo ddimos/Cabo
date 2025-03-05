@@ -1,5 +1,7 @@
 #include "client/game/step/DecideCard.hpp"
 
+#include "shared/game/Board.hpp"
+
 #include "shared/events/GameEvents.hpp"
 #include "shared/events/NetworkEvents.hpp"
 
@@ -13,26 +15,24 @@ DecideCard::DecideCard(Board& _board, PlayerId _managedPlayerId)
         {
             {Id::WaitCard, {         
                 .onEnter = [this](){
-                    // TODo
+                    // TODO start a preview animation
                 },
-                .onUpdate = [this](sf::Time){
-                }
+                .onUpdate = {}
             }},
             {Id::WaitInput, {         
                 .onEnter = [this](){
-                    m_boardRef.onParticipantStartDeciding();
+                    m_boardRef.onParticipantStartDeciding(Card(m_rank, m_suit));
                 },
-                .onUpdate = [this](sf::Time){
-                }
+                .onUpdate = {}
             }},
             {Id::Finished, {
                 .onEnter = [this](){
                     m_boardRef.onParticipantFinishDeciding();
+                    // TODO Shouldn't I send the result of deciding
                     events::RemotePlayerInputNetEvent event(getManagedPlayerId(), InputType::DecideButton, m_button);
                     m_boardRef.getContext().get<net::Manager>().send(event);
                 },
-                .onUpdate = [this](sf::Time){
-                }
+                .onUpdate = {}
             }},
         }
     )
@@ -50,6 +50,9 @@ void DecideCard::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBe
             {    
                 if (getCurrentStateId() != Id::WaitCard)
                     return;
+
+                m_rank = _event.m_rank;
+                m_suit = _event.m_suit;
 
                 requestFollowingState();
             }
@@ -78,30 +81,7 @@ bool DecideCard::isFinished() const
 
 StepId DecideCard::getNextStepId() const
 {
-    switch (m_button)
-    {
-    case DecideButton::Action:
-        switch (m_cardAbility)
-        {
-        case Card::Ability::Peek:
-            return StepId::SeeOwnCard;
-        case Card::Ability::Spy:
-            return StepId::SeeSomeonesCard;
-        case Card::Ability::SwapBlindly:
-            return StepId::SwapCardBlindly;
-        case Card::Ability::SwapOpenly:
-            return StepId::SwapCardOpenly;
-        default:
-            break;
-        }
-    case DecideButton::Discard:
-        return StepId::DiscardCard;
-    case DecideButton::Match:
-        return StepId::MatchCard;
-    case DecideButton::Take:
-        return StepId::TakeCard;
-    }
-    return StepId::Idle;
+    return shared::game::getNextStepId(m_button, m_cardAbility);
 }
 
 } // namespace cn::client::game::step

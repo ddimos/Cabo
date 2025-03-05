@@ -52,9 +52,11 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
         std::move(cards), seed
     );
 
+    auto discard = std::make_shared<game::Discard>();
+
     // // // getContainer(core::object::Container::Type::Game).add(table);
     getContainer(core::object::Container::Type::Game).add(deck);
-    // // // getContainer(core::object::Container::Type::Game).add(discard);
+    getContainer(core::object::Container::Type::Game).add(discard);
 
     std::vector<game::Participant*> participants;
     for (const auto& player : playerManagerRef.getPlayers())
@@ -77,7 +79,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
     // TODO to randomize for the first play, then the player who won  
     PlayerId firstParticipantTurn = playerManagerRef.getPlayers().front().id;
     
-    m_board = std::make_unique<game::Board>(getContext(), *(deck.get()), std::move(participants), firstParticipantTurn);
+    m_board = std::make_unique<game::Board>(getContext(), *deck, *discard, std::move(participants), firstParticipantTurn);
 
     m_listenerId = core::event::getNewListenerId();
 

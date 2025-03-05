@@ -21,8 +21,7 @@ SeeOwnCard::SeeOwnCard(Board& _board, PlayerId _managedPlayerId)
                     events::RemotePlayerInputNetEvent event(getManagedPlayerId(), InputType::ClickSlot, m_slotId);
                     m_boardRef.getContext().get<net::Manager>().send(event);
                 },
-                .onUpdate = [this](sf::Time){
-                }
+                .onUpdate = {}
             }},
             {Id::SeeCard, {
                 .onEnter = [this](){
@@ -40,11 +39,12 @@ SeeOwnCard::SeeOwnCard(Board& _board, PlayerId _managedPlayerId)
                     auto* participant = m_boardRef.getParticipant(getManagedPlayerId());
                     participant->onFinishShowingCardInSlot(m_slotId);
                 },
-                .onUpdate = [this](sf::Time){
-                    // for debugging
-                    // requestState(Id::WaitInput);
-                    // m_seeCardTimeDt = m_seeCardTime;
-                }
+                .onUpdate = {}
+                //     [this](sf::Time){
+                //     // for debugging
+                //     // requestState(Id::WaitInput);
+                //     // m_seeCardTimeDt = m_seeCardTime;
+                // }
             }},
         })
     , m_boardRef(_board)

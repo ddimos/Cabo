@@ -7,29 +7,25 @@
 namespace cn::client::game::step
 {
 
-class DecideCard : public Step
+class TakeCard : public Step
 {
 public:
-    DecideCard(Board& _board, PlayerId _managedPlayerId);
+    TakeCard(Board& _board, PlayerId _managedPlayerId);
 
 private:
     void registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered) override;
     bool isFinished() const override;
     StepId getNextStepId() const override;
-
+    
     enum Id : Step::StateId
     {
-        WaitCard,
         WaitInput,
         Finished
     };
 
     Board& m_boardRef;
-    DecideButton m_button = DecideButton::Action;
-    Card::Ability m_cardAbility = Card::Ability::None;
 
-    Card::Rank m_rank;
-    Card::Suit m_suit;
+    ParticipantSlotId m_slotId = shared::game::ParticipantSlotIdInvalid;
 };
 
 } // namespace cn::client::game::step

@@ -24,4 +24,32 @@ inline StepId getFirstStepId(BoardState _boardState)
     return firstStep;
 }
 
+inline StepId getNextStepId(DecideButton _button, Card::Ability _ability)
+{
+    switch (_button)
+    {
+    case DecideButton::Action:
+        switch (_ability)
+        {
+        case Card::Ability::Peek:
+            return StepId::SeeOwnCard;
+        case Card::Ability::Spy:
+            return StepId::SeeSomeonesCard;
+        case Card::Ability::SwapBlindly:
+            return StepId::SwapCardBlindly;
+        case Card::Ability::SwapOpenly:
+            return StepId::SwapCardOpenly;
+        default:
+            break;
+        }
+    case DecideButton::Discard:
+        return StepId::DiscardCard;
+    case DecideButton::Match:
+        return StepId::MatchCard;
+    case DecideButton::Take:
+        return StepId::TakeCard;
+    }
+    return StepId::Idle;
+}
+
 } // namespace cn::shared::game

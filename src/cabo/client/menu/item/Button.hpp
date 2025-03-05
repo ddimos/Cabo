@@ -26,7 +26,9 @@ public:
     void setPosition(Position _position);
     void setRotation(float _angleDeg);
     void setClickCallback(component::Clickable::Callback _onClickCallback);
-    
+
+    void setTextureRectPosition(sf::Vector2i _posDefault, sf::Vector2i _posHover);
+
 protected:
     void onDraw(sf::RenderWindow& _windowRef) override;
     void onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered) override;
