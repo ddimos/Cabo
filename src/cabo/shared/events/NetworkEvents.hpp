@@ -141,4 +141,19 @@ public:
     shared::game::Card::Suit m_suit = shared::game::Card::Suit::Clubs;
 };
 
+class PlayerSlotUpdateNetEvent final : public BaseNetEvent
+{
+public:
+    CN_EVENT(id::PlayerSlotUpdate)
+
+    PlayerSlotUpdateNetEvent() = default;
+    PlayerSlotUpdateNetEvent(PlayerId _playerId, shared::game::ParticipantSlotId _slotId, bool _wasAdded)
+        : m_playerId(_playerId), m_slotId(_slotId), m_wasAdded(_wasAdded)
+    {}
+
+    PlayerId m_playerId = PlayerIdInvalid;
+    shared::game::ParticipantSlotId m_slotId = shared::game::ParticipantSlotIdInvalid;
+    bool m_wasAdded = false;
+};
+
 } // namespace cn::events

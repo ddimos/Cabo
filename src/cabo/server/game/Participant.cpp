@@ -13,15 +13,14 @@ Participant::Participant(const core::Context& _context, PlayerId _id, std::map<P
 {
 }
 
-void Participant::addSlot()
+ParticipantSlotId Participant::addSlot()
 {
     if (m_currentNumberOfSlots >= m_slots.size())
     {
-        CN_ASSERT(false);
-        return; // TODO ParticipantSlotIdInvalid
+        return shared::game::ParticipantSlotIdInvalid;
     }
-
     m_currentNumberOfSlots++;
+    return m_currentNumberOfSlots-1;
 }
 
 void Participant::removeSlot(ParticipantSlotId _id)

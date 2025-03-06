@@ -26,9 +26,11 @@ enum : core::event::EventId
     PlayerInfoUpdate,
     PlayerJoinAccept,
     PlayerReady,
+    PlayerSlotUpdate,
     PlayerTurnUpdate,
     ProvideCard,
     RemotePlayerInput,
+    ShowCardInSlot,
     StartGame,
 
 

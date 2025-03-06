@@ -62,7 +62,7 @@ void Participant::setSpawnPoint(PlayerSpawnPoint _spawnPoint)
     }
 }
 
-void Participant::addSlot()
+void Participant::addSlot(ParticipantSlotId _id)
 {
     if (m_currentNumberOfSlots >= m_slots.size())
     {
@@ -71,6 +71,8 @@ void Participant::addSlot()
     }
 
     m_currentNumberOfSlots++;
+    auto& slot = getSlot(_id);
+    slot.button->requestActivated();
 }
 
 void Participant::removeSlot(ParticipantSlotId _id)
@@ -82,7 +84,14 @@ void Participant::removeSlot(ParticipantSlotId _id)
     }
     m_currentNumberOfSlots--;
 
-    m_slots.at(_id).button->requestDeactivated();
+    auto& slot = getSlot(_id);
+    if (slot.button->isActivated())
+        slot.button->requestDeactivated();
+    if (slot.cardImage->isActivated())
+        slot.cardImage->requestDeactivated();
+    
+    // Or should I just erase it? 
+    slot.wasRemoved = true;
 }
 
 void Participant::onStartShowingCardInSlot(ParticipantSlotId _id)
@@ -97,6 +106,8 @@ void Participant::onStartShowingCardInSlot(ParticipantSlotId _id)
 void Participant::onCardRecievedInSlot(ParticipantSlotId _id, Card _card)
 {
     auto& slot = getSlot(_id);
+    if (slot.wasRemoved)
+        return;
 
     slot.card = _card;
     slot.cardImage->setTextureRect(game::spriteSheet::getCardTextureRect(_card.getRank(), _card.getSuit()));
@@ -108,6 +119,8 @@ void Participant::onCardRecievedInSlot(ParticipantSlotId _id, Card _card)
 void Participant::onFinishShowingCardInSlot(ParticipantSlotId _id)
 {
     auto slot = getSlot(_id);
+    if (slot.wasRemoved)
+        return;
     slot.cardImage->requestDeactivated();
     slot.button->requestActivated();
 }

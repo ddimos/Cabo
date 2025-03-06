@@ -33,7 +33,7 @@ public:
 
     void setSpawnPoint(PlayerSpawnPoint _spawnPoint);
 
-    void addSlot();
+    void addSlot(ParticipantSlotId _id);
     void removeSlot(ParticipantSlotId _id);
 
     void onStartShowingCardInSlot(ParticipantSlotId _id);

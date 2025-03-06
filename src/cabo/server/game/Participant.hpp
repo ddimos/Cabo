@@ -29,7 +29,7 @@ public:
 
     PlayerId getId() const { return m_id; }
 
-    void addSlot();
+    ParticipantSlotId addSlot();
     void removeSlot(ParticipantSlotId _id);
 
     const ParticipantSlot& getSlot(ParticipantSlotId _id) const;

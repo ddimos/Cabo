@@ -5,6 +5,7 @@
 #include "client/game/step/DecideCard.hpp"
 #include "client/game/step/DrawCard.hpp"
 #include "client/game/step/Finish.hpp"
+#include "client/game/step/MatchCard.hpp"
 #include "client/game/step/SeeOwnCard.hpp"
 #include "client/game/step/TakeCard.hpp"
 
@@ -78,12 +79,28 @@ void Board::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRe
                 ++m_numberOfDiscardCards;
             }
         );
+        _dispatcher.registerEvent<events::PlayerSlotUpdateNetEvent>(m_listenerId,
+            [&_dispatcher, this](const events::PlayerSlotUpdateNetEvent& _event){
+                auto* participant = getParticipant(_event.m_playerId);
+                if (_event.m_wasAdded)
+                {
+                    participant->addSlot(_event.m_slotId);
+                    m_queueRef.push("Player gets a card");
+                }
+                else
+                {
+                    participant->removeSlot(_event.m_slotId);
+                    m_queueRef.push("Player gets rid of a card");
+                }
+            }
+        );
     }
     else
     {
         _dispatcher.unregisterEvent<events::BoardStateUpdateNetEvent>(m_listenerId);
         _dispatcher.unregisterEvent<events::PlayerTurnUpdateNetEvent>(m_listenerId);
         _dispatcher.unregisterEvent<events::DiscardCardNetEvent>(m_listenerId);
+        _dispatcher.unregisterEvent<events::PlayerSlotUpdateNetEvent>(m_listenerId);
     }
 }
 
@@ -174,6 +191,10 @@ void Board::changeStep(StepId _nextStepId)
     case StepId::FinishTurn:
         m_queueRef.push("Finish or cabo");
         m_localPlayerStep = std::make_unique<step::Finish>(*this, m_localPlayerId);
+        break;
+    case StepId::MatchCard:
+        m_queueRef.push("You can pick any of your card");
+        m_localPlayerStep = std::make_unique<step::MatchCard>(*this, m_localPlayerId);
         break;
     case StepId::SeeOwnCard:
         m_queueRef.push("You can peek any of your card");

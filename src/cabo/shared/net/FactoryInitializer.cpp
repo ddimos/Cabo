@@ -184,6 +184,24 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
             return std::make_unique<events::DiscardCardNetEvent>();
         }
     );
+    _factoryRef.add(
+        events::id::PlayerSlotUpdate,
+        [](const core::event::Event& _event, nsf::Buffer& _buffer){
+            auto& event = static_cast<const events::PlayerSlotUpdateNetEvent&>(_event);
+            _buffer << event.m_playerId;
+            _buffer << event.m_slotId;
+            _buffer << event.m_wasAdded;
+        },
+        [](core::event::Event& _event, nsf::Buffer& _buffer){
+            auto& event = static_cast<events::PlayerSlotUpdateNetEvent&>(_event);
+            _buffer >> event.m_playerId;
+            _buffer >> event.m_slotId;
+            _buffer >> event.m_wasAdded;
+        },
+        [](){
+            return std::make_unique<events::PlayerSlotUpdateNetEvent>();
+        }
+    );
 }
 
 } // namespace cn::net

@@ -269,8 +269,52 @@ void Board::processInputEvent(const events::RemotePlayerInputNetEvent& _event)
                 break;
             }
             CN_ASSERT(_event.m_senderPeerId == _event.m_playerId);
-            CN_LOG_FRM("Participant {} finishes turn.", _event.m_senderPeerId);
             participant.currentStepId = StepId::Idle;
+            CN_LOG_FRM("Participant {} finishes turn.", _event.m_senderPeerId);
+        }
+        else if (participant.currentStepId == StepId::MatchCard)
+        {
+            if (_event.m_inputType != InputType::ClickSlot)
+            {
+                CN_ASSERT(false);
+                // TODO punish?
+                break;
+            }
+            ParticipantSlotId slotId = std::get<ParticipantSlotId>(_event.m_data);
+            auto* card = participant.participantRef.getCard(slotId);
+
+            bool success = card->getRank() == m_drawnCardPtr->getRank();
+
+            m_discardRef.discard(m_drawnCardPtr);
+            events::DiscardCardNetEvent event(m_drawnCardPtr->getRank(), m_drawnCardPtr->getSuit());
+            netManRef.send(event); 
+
+            events::ProvideCardNetEvent eventProvide(card->getRank(), card->getSuit());
+            netManRef.send(eventProvide);
+            ParticipantSlotId updatedSlotId = shared::game::ParticipantSlotIdInvalid;
+            if (success)
+            {
+                events::DiscardCardNetEvent eventDiscard(m_drawnCardPtr->getRank(), m_drawnCardPtr->getSuit());
+                netManRef.send(eventDiscard); 
+                updatedSlotId = slotId;
+            }
+            else
+            {
+                updatedSlotId = participant.participantRef.addSlot();
+            }
+            // if slot id is invalid, it means no available space left
+            if (updatedSlotId != shared::game::ParticipantSlotIdInvalid)
+            {
+                events::PlayerSlotUpdateNetEvent event(_event.m_senderPeerId, updatedSlotId, !success);
+                netManRef.send(event);
+            }
+
+            participant.currentStepId = StepId::FinishTurn;
+
+            CN_LOG_FRM("Match card, participant: {}, slot: {}, new slot: {}, drawn card: {} {}, matched card: {} {}", 
+                _event.m_senderPeerId, slotId, updatedSlotId, (int)m_drawnCardPtr->getRank(), (int)m_drawnCardPtr->getSuit(),
+                (int)card->getRank(), (int)card->getSuit() 
+            );
         }
         else if (participant.currentStepId == StepId::TakeCard)
         {
