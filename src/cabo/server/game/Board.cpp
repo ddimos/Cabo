@@ -229,8 +229,15 @@ void Board::processInputEvent(const events::RemotePlayerInputNetEvent& _event)
             }
             DecideButton button = std::get<DecideButton>(_event.m_data);
             participant.currentStepId = shared::game::getNextStepId(button, Card::Ability::None);
-
+            
             CN_LOG_FRM("Decide button, participant: {}, button: {}", _event.m_senderPeerId, (int)button);
+            
+            if (button == DecideButton::Discard)
+            {
+                events::DiscardCardNetEvent eventDiscard(m_drawnCardPtr->getRank(), m_drawnCardPtr->getSuit());
+                netManRef.send(eventDiscard);
+                CN_LOG_FRM("Discard card, participant: {}, card: {} {}", _event.m_senderPeerId, (int)m_drawnCardPtr->getRank(), (int)m_drawnCardPtr->getSuit());
+            }
         }
         else if (participant.currentStepId == StepId::DrawCard)
         {
@@ -288,19 +295,23 @@ void Board::processInputEvent(const events::RemotePlayerInputNetEvent& _event)
             m_discardRef.discard(m_drawnCardPtr);
             events::DiscardCardNetEvent event(m_drawnCardPtr->getRank(), m_drawnCardPtr->getSuit());
             netManRef.send(event); 
-
+            
             events::ProvideCardNetEvent eventProvide(card->getRank(), card->getSuit());
             netManRef.send(eventProvide);
             ParticipantSlotId updatedSlotId = shared::game::ParticipantSlotIdInvalid;
             if (success)
             {
-                events::DiscardCardNetEvent eventDiscard(m_drawnCardPtr->getRank(), m_drawnCardPtr->getSuit());
+                m_discardRef.discard(card);
+                events::DiscardCardNetEvent eventDiscard(card->getRank(), card->getSuit());
                 netManRef.send(eventDiscard); 
                 updatedSlotId = slotId;
+                participant.participantRef.removeSlot(slotId);
             }
             else
             {
                 updatedSlotId = participant.participantRef.addSlot();
+                if (updatedSlotId != shared::game::ParticipantSlotIdInvalid)
+                    participant.participantRef.replace(updatedSlotId, m_deckRef.getNextCard());
             }
             // if slot id is invalid, it means no available space left
             if (updatedSlotId != shared::game::ParticipantSlotIdInvalid)

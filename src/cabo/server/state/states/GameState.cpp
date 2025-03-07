@@ -61,12 +61,14 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
     std::vector<game::Participant*> participants;
     for (const auto& player : playerManagerRef.getPlayers())
     {
-        std::map<game::ParticipantSlotId, game::ParticipantSlot> slots;
-        
         unsigned short numberOfSlots = shared::game::MaxNumberOfParticipantSlots;
+        
+        std::vector<game::ParticipantSlot> slots;
+        slots.reserve(numberOfSlots);
+
         for (game::ParticipantSlotId slotId = 0; slotId < numberOfSlots; ++slotId)
         {
-            slots.emplace(slotId, game::ParticipantSlot{ slotId, deck->getNextCard() });
+            slots.emplace_back(game::ParticipantSlot{ slotId, false, deck->getNextCard() });
         }
         auto playerId = player.id;
         auto participant = std::make_shared<game::Participant>(

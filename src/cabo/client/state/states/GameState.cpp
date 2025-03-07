@@ -57,8 +57,9 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
             const cn::Player& player = players[playerIndex];
 
             auto playerId = player.id;
-            std::map<game::ParticipantSlotId, game::ParticipantSlot> slots;
             unsigned short numberOfSlots = shared::game::MaxNumberOfParticipantSlots;
+            std::vector<game::ParticipantSlot> slots;
+            slots.reserve(numberOfSlots);
             for (game::ParticipantSlotId slotId = 0; slotId < numberOfSlots; ++slotId)
             {
                 // TODO make a choosable button?
@@ -86,7 +87,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
                 cardImage->setActivationOption(core::object::Object::ActivationOption::Manually);
                 getContainer(core::object::Container::Type::Menu).add(cardImage);
 
-                slots.emplace(slotId, game::ParticipantSlot{ slotId, game::Card{cardPair.first, cardPair.second}, cardImage.get(), slotButton.get(), false});
+                slots.emplace_back(game::ParticipantSlot{ slotId, false, game::Card{cardPair.first, cardPair.second}, cardImage.get(), slotButton.get()});
             }
 
             auto participant = std::make_shared<game::Participant>(

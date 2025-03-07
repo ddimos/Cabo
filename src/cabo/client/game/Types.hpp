@@ -26,7 +26,6 @@ struct ParticipantSlot : public shared::game::ParticipantSlot
     menu::item::SimpleImage* cardImage = nullptr;
     menu::item::Button* button; // can be a ref
     bool isCardValid = false;
-    bool wasRemoved = false;
 };
 
 using shared::game::StepId;

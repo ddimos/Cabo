@@ -8,13 +8,13 @@ Object::~Object() = default;
 
 void Object::requestActivated()
 {
-    CN_ASSERT(!m_isActivated);
+    CN_ASSERT(!m_isActivated || m_desiredState == DesiredState::Deactivated);
     m_desiredState = DesiredState::Activated;
 }
 
 void Object::requestDeactivated()
 {
-    CN_ASSERT(m_isActivated);
+    CN_ASSERT(m_isActivated || m_desiredState == DesiredState::Activated);
     m_desiredState = DesiredState::Deactivated;
 }
 

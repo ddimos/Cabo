@@ -18,6 +18,7 @@ static_assert(std::numeric_limits<ParticipantSlotId>::max() > MaxNumberOfPartici
 struct ParticipantSlot
 {
     ParticipantSlotId id;
+    bool wasRemoved = false;
 };
 
 enum class BoardState

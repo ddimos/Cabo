@@ -6,21 +6,26 @@
 namespace cn::server::game
 {
 
-Participant::Participant(const core::Context& _context, PlayerId _id, std::map<ParticipantSlotId, ParticipantSlot>&& _slots, unsigned short _initialNumberOfSlots)
+Participant::Participant(const core::Context& _context, PlayerId _id, std::vector<ParticipantSlot>&& _slots, unsigned short _initialNumberOfSlots)
     : m_id(_id)
     , m_slots(std::move(_slots))
     , m_currentNumberOfSlots(_initialNumberOfSlots)
+    , m_nextSlotIdToAdd(_initialNumberOfSlots)
 {
 }
 
 ParticipantSlotId Participant::addSlot()
 {
-    if (m_currentNumberOfSlots >= m_slots.size())
+    if (m_nextSlotIdToAdd >= m_slots.size())
     {
         return shared::game::ParticipantSlotIdInvalid;
     }
+    CN_ASSERT(m_currentNumberOfSlots <= m_slots.size());
+    
     m_currentNumberOfSlots++;
-    return m_currentNumberOfSlots-1;
+    m_nextSlotIdToAdd++;
+
+    return m_nextSlotIdToAdd-1;
 }
 
 void Participant::removeSlot(ParticipantSlotId _id)
@@ -30,12 +35,21 @@ void Participant::removeSlot(ParticipantSlotId _id)
         CN_ASSERT(false);
         return;
     }
+    CN_ASSERT(!getSlot(_id).wasRemoved);
+
+    getSlot(_id).wasRemoved = true;
     m_currentNumberOfSlots--;
 }
 
 const ParticipantSlot& Participant::getSlot(ParticipantSlotId _id) const
 {
-    CN_ASSERT(m_slots.contains(_id));
+    CN_ASSERT(m_slots.size() > _id);
+    return m_slots.at(_id);
+}
+
+ParticipantSlot& Participant::getSlot(ParticipantSlotId _id)
+{
+    CN_ASSERT(m_slots.size() > _id);
     return m_slots.at(_id);
 }
 
@@ -46,25 +60,9 @@ Card* Participant::getCard(ParticipantSlotId _id) const
 
 Card* Participant::replace(ParticipantSlotId _id, Card* _card)
 {
-    auto prevCard = m_slots.at(_id).card;
-    m_slots.at(_id).card = _card;
+    auto prevCard = getSlot(_id).card;
+    getSlot(_id).card = _card;
     return prevCard;
-}
-
-void Participant::deal(Card* _card)
-{
-    bool assigned = false;
-
-    for (auto& [id, slot] : m_slots)
-    {
-        if (slot.card)
-            continue;
-
-        slot.card = _card;
-        assigned = true;
-        break;
-    }
-    CN_ASSERT(assigned);
 }
 
 } // namespace cn::server::game

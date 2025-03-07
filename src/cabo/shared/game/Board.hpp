@@ -43,7 +43,7 @@ inline StepId getNextStepId(DecideButton _button, Card::Ability _ability)
             break;
         }
     case DecideButton::Discard:
-        return StepId::DiscardCard;
+        return StepId::FinishTurn;
     case DecideButton::Match:
         return StepId::MatchCard;
     case DecideButton::Take:

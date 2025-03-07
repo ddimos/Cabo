@@ -8,7 +8,7 @@
 #include "server/game/Types.hpp"
 
 #include <functional>
-#include <map>
+#include <vector>
 
 namespace cn::core
 {
@@ -24,7 +24,7 @@ class Participant final : public core::object::Object
 {
 public:
     Participant(const core::Context& _context, PlayerId _id,
-        std::map<ParticipantSlotId, ParticipantSlot>&& _slots,
+        std::vector<ParticipantSlot>&& _slots,
         unsigned short _initialNumberOfSlots);
 
     PlayerId getId() const { return m_id; }
@@ -37,13 +37,14 @@ public:
 
     Card* replace(ParticipantSlotId _id, Card* _card);
 
-    void deal(Card* _card);
-
 private:
+    ParticipantSlot& getSlot(ParticipantSlotId _id);
+
     PlayerId m_id = PlayerIdInvalid;
 
-    std::map<ParticipantSlotId, ParticipantSlot> m_slots;
+    std::vector<ParticipantSlot> m_slots;
     unsigned short m_currentNumberOfSlots = 0;
+    ParticipantSlotId m_nextSlotIdToAdd = shared::game::ParticipantSlotIdInvalid;
 };
 
 } // namespace cn::server::game

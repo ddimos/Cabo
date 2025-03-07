@@ -13,7 +13,7 @@
 namespace cn::client::game
 {
 
-Participant::Participant(const core::Context& _context, PlayerId _id, bool _isLocal, std::map<ParticipantSlotId, ParticipantSlot>&& _slots, unsigned short _initialNumberOfSlots)
+Participant::Participant(const core::Context& _context, PlayerId _id, bool _isLocal, std::vector<ParticipantSlot>&& _slots, unsigned short _initialNumberOfSlots)
     : m_id(_id)
     , m_isLocal(_isLocal)
     , m_slots(std::move(_slots))
@@ -45,7 +45,7 @@ void Participant::setSpawnPoint(PlayerSpawnPoint _spawnPoint)
     int cardsInRow = 4;
     int i = 0;
     int j = 0;
-    for (auto& [id, slot] : m_slots)
+    for (auto& slot : m_slots)
     {
         sf::Vector2f localPos = sf::Vector2f(i * offsetBetweenCardsX - 165, j * offsetBetweenCardsY + 20);
         localPos = core::math::rotateVector(localPos, m_spawnPoint.angleDeg + 90.f);
@@ -67,11 +67,12 @@ void Participant::addSlot(ParticipantSlotId _id)
     if (m_currentNumberOfSlots >= m_slots.size())
     {
         CN_ASSERT(false);
-        return; // ParticipantSlotIdInvalid
+        return;
     }
 
     m_currentNumberOfSlots++;
     auto& slot = getSlot(_id);
+    CN_ASSERT(!slot.wasRemoved);
     slot.button->requestActivated();
 }
 
@@ -85,6 +86,7 @@ void Participant::removeSlot(ParticipantSlotId _id)
     m_currentNumberOfSlots--;
 
     auto& slot = getSlot(_id);
+    CN_ASSERT(!slot.wasRemoved);
     if (slot.button->isActivated())
         slot.button->requestDeactivated();
     if (slot.cardImage->isActivated())
@@ -136,13 +138,13 @@ void Participant::onProvideCardInSlot(ParticipantSlotId _id, Card _card)
 
 const ParticipantSlot& Participant::getSlot(ParticipantSlotId _id) const
 {
-    CN_ASSERT(m_slots.contains(_id));
+    CN_ASSERT(m_slots.size() > _id);
     return m_slots.at(_id);
 }
 
 ParticipantSlot& Participant::getSlot(ParticipantSlotId _id)
 {
-    CN_ASSERT(m_slots.contains(_id));
+    CN_ASSERT(m_slots.size() > _id);
     return m_slots.at(_id);
 }
 
