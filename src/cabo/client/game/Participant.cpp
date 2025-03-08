@@ -33,6 +33,8 @@ Participant::Participant(const core::Context& _context, PlayerId _id, bool _isLo
 
 void Participant::setSpawnPoint(PlayerSpawnPoint _spawnPoint)
 {
+    // This method can be useful in case of resizing the window
+
     m_spawnPoint = _spawnPoint;
     {
         sf::Vector2f localPos = sf::Vector2f(0, 15);
@@ -40,18 +42,20 @@ void Participant::setSpawnPoint(PlayerSpawnPoint _spawnPoint)
         m_nameText.setPosition(_spawnPoint.pos + localPos);
     }
 
-    float offsetBetweenCardsX = 85;
-    float offsetBetweenCardsY = 115;
-    int cardsInRow = 4;
+    // TODO add to consts
+    const float offsetBetweenCardsX = 85.f;
+    const float offsetBetweenCardsY = 115.f;
+    const int cardsInRow = 4;
+
     int i = 0;
     int j = 0;
     for (auto& slot : m_slots)
     {
-        sf::Vector2f localPos = sf::Vector2f(i * offsetBetweenCardsX - 165, j * offsetBetweenCardsY + 20);
+        sf::Vector2f localPos = sf::Vector2f(i * offsetBetweenCardsX - 127, j * offsetBetweenCardsY + 70);
         localPos = core::math::rotateVector(localPos, m_spawnPoint.angleDeg + 90.f);
         slot.button->setPosition(client::menu::Position{ .m_position = (m_spawnPoint.pos + localPos) });
         slot.button->setRotation(m_spawnPoint.angleDeg + 90.f);
-        slot.cardImage->setPosition(client::menu::Position{ .m_position = (m_spawnPoint.pos + localPos - sf::Vector2f{70, 100}) });
+        slot.cardImage->setPosition(client::menu::Position{ .m_position = (m_spawnPoint.pos + localPos) });
         // slot.cardImage->setRotation(m_spawnPoint.angleDeg + 90.f);
         ++i;
         if(i >= cardsInRow)

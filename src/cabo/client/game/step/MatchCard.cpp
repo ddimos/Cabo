@@ -16,7 +16,7 @@ MatchCard::MatchCard(Board& _board, PlayerId _managedPlayerId)
             {Id::WaitInput, {}},
             {Id::WaitServerReply, {
                 .onEnter = [this](){
-                    events::RemotePlayerInputNetEvent event(getManagedPlayerId(), InputType::ClickSlot, m_slotId);
+                    events::RemotePlayerInputNetEvent event(getManagedPlayerId(), InputType::ClickSlot, ClickSlotInputData{m_slotId, getManagedPlayerId()});
                     m_boardRef.getContext().get<net::Manager>().send(event);
 
                     auto* participant = m_boardRef.getParticipant(getManagedPlayerId());

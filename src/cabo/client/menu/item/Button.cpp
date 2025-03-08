@@ -16,6 +16,8 @@ Button::Button(const sf::Texture& _texture, const sf::IntRect& _textureRectDefau
 {
     m_sprite.setTexture(_texture);
     m_sprite.setTextureRect(m_textureRectDefault);
+    m_sprite.setOrigin(m_sprite.getLocalBounds().getSize() / 2.f);
+
     m_clickable.setButton(_button);
     m_hoverable.setCallback(
         [this](bool _isHovered){
@@ -36,13 +38,15 @@ Button::Button(Position _position, const sf::Texture& _texture, const sf::IntRec
 
     m_sprite.setTexture(_texture);
     m_sprite.setTextureRect(m_textureRectDefault);
-    m_sprite.setPosition(m_transformable.calculateGlobalPos(m_sprite.getGlobalBounds().getSize()));
+    m_sprite.setPosition(m_transformable.calculateGlobalPos(sf::Vector2f{}));
+    m_sprite.setOrigin(m_sprite.getLocalBounds().getSize() / 2.f);
 
     m_clickable.setCallback(_onClickCallback);
-    m_clickable.setBounds(m_sprite.getGlobalBounds());
     m_clickable.setButton(_button);
 
-    m_hoverable.setBounds(m_sprite.getGlobalBounds());
+    m_clickable.setBounds(sf::FloatRect(m_sprite.getPosition(), m_sprite.getLocalBounds().getSize()));
+    m_hoverable.setBounds(sf::FloatRect(m_sprite.getPosition(), m_sprite.getLocalBounds().getSize()));
+
     m_hoverable.setCallback(
         [this](bool _isHovered){
             if (_isHovered)
@@ -66,7 +70,7 @@ float Button::getRotation() const
 void Button::setPosition(Position _position)
 {
     m_transformable.setPosition(_position);
-    m_sprite.setPosition(m_transformable.calculateGlobalPos(m_sprite.getLocalBounds().getSize()));
+    m_sprite.setPosition(m_transformable.calculateGlobalPos(sf::Vector2f{}));
     m_clickable.setBounds(sf::FloatRect(m_sprite.getPosition(), m_sprite.getLocalBounds().getSize()));
     m_hoverable.setBounds(sf::FloatRect(m_sprite.getPosition(), m_sprite.getLocalBounds().getSize()));
 }
@@ -76,6 +80,9 @@ void Button::setRotation(float _angleDeg)
     m_sprite.setRotation(_angleDeg);
     m_hoverable.setRotation(_angleDeg);
     m_clickable.setRotation(_angleDeg);
+
+    m_clickable.setBounds(sf::FloatRect(m_sprite.getPosition(), m_sprite.getLocalBounds().getSize()));
+    m_hoverable.setBounds(sf::FloatRect(m_sprite.getPosition(), m_sprite.getLocalBounds().getSize()));
 }
 
 void Button::setClickCallback(component::Clickable::Callback _onClickCallback)

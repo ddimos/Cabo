@@ -18,7 +18,7 @@ void MouseInteractable::setRotation(float _rotation)
 bool MouseInteractable::contains(sf::Vector2f _mousePos) const
 {
     const sf::Vector2f mousePositionInLocalCoord = core::math::rotateVectorInverse((_mousePos - m_bounds.getPosition()), m_rotation);
-    sf::FloatRect localBounds(sf::Vector2f(0.f, 0.f), m_bounds.getSize());
+    sf::FloatRect localBounds(-m_bounds.getSize()/2.f, m_bounds.getSize());
     return localBounds.contains(mousePositionInLocalCoord);
 }
 

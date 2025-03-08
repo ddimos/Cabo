@@ -1,6 +1,7 @@
 #pragma once
 
 #include "shared/game/Constants.hpp"
+#include "shared/player/Types.hpp"
 
 #include <cstdint>
 #include <limits>
@@ -17,7 +18,7 @@ static_assert(std::numeric_limits<ParticipantSlotId>::max() > MaxNumberOfPartici
 
 struct ParticipantSlot
 {
-    ParticipantSlotId id;
+    ParticipantSlotId id = ParticipantSlotIdInvalid;
     bool wasRemoved = false;
 };
 
@@ -52,6 +53,12 @@ enum class InputType
     Finish
 };
 
-using InputDataVariant = std::variant<DecideButton, ParticipantSlotId, PileType, std::monostate>;
+struct ClickSlotInputData
+{
+    ParticipantSlotId slotId = ParticipantSlotIdInvalid;
+    PlayerId playerId = PlayerIdInvalid;
+};
+
+using InputDataVariant = std::variant<DecideButton, ClickSlotInputData, PileType, std::monostate>;
 
 } // namespace cn::shared::game

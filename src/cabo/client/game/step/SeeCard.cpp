@@ -1,4 +1,4 @@
-#include "client/game/step/SeeOwnCard.hpp"
+#include "client/game/step/SeeCard.hpp"
 #include "client/game/Participant.hpp"
 
 #include "shared/events/GameEvents.hpp"
@@ -9,23 +9,23 @@
 namespace cn::client::game::step
 {
 
-SeeOwnCard::SeeOwnCard(Board& _board, PlayerId _managedPlayerId)
+SeeCard::SeeCard(Board& _board, PlayerId _managedPlayerId, bool _seeOwnCard)
     : Step(_managedPlayerId,
         {
             {Id::WaitInput, {}},
             {Id::RequestSeeCard, {            
                 .onEnter = [this](){
-                    auto* participant = m_boardRef.getParticipant(getManagedPlayerId());
+                    auto* participant = m_boardRef.getParticipant(m_slotOwnerId);
                     participant->onStartShowingCardInSlot(m_slotId);
                     
-                    events::RemotePlayerInputNetEvent event(getManagedPlayerId(), InputType::ClickSlot, m_slotId);
+                    events::RemotePlayerInputNetEvent event(getManagedPlayerId(), InputType::ClickSlot, ClickSlotInputData{m_slotId, m_slotOwnerId});
                     m_boardRef.getContext().get<net::Manager>().send(event);
                 },
                 .onUpdate = {}
             }},
-            {Id::SeeCard, {
+            {Id::Look, {
                 .onEnter = [this](){
-                    auto* participant = m_boardRef.getParticipant(getManagedPlayerId());
+                    auto* participant = m_boardRef.getParticipant(m_slotOwnerId);
                     participant->onCardRecievedInSlot(m_slotId, Card(m_rank, m_suit));
                 },
                 .onUpdate = [this](sf::Time _dt){
@@ -36,7 +36,7 @@ SeeOwnCard::SeeOwnCard(Board& _board, PlayerId _managedPlayerId)
             }},
             {Id::Finished, {
                 .onEnter = [this](){
-                    auto* participant = m_boardRef.getParticipant(getManagedPlayerId());
+                    auto* participant = m_boardRef.getParticipant(m_slotOwnerId);
                     participant->onFinishShowingCardInSlot(m_slotId);
                 },
                 .onUpdate = {}
@@ -48,10 +48,11 @@ SeeOwnCard::SeeOwnCard(Board& _board, PlayerId _managedPlayerId)
             }},
         })
     , m_boardRef(_board)
+    , m_seeOwnCard(_seeOwnCard)
 {
 }
 
-void SeeOwnCard::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered)
+void SeeCard::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered)
 {
     if (_isBeingRegistered)
     {
@@ -60,11 +61,20 @@ void SeeOwnCard::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBe
             {
                 if (getCurrentStateId() != Id::WaitInput)
                     return;
-                if (_event.slotOwnerId != getManagedPlayerId()) // TODO give feedback to the player
-                    return;
+                if (m_seeOwnCard)
+                {
+                    if (_event.slotOwnerId != getManagedPlayerId()) // TODO give feedback to the player
+                        return;
+                }
+                else
+                {
+                    if (_event.slotOwnerId == getManagedPlayerId())
+                        return;
+                }
 
                 requestFollowingState();
                 m_slotId = _event.slotId;
+                m_slotOwnerId = _event.slotOwnerId;
             }
         );
         _dispatcher.registerEvent<events::ProvideCardNetEvent>(getListenerId(),
@@ -86,12 +96,12 @@ void SeeOwnCard::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBe
     }
 }
 
-bool SeeOwnCard::isFinished() const
+bool SeeCard::isFinished() const
 {
     return getCurrentStateId() == Id::Finished;
 } 
 
-StepId SeeOwnCard::getNextStepId() const
+StepId SeeCard::getNextStepId() const
 {
     return StepId::FinishTurn;
 }

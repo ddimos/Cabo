@@ -109,16 +109,20 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
             _buffer << event.m_playerId;
             _buffer << static_cast<uint8_t>(event.m_inputType);
 
-            uint8_t data = 0;
             if (event.m_inputType == shared::game::InputType::ClickPile)
-                data = static_cast<uint8_t>(std::get<shared::game::PileType>(event.m_data));
+            {
+                _buffer << static_cast<uint8_t>(std::get<shared::game::PileType>(event.m_data));
+            }
             else if (event.m_inputType == shared::game::InputType::ClickSlot)
-                data = static_cast<uint8_t>(std::get<shared::game::ParticipantSlotId>(event.m_data));
+            {
+                auto dataStruct = std::get<shared::game::ClickSlotInputData>(event.m_data);
+                _buffer << static_cast<uint8_t>(dataStruct.slotId);
+                _buffer << static_cast<uint8_t>(dataStruct.playerId);
+            }
             else if (event.m_inputType == shared::game::InputType::DecideButton)
-                data = static_cast<uint8_t>(std::get<shared::game::DecideButton>(event.m_data));
-            
-            if (event.m_inputType != shared::game::InputType::Cabo)
-                _buffer << data;
+            {
+                _buffer << static_cast<uint8_t>(std::get<shared::game::DecideButton>(event.m_data));
+            }
         },
         [](core::event::Event& _event, nsf::Buffer& _buffer){
             auto& event = static_cast<events::RemotePlayerInputNetEvent&>(_event);
@@ -127,18 +131,26 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
             _buffer >> inputType;
             event.m_inputType = static_cast<shared::game::InputType>(inputType);
             
-            if (event.m_inputType == shared::game::InputType::Cabo)
-                return;
-            
-            uint8_t data = 0;
-            _buffer >> data;
-            
+            [[maybe_unused]] uint8_t data = 0;
             if (event.m_inputType == shared::game::InputType::ClickPile)
+            {
+                _buffer >> data;
                 event.m_data = static_cast<shared::game::PileType>(data);
+            }
             else if (event.m_inputType == shared::game::InputType::ClickSlot)
-                event.m_data = static_cast<shared::game::ParticipantSlotId>(data);
+            {
+                shared::game::ClickSlotInputData dataStruct;
+                _buffer >> data;
+                dataStruct.slotId = data;
+                _buffer >> data;
+                dataStruct.playerId = data;
+                event.m_data = dataStruct;
+            }
             else if (event.m_inputType == shared::game::InputType::DecideButton)
+            {
+                _buffer >> data;
                 event.m_data = static_cast<shared::game::DecideButton>(data);
+            }
         },
         [](){
             return std::make_unique<events::RemotePlayerInputNetEvent>();

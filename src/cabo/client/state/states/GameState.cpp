@@ -110,7 +110,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
 
     auto deckButton = std::make_shared<menu::item::Button>(
         menu::Position{
-            .m_position = sf::Vector2f(75.f-45.f, 0.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
+            .m_position = sf::Vector2f(75.f, 0.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
             .m_specPositionX = menu::Position::Special::OFFSET_FROM_CENTER, .m_specPositionY = menu::Position::Special::CENTER_ALLIGNED
         },
         textureHolderRef.get(TextureIds::Cards),
@@ -125,7 +125,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
 
     auto discardButton = std::make_shared<menu::item::Button>(
         menu::Position{
-            .m_position = sf::Vector2f(-75.f-45.f, 0.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
+            .m_position = sf::Vector2f(-75.f, 0.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
             .m_specPositionX = menu::Position::Special::OFFSET_FROM_CENTER, .m_specPositionY = menu::Position::Special::CENTER_ALLIGNED
         },
         textureHolderRef.get(TextureIds::Cards),
@@ -168,7 +168,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
 
     auto discardCardImage = std::make_shared<menu::item::SimpleImage>(
         menu::Position{
-            .m_position = sf::Vector2f(-75.f-45.f, 0.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
+            .m_position = sf::Vector2f(-75.f, 0.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
             .m_specPositionX = menu::Position::Special::OFFSET_FROM_CENTER, .m_specPositionY = menu::Position::Special::CENTER_ALLIGNED
         },
         textureHolderRef.get(TextureIds::Cards),
@@ -181,7 +181,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
     {
         auto matchButton = std::make_shared<menu::item::Button>(
             menu::Position{
-                .m_position = sf::Vector2f(-150.f-45.f, 200.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
+                .m_position = sf::Vector2f(-150.f, 200.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
                 .m_specPositionX = menu::Position::Special::OFFSET_FROM_CENTER, .m_specPositionY = menu::Position::Special::OFFSET_FROM_CENTER
             },
             textureHolderRef.get(TextureIds::DecideButtons),
@@ -198,7 +198,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
 
         auto takeButton = std::make_shared<menu::item::Button>(
             menu::Position{
-                .m_position = sf::Vector2f(-70.f-45.f, 200.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
+                .m_position = sf::Vector2f(-70.f, 200.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
                 .m_specPositionX = menu::Position::Special::OFFSET_FROM_CENTER, .m_specPositionY = menu::Position::Special::OFFSET_FROM_CENTER
             },
             textureHolderRef.get(TextureIds::DecideButtons),
@@ -215,7 +215,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
 
         auto actionButton = std::make_shared<menu::item::Button>(
             menu::Position{
-                .m_position = sf::Vector2f(70.f-45.f, 200.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
+                .m_position = sf::Vector2f(70.f, 200.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
                 .m_specPositionX = menu::Position::Special::OFFSET_FROM_CENTER, .m_specPositionY = menu::Position::Special::OFFSET_FROM_CENTER
             },
             textureHolderRef.get(TextureIds::DecideButtons),
@@ -232,7 +232,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
 
         auto discardDecideButton = std::make_shared<menu::item::Button>(
             menu::Position{
-                .m_position = sf::Vector2f(150.f-45.f, 200.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
+                .m_position = sf::Vector2f(150.f, 200.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
                 .m_specPositionX = menu::Position::Special::OFFSET_FROM_CENTER, .m_specPositionY = menu::Position::Special::OFFSET_FROM_CENTER
             },
             textureHolderRef.get(TextureIds::DecideButtons),

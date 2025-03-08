@@ -6,7 +6,7 @@
 #include "client/game/step/DrawCard.hpp"
 #include "client/game/step/Finish.hpp"
 #include "client/game/step/MatchCard.hpp"
-#include "client/game/step/SeeOwnCard.hpp"
+#include "client/game/step/SeeCard.hpp"
 #include "client/game/step/TakeCard.hpp"
 
 #include "client/player/Manager.hpp"
@@ -47,7 +47,7 @@ void Board::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRe
         _dispatcher.registerEvent<events::BoardStateUpdateNetEvent>(m_listenerId,
             [&_dispatcher, this](const events::BoardStateUpdateNetEvent& _event){
                 CN_LOG_FRM("Board {} ", (unsigned)_event.m_boardState);
-                m_queueRef.push("Board state changed"); // TODO give a name
+                // m_queueRef.push("Board state changed"); // TODO give a name
                 m_boardState = _event.m_boardState;
             }
         );
@@ -198,7 +198,11 @@ void Board::changeStep(StepId _nextStepId)
         break;
     case StepId::SeeOwnCard:
         m_queueRef.push("You can peek any of your card");
-        m_localPlayerStep = std::make_unique<step::SeeOwnCard>(*this, m_localPlayerId);
+        m_localPlayerStep = std::make_unique<step::SeeCard>(*this, m_localPlayerId, true);
+        break;
+    case StepId::SeeSomeonesCard:
+        m_queueRef.push("You can peek any card except yours");
+        m_localPlayerStep = std::make_unique<step::SeeCard>(*this, m_localPlayerId, false);
         break;
     case StepId::TakeCard:
         m_queueRef.push("You can pick any of your card");

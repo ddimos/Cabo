@@ -45,6 +45,8 @@ private:
     size_t getIndexOfNextParticipantTurn(size_t _currentIndex) const;
     void processInputEvent(const events::RemotePlayerInputNetEvent& _event);
 
+    void processSeeCardStep(const events::RemotePlayerInputNetEvent& _event, BoardParticipant& _participant);
+
     const core::Context& m_contextRef;
     core::event::ListenerId m_listenerId = core::event::ListenerIdInvalid;
 

@@ -19,7 +19,7 @@ TakeCard::TakeCard(Board& _board, PlayerId _managedPlayerId)
                     auto* participant = m_boardRef.getParticipant(getManagedPlayerId());
                     participant->onProvideCardInSlot(m_slotId, m_boardRef.getDrawnCard());
 
-                    events::RemotePlayerInputNetEvent event(getManagedPlayerId(), InputType::ClickSlot, m_slotId);
+                    events::RemotePlayerInputNetEvent event(getManagedPlayerId(), InputType::ClickSlot, ClickSlotInputData{m_slotId, getManagedPlayerId()});
                     m_boardRef.getContext().get<net::Manager>().send(event);
                 },
                 .onUpdate = {}

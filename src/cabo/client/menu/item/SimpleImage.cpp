@@ -10,7 +10,8 @@ SimpleImage::SimpleImage(Position _position, const sf::Texture& _texture, sf::Co
     m_sprite.setTexture(_texture);
     m_sprite.setScale(_scale, _scale);
     m_sprite.setColor(_color);
-    m_sprite.setPosition(m_transformable.calculateGlobalPos(m_sprite.getGlobalBounds().getSize()));
+    m_sprite.setPosition(m_transformable.calculateGlobalPos(sf::Vector2f{}));
+    m_sprite.setOrigin(m_sprite.getLocalBounds().getSize() / 2.f);
 }
 
 SimpleImage::SimpleImage(Position _position, const sf::Texture& _texture, sf::IntRect _rectangle)
@@ -19,7 +20,8 @@ SimpleImage::SimpleImage(Position _position, const sf::Texture& _texture, sf::In
 
     m_sprite.setTexture(_texture);
     m_sprite.setTextureRect(_rectangle);
-    m_sprite.setPosition(m_transformable.calculateGlobalPos(m_sprite.getGlobalBounds().getSize()));
+    m_sprite.setPosition(m_transformable.calculateGlobalPos(sf::Vector2f{}));
+    m_sprite.setOrigin(m_sprite.getLocalBounds().getSize() / 2.f);
 }
 
 SimpleImage::SimpleImage(Position _position, const sf::Texture& _texture)
@@ -27,7 +29,8 @@ SimpleImage::SimpleImage(Position _position, const sf::Texture& _texture)
     m_transformable.setPosition(_position);
 
     m_sprite.setTexture(_texture);
-    m_sprite.setPosition(m_transformable.calculateGlobalPos(m_sprite.getGlobalBounds().getSize()));
+    m_sprite.setPosition(m_transformable.calculateGlobalPos(sf::Vector2f{}));
+    m_sprite.setOrigin(m_sprite.getLocalBounds().getSize() / 2.f);
 }
 
 void SimpleImage::setTextureRect(sf::IntRect _rectangle)
@@ -39,7 +42,7 @@ void SimpleImage::setTextureRect(sf::IntRect _rectangle)
 void SimpleImage::setPosition(Position _position)
 {
     m_transformable.setPosition(_position);
-    m_sprite.setPosition(m_transformable.calculateGlobalPos(m_sprite.getGlobalBounds().getSize()));
+    m_sprite.setPosition(m_transformable.calculateGlobalPos(sf::Vector2f{}));
 }
 
 void SimpleImage::setRotation(float _angleDeg)

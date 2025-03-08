@@ -7,10 +7,10 @@
 namespace cn::client::game::step
 {
 
-class SeeOwnCard : public Step
+class SeeCard : public Step
 {
 public:
-    SeeOwnCard(Board& _board, PlayerId _managedPlayerId);
+    SeeCard(Board& _board, PlayerId _managedPlayerId, bool _seeOwnCard);
 
 private:
     void registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered) override;
@@ -21,13 +21,15 @@ private:
     {
         WaitInput,
         RequestSeeCard,
-        SeeCard,
+        Look,
         Finished
     };
 
     Board& m_boardRef;
+    const bool m_seeOwnCard = true;
 
     ParticipantSlotId m_slotId = shared::game::ParticipantSlotIdInvalid;
+    PlayerId m_slotOwnerId = PlayerIdInvalid;
 
     Card::Rank m_rank;
     Card::Suit m_suit;

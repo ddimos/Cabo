@@ -38,7 +38,6 @@ DecideCard::DecideCard(Board& _board, PlayerId _managedPlayerId)
     )
     , m_boardRef(_board)
 {
-
 }
 
 void DecideCard::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered)
@@ -81,7 +80,7 @@ bool DecideCard::isFinished() const
 
 StepId DecideCard::getNextStepId() const
 {
-    return shared::game::getNextStepId(m_button, m_cardAbility);
+    return shared::game::getNextStepId(m_button, Card::getAbility(Card(m_rank, m_suit)));
 }
 
 } // namespace cn::client::game::step
