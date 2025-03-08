@@ -13,10 +13,12 @@
 namespace cn::client::game
 {
 
-Participant::Participant(const core::Context& _context, PlayerId _id, bool _isLocal, std::vector<ParticipantSlot>&& _slots, unsigned short _initialNumberOfSlots)
+Participant::Participant(const core::Context& _context, PlayerId _id, bool _isLocal, std::vector<ParticipantSlot>&& _slots,
+                         menu::item::SimpleImage& _openCardImageRef, unsigned short _initialNumberOfSlots)
     : m_id(_id)
     , m_isLocal(_isLocal)
     , m_slots(std::move(_slots))
+    , m_openCardImageRef(_openCardImageRef)
     , m_currentNumberOfSlots(_initialNumberOfSlots)
 {
     auto& fontHolderRef = _context.get<client::FontHolder>();
@@ -34,12 +36,20 @@ Participant::Participant(const core::Context& _context, PlayerId _id, bool _isLo
 void Participant::setSpawnPoint(PlayerSpawnPoint _spawnPoint)
 {
     // This method can be useful in case of resizing the window
-
+    
     m_spawnPoint = _spawnPoint;
+    float rotation = m_spawnPoint.angleDeg + 90.f;
+
     {
         sf::Vector2f localPos = sf::Vector2f(0, 15);
-        localPos = core::math::rotateVector(localPos, m_spawnPoint.angleDeg + 90.f);
+        localPos = core::math::rotateVector(localPos, rotation);
         m_nameText.setPosition(_spawnPoint.pos + localPos);
+    }
+    {
+        sf::Vector2f localPos = sf::Vector2f(0, 210.f);
+        localPos = core::math::rotateVector(localPos, rotation);
+        m_openCardImageRef.setPosition(client::menu::Position{ .m_position = (m_spawnPoint.pos + localPos) });
+        m_openCardImageRef.setRotation(rotation + 180.f);
     }
 
     // TODO add to consts
@@ -47,16 +57,20 @@ void Participant::setSpawnPoint(PlayerSpawnPoint _spawnPoint)
     const float offsetBetweenCardsY = 115.f;
     const int cardsInRow = 4;
 
+    float imageRotation = rotation;
+    if (m_spawnPoint.angleDeg >= 0 && m_spawnPoint.angleDeg <= 180)
+        imageRotation += 180.f;
+
     int i = 0;
     int j = 0;
     for (auto& slot : m_slots)
     {
         sf::Vector2f localPos = sf::Vector2f(i * offsetBetweenCardsX - 127, j * offsetBetweenCardsY + 70);
-        localPos = core::math::rotateVector(localPos, m_spawnPoint.angleDeg + 90.f);
+        localPos = core::math::rotateVector(localPos, rotation);
         slot.button->setPosition(client::menu::Position{ .m_position = (m_spawnPoint.pos + localPos) });
-        slot.button->setRotation(m_spawnPoint.angleDeg + 90.f);
+        slot.button->setRotation(rotation);
         slot.cardImage->setPosition(client::menu::Position{ .m_position = (m_spawnPoint.pos + localPos) });
-        // slot.cardImage->setRotation(m_spawnPoint.angleDeg + 90.f);
+        slot.cardImage->setRotation(imageRotation);
         ++i;
         if(i >= cardsInRow)
         {
@@ -100,7 +114,18 @@ void Participant::removeSlot(ParticipantSlotId _id)
     slot.wasRemoved = true;
 }
 
-void Participant::onStartShowingCardInSlot(ParticipantSlotId _id)
+void Participant::onStartShowingCard(Card _card)
+{
+    m_openCardImageRef.setTextureRect(game::spriteSheet::getCardTextureRect(_card.getRank(), _card.getSuit()));
+    m_openCardImageRef.requestActivated();
+}
+
+void Participant::onFinishShowingCard()
+{
+    m_openCardImageRef.requestDeactivated();
+}
+
+void Participant::onStartShowingOwnCardInSlot(ParticipantSlotId _id)
 {
     const auto& slot = getSlot(_id);
     slot.button->requestDeactivated();
@@ -109,25 +134,11 @@ void Participant::onStartShowingCardInSlot(ParticipantSlotId _id)
     // TODO start an animation
 }
 
-void Participant::onCardRecievedInSlot(ParticipantSlotId _id, Card _card)
-{
-    auto& slot = getSlot(_id);
-    if (slot.wasRemoved)
-        return;
-
-    slot.card = _card;
-    slot.cardImage->setTextureRect(game::spriteSheet::getCardTextureRect(_card.getRank(), _card.getSuit()));
-    slot.isCardValid = true;
-
-    slot.cardImage->requestActivated();
-}
-
-void Participant::onFinishShowingCardInSlot(ParticipantSlotId _id)
+void Participant::onFinishShowingOwnCardInSlot(ParticipantSlotId _id)
 {
     auto slot = getSlot(_id);
     if (slot.wasRemoved)
         return;
-    slot.cardImage->requestDeactivated();
     slot.button->requestActivated();
 }
 

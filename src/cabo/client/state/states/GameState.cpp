@@ -90,8 +90,16 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
                 slots.emplace_back(game::ParticipantSlot{ slotId, false, game::Card{cardPair.first, cardPair.second}, cardImage.get(), slotButton.get()});
             }
 
+            auto openCardCardImage = std::make_shared<menu::item::SimpleImage>(
+                menu::Position{},
+                textureHolderRef.get(TextureIds::Cards),
+                game::spriteSheet::getCardBackTextureRect()
+            );
+            openCardCardImage->setActivationOption(core::object::Object::ActivationOption::Manually);
+            getContainer(core::object::Container::Type::Menu).add(openCardCardImage);
+
             auto participant = std::make_shared<game::Participant>(
-                getContext(), playerId, true, std::move(slots), shared::game::DefaultInitNumberOfParticipantSlots
+                getContext(), playerId, true, std::move(slots), *openCardCardImage, shared::game::DefaultInitNumberOfParticipantSlots
             );
             participant->setSpawnPoint(spawnPoints[index]);
             getContainer(core::object::Container::Type::Game).add(participant);

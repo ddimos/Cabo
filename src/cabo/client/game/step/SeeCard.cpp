@@ -15,8 +15,8 @@ SeeCard::SeeCard(Board& _board, PlayerId _managedPlayerId, bool _seeOwnCard)
             {Id::WaitInput, {}},
             {Id::RequestSeeCard, {            
                 .onEnter = [this](){
-                    auto* participant = m_boardRef.getParticipant(m_slotOwnerId);
-                    participant->onStartShowingCardInSlot(m_slotId);
+                    auto* owner = m_boardRef.getParticipant(m_slotOwnerId);
+                    owner->onStartShowingOwnCardInSlot(m_slotId);
                     
                     events::RemotePlayerInputNetEvent event(getManagedPlayerId(), InputType::ClickSlot, ClickSlotInputData{m_slotId, m_slotOwnerId});
                     m_boardRef.getContext().get<net::Manager>().send(event);
@@ -25,8 +25,8 @@ SeeCard::SeeCard(Board& _board, PlayerId _managedPlayerId, bool _seeOwnCard)
             }},
             {Id::Look, {
                 .onEnter = [this](){
-                    auto* participant = m_boardRef.getParticipant(m_slotOwnerId);
-                    participant->onCardRecievedInSlot(m_slotId, Card(m_rank, m_suit));
+                    auto* participant = m_boardRef.getParticipant(getManagedPlayerId());
+                    participant->onStartShowingCard(Card(m_rank, m_suit));
                 },
                 .onUpdate = [this](sf::Time _dt){
                     m_seeCardTimeDt -= _dt;
@@ -36,8 +36,11 @@ SeeCard::SeeCard(Board& _board, PlayerId _managedPlayerId, bool _seeOwnCard)
             }},
             {Id::Finished, {
                 .onEnter = [this](){
-                    auto* participant = m_boardRef.getParticipant(m_slotOwnerId);
-                    participant->onFinishShowingCardInSlot(m_slotId);
+                    auto* owner = m_boardRef.getParticipant(m_slotOwnerId);
+                    owner->onFinishShowingOwnCardInSlot(m_slotId);
+
+                    auto* participant = m_boardRef.getParticipant(getManagedPlayerId());
+                    participant->onFinishShowingCard();
                 },
                 .onUpdate = {}
                 //     [this](sf::Time){
