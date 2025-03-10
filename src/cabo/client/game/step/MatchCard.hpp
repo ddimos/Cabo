@@ -31,8 +31,9 @@ private:
 
     Card::Rank m_rank;
     Card::Suit m_suit;
+    bool m_isMatched = false;
 
-    const sf::Time m_seeCardTime = sf::seconds(2.f);
+    const sf::Time m_seeCardTime = sf::seconds(1.f);
     sf::Time m_seeCardTimeDt = m_seeCardTime;
 };
 

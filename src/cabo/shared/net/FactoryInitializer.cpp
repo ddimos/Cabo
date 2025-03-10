@@ -197,6 +197,28 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
         }
     );
     _factoryRef.add(
+        events::id::MatchCard,
+        [](const core::event::Event& _event, nsf::Buffer& _buffer){
+            auto& event = static_cast<const events::MatchCardNetEvent&>(_event);
+            _buffer << static_cast<uint8_t>(event.m_rank);
+            _buffer << static_cast<uint8_t>(event.m_suit);
+            _buffer << event.m_isMatched;
+        },
+        [](core::event::Event& _event, nsf::Buffer& _buffer){
+            auto& event = static_cast<events::MatchCardNetEvent&>(_event);
+            uint8_t rank;
+            uint8_t suit;
+            _buffer >> rank;
+            _buffer >> suit;
+            event.m_rank = static_cast<shared::game::Card::Rank>(rank);
+            event.m_suit = static_cast<shared::game::Card::Suit>(suit);
+            _buffer >> event.m_isMatched;
+        },
+        [](){
+            return std::make_unique<events::MatchCardNetEvent>();
+        }
+    );
+    _factoryRef.add(
         events::id::PlayerSlotUpdate,
         [](const core::event::Event& _event, nsf::Buffer& _buffer){
             auto& event = static_cast<const events::PlayerSlotUpdateNetEvent&>(_event);

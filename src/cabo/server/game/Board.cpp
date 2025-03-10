@@ -265,51 +265,7 @@ void Board::processInputEvent(const events::RemotePlayerInputNetEvent& _event)
         }
         else if (participant.currentStepId == StepId::MatchCard)
         {
-            if (_event.m_inputType != InputType::ClickSlot)
-            {
-                CN_ASSERT(false);
-                // TODO punish?
-                break;
-            }
-            ClickSlotInputData dataStruct = std::get<ClickSlotInputData>(_event.m_data);
-            auto* card = participant.participantRef.getCard(dataStruct.slotId);
-
-            bool success = card->getRank() == m_drawnCardPtr->getRank();
-
-            m_discardRef.discard(m_drawnCardPtr);
-            events::DiscardCardNetEvent event(m_drawnCardPtr->getRank(), m_drawnCardPtr->getSuit());
-            netManRef.send(event); 
-            
-            events::ProvideCardNetEvent eventProvide(card->getRank(), card->getSuit());
-            netManRef.send(eventProvide);
-            ParticipantSlotId updatedSlotId = shared::game::ParticipantSlotIdInvalid;
-            if (success)
-            {
-                m_discardRef.discard(card);
-                events::DiscardCardNetEvent eventDiscard(card->getRank(), card->getSuit());
-                netManRef.send(eventDiscard); 
-                updatedSlotId = dataStruct.slotId;
-                participant.participantRef.removeSlot(dataStruct.slotId);
-            }
-            else
-            {
-                updatedSlotId = participant.participantRef.addSlot();
-                if (updatedSlotId != shared::game::ParticipantSlotIdInvalid)
-                    participant.participantRef.replace(updatedSlotId, m_deckRef.getNextCard());
-            }
-            // if slot id is invalid, it means no available space left
-            if (updatedSlotId != shared::game::ParticipantSlotIdInvalid)
-            {
-                events::PlayerSlotUpdateNetEvent event(_event.m_senderPeerId, updatedSlotId, !success);
-                netManRef.send(event);
-            }
-
-            participant.currentStepId = StepId::FinishTurn;
-
-            CN_LOG_FRM("Match card, participant: {}, slot: {}, new slot: {}, drawn card: {} {}, matched card: {} {}", 
-                _event.m_senderPeerId, dataStruct.slotId, updatedSlotId, (int)m_drawnCardPtr->getRank(), (int)m_drawnCardPtr->getSuit(),
-                (int)card->getRank(), (int)card->getSuit() 
-            );
+            processMatchCardStep(_event, participant);
         }
         else if (participant.currentStepId == StepId::SeeOwnCard || participant.currentStepId == StepId::SeeSomeonesCard)
         {
@@ -353,6 +309,57 @@ void Board::processInputEvent(const events::RemotePlayerInputNetEvent& _event)
 
     if (forwardEvent)
         netManRef.send(_event, nsf::MessageInfo::Type::EXCLUDE_BRODCAST, true, _event.m_senderPeerId);
+}
+
+void Board::processMatchCardStep(const events::RemotePlayerInputNetEvent& _event, BoardParticipant& _participant)
+{
+    if (_event.m_inputType != InputType::ClickSlot)
+    {
+        CN_ASSERT(false);
+        // TODO punish?
+        return;
+    }
+    auto& netManRef = getContext().get<net::Manager>(); 
+
+    ClickSlotInputData dataStruct = std::get<ClickSlotInputData>(_event.m_data);
+    auto* card = _participant.participantRef.getCard(dataStruct.slotId);
+
+    bool success = card->getRank() == m_drawnCardPtr->getRank();
+
+    m_discardRef.discard(m_drawnCardPtr);
+    events::DiscardCardNetEvent event(m_drawnCardPtr->getRank(), m_drawnCardPtr->getSuit());
+    netManRef.send(event); 
+    
+    events::MatchCardNetEvent eventMatch(card->getRank(), card->getSuit(), success);
+    netManRef.send(eventMatch); 
+
+    ParticipantSlotId updatedSlotId = shared::game::ParticipantSlotIdInvalid;
+    if (success)
+    {
+        // Everyone will discard it locally
+        m_discardRef.discard(card);
+        updatedSlotId = dataStruct.slotId;
+        _participant.participantRef.removeSlot(dataStruct.slotId);
+    }
+    else
+    {
+        updatedSlotId = _participant.participantRef.addSlot();
+        if (updatedSlotId != shared::game::ParticipantSlotIdInvalid)
+            _participant.participantRef.replace(updatedSlotId, m_deckRef.getNextCard());
+    }
+    // if slot id is invalid, it means no available space left
+    if (updatedSlotId != shared::game::ParticipantSlotIdInvalid)
+    {
+        events::PlayerSlotUpdateNetEvent event(_event.m_senderPeerId, updatedSlotId, !success);
+        netManRef.send(event);
+    }
+
+    _participant.currentStepId = StepId::FinishTurn;
+
+    CN_LOG_FRM("Match card, participant: {}, slot: {}, new slot: {}, drawn card: {} {}, matched card: {} {}", 
+        _event.m_senderPeerId, dataStruct.slotId, updatedSlotId, (int)m_drawnCardPtr->getRank(), (int)m_drawnCardPtr->getSuit(),
+        (int)card->getRank(), (int)card->getSuit() 
+    );
 }
 
 void Board::processSeeCardStep(const events::RemotePlayerInputNetEvent& _event, BoardParticipant& _participant)

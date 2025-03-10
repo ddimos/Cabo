@@ -45,6 +45,7 @@ private:
     size_t getIndexOfNextParticipantTurn(size_t _currentIndex) const;
     void processInputEvent(const events::RemotePlayerInputNetEvent& _event);
 
+    void processMatchCardStep(const events::RemotePlayerInputNetEvent& _event, BoardParticipant& _participant);
     void processSeeCardStep(const events::RemotePlayerInputNetEvent& _event, BoardParticipant& _participant);
 
     const core::Context& m_contextRef;

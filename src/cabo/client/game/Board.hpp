@@ -29,7 +29,7 @@ public:
 
     Board(const core::Context& _context, std::vector<game::Participant*>&& _participants, menu::item::NotificationQueue& _queue,
           menu::item::Button& _finishButton, menu::item::SimpleImage& _deckCardImage, menu::item::SimpleImage& _discardCardImage,
-          DecideButtons&& _decideButtons);
+          menu::item::SimpleImage& _matchedCardImageRef, DecideButtons&& _decideButtons);
 
     void registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered);
     void update(sf::Time _dt);
@@ -42,10 +42,14 @@ public:
     void onParticipantFinishesTurn(PlayerId _id);
     void onParticipantFinishedTurn(PlayerId _id);
 
+    void onShowMatchedCard(Card _card);
+    void onHideMatchedCard(bool _discard);
+
     Card getDrawnCard() const { return m_drawnCard; }
 
 private:
     void changeStep(StepId _nextStepId);
+    void discardCard(Card _card);
 
     const core::Context& m_contextRef;
     
@@ -54,6 +58,7 @@ private:
     menu::item::Button& m_finishButtonRef;
     menu::item::SimpleImage& m_deckCardImageRef;
     menu::item::SimpleImage& m_discardCardImageRef;
+    menu::item::SimpleImage& m_matchedCardImageRef;
     DecideButtons m_decideButtons;
 
     core::event::ListenerId m_listenerId = core::event::ListenerIdInvalid;
@@ -64,8 +69,10 @@ private:
     StepId m_localPlayerStepId = StepId::Idle;
     StepId m_desiredPlayerStepId = StepId::Idle;
 
-    Card m_drawnCard;
     unsigned m_numberOfDiscardCards = 0;
+
+    Card m_drawnCard;
+    Card m_matchedCard;
 };
    
 } // namespace cn::client::game

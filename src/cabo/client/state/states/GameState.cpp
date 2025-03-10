@@ -185,6 +185,17 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
     discardCardImage->setActivationOption(core::object::Object::ActivationOption::Manually);
     getContainer(core::object::Container::Type::Menu).add(discardCardImage);
 
+    auto matchedCardImage = std::make_shared<menu::item::SimpleImage>(
+        menu::Position{
+            .m_position = sf::Vector2f(-120.f, 70.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
+            .m_specPositionX = menu::Position::Special::OFFSET_FROM_CENTER, .m_specPositionY = menu::Position::Special::OFFSET_FROM_CENTER
+        },
+        textureHolderRef.get(TextureIds::Cards),
+        game::spriteSheet::getCardTextureRect(cardPair.first, cardPair.second)
+    );
+    matchedCardImage->setActivationOption(core::object::Object::ActivationOption::Manually);
+    getContainer(core::object::Container::Type::Menu).add(matchedCardImage);
+
     game::Board::DecideButtons buttons;
     {
         auto matchButton = std::make_shared<menu::item::Button>(
@@ -285,7 +296,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
     getContainer(core::object::Container::Type::Menu).add(queue);
 
     m_board = std::make_unique<game::Board>(
-        getContext(), std::move(participants), *queue, *finishButton, *deckCardImage, *discardCardImage, std::move(buttons)
+        getContext(), std::move(participants), *queue, *finishButton, *deckCardImage, *discardCardImage, *matchedCardImage, std::move(buttons)
     );
 
     m_listenerId = core::event::getNewListenerId();

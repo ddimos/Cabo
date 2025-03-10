@@ -20,14 +20,13 @@ MatchCard::MatchCard(Board& _board, PlayerId _managedPlayerId)
                     m_boardRef.getContext().get<net::Manager>().send(event);
 
                     auto* participant = m_boardRef.getParticipant(getManagedPlayerId());
-                    participant->onStartShowingCardInSlot(m_slotId);
+                    participant->onStartShowingOwnCardInSlot(m_slotId);
                 },
                 .onUpdate = {}
             }},
             {Id::SeeCard, {
                 .onEnter = [this](){
-                    auto* participant = m_boardRef.getParticipant(getManagedPlayerId());
-                    participant->onCardRecievedInSlot(m_slotId, Card(m_rank, m_suit));
+                    m_boardRef.onShowMatchedCard(Card(m_rank, m_suit));
                 },
                 .onUpdate = [this](sf::Time _dt){
                     m_seeCardTimeDt -= _dt;
@@ -39,7 +38,9 @@ MatchCard::MatchCard(Board& _board, PlayerId _managedPlayerId)
             {Id::Finished, {
                 .onEnter = [this](){
                     auto* participant = m_boardRef.getParticipant(getManagedPlayerId());
-                    participant->onFinishShowingCardInSlot(m_slotId);
+                    participant->onFinishShowingOwnCardInSlot(m_slotId);
+
+                    m_boardRef.onHideMatchedCard(m_isMatched);
                 },
                 .onUpdate = {}
             }},
@@ -64,8 +65,8 @@ void MatchCard::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBei
                 m_slotId = _event.slotId;
             }
         );
-        _dispatcher.registerEvent<events::ProvideCardNetEvent>(getListenerId(),
-            [this](const events::ProvideCardNetEvent& _event)
+        _dispatcher.registerEvent<events::MatchCardNetEvent>(getListenerId(),
+            [this](const events::MatchCardNetEvent& _event)
             {    
                 if (getCurrentStateId() != Id::WaitServerReply)
                     return;
@@ -73,13 +74,14 @@ void MatchCard::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBei
                 requestFollowingState();
                 m_rank = _event.m_rank;
                 m_suit = _event.m_suit;
+                m_isMatched = _event.m_isMatched;
             }
         );
     }
     else
     {
         _dispatcher.unregisterEvent<events::LocalPlayerClickSlotEvent>(getListenerId());
-        _dispatcher.unregisterEvent<events::ProvideCardNetEvent>(getListenerId());
+        _dispatcher.unregisterEvent<events::MatchCardNetEvent>(getListenerId());
     }
 }
 

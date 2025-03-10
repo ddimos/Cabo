@@ -141,6 +141,21 @@ public:
     shared::game::Card::Suit m_suit = shared::game::Card::Suit::Clubs;
 };
 
+class MatchCardNetEvent final : public BaseNetEvent
+{
+public:
+    CN_EVENT(id::MatchCard)
+
+    MatchCardNetEvent() = default;
+    MatchCardNetEvent(shared::game::Card::Rank _rank, shared::game::Card::Suit _suit, bool _isMatched)
+        : m_rank(_rank), m_suit(_suit), m_isMatched(_isMatched)
+    {}
+
+    shared::game::Card::Rank m_rank = shared::game::Card::Rank::Ace;
+    shared::game::Card::Suit m_suit = shared::game::Card::Suit::Clubs;
+    bool m_isMatched = false;
+};
+
 class PlayerSlotUpdateNetEvent final : public BaseNetEvent
 {
 public:

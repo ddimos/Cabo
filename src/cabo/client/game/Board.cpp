@@ -23,13 +23,14 @@ namespace cn::client::game
 
 Board::Board(const core::Context& _context, std::vector<game::Participant*>&& _participants, menu::item::NotificationQueue& _queue,
              menu::item::Button& _finishButton, menu::item::SimpleImage& _deckCardImage, menu::item::SimpleImage& _discardCardImage,
-             DecideButtons&& _decideButtons)
+             menu::item::SimpleImage& _matchedCardImageRef, DecideButtons&& _decideButtons)
     : m_contextRef(_context)
     , m_participants(std::move(_participants))
     , m_queueRef(_queue)
     , m_finishButtonRef(_finishButton)
     , m_deckCardImageRef(_deckCardImage)
     , m_discardCardImageRef(_discardCardImage)
+    , m_matchedCardImageRef(_matchedCardImageRef)
     , m_decideButtons(std::move(_decideButtons))
 {
     auto& eventDispatcherRef = getContext().get<core::event::Dispatcher>();
@@ -73,10 +74,7 @@ void Board::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRe
         );
         _dispatcher.registerEvent<events::DiscardCardNetEvent>(m_listenerId,
             [&_dispatcher, this](const events::DiscardCardNetEvent& _event){
-                m_discardCardImageRef.setTextureRect(game::spriteSheet::getCardTextureRect(_event.m_rank, _event.m_suit));
-                if (m_numberOfDiscardCards == 0)
-                    m_discardCardImageRef.requestActivated();
-                ++m_numberOfDiscardCards;
+                discardCard(Card(_event.m_rank, _event.m_suit));
             }
         );
         _dispatcher.registerEvent<events::PlayerSlotUpdateNetEvent>(m_listenerId,
@@ -167,6 +165,20 @@ void Board::onParticipantFinishedTurn(PlayerId _id)
     m_finishButtonRef.requestDeactivated();
 }
 
+void Board::onShowMatchedCard(Card _card)
+{
+    m_matchedCardImageRef.setTextureRect(game::spriteSheet::getCardTextureRect(_card.getRank(), _card.getSuit()));
+    m_matchedCardImageRef.requestActivated();
+    m_matchedCard = _card;
+}
+
+void Board::onHideMatchedCard(bool _discard)
+{
+    m_matchedCardImageRef.requestDeactivated();
+    if (_discard)
+        discardCard(m_matchedCard);
+}
+
 void Board::changeStep(StepId _nextStepId)
 {
     m_localPlayerStepId = _nextStepId;
@@ -215,6 +227,14 @@ void Board::changeStep(StepId _nextStepId)
         m_localPlayerStep->registerEvents(eventDispatcherRef, true);
     
     CN_LOG_FRM("Set step {}", (unsigned)_nextStepId);
+}
+
+void Board::discardCard(Card _card)
+{
+    m_discardCardImageRef.setTextureRect(game::spriteSheet::getCardTextureRect(_card.getRank(), _card.getSuit()));
+    if (m_numberOfDiscardCards == 0)
+        m_discardCardImageRef.requestActivated();
+    ++m_numberOfDiscardCards;
 }
 
 } // namespace cn::client::game
