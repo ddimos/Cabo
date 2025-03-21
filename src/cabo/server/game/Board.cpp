@@ -1,6 +1,4 @@
 #include "server/game/Board.hpp"
-#include "server/game/step/DrawCard.hpp"
-#include "server/game/step/SeeOwnCard.hpp"
 
 #include "shared/game/Board.hpp"
 #include "shared/events/NetworkEvents.hpp"
