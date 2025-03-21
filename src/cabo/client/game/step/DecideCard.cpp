@@ -29,7 +29,7 @@ DecideCard::DecideCard(Board& _board, PlayerId _managedPlayerId)
                 .onEnter = [this](){
                     m_boardRef.onParticipantFinishDeciding();
                     // TODO Shouldn't I send the result of deciding
-                    events::RemotePlayerInputNetEvent event(getManagedPlayerId(), InputType::DecideButton, m_button);
+                    events::RemotePlayerInputNetEvent event(getManagedPlayerId(), InputType::Action, m_button);
                     m_boardRef.getContext().get<net::Manager>().send(event);
                 },
                 .onUpdate = {}

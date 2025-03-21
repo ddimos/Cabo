@@ -24,4 +24,7 @@ sf::IntRect getDiscardButtonTextureRect(Hover _hover = Hover::No);
 
 sf::IntRect getFinishButtonTextureRect(Hover _hover = Hover::No);
 
+sf::IntRect getYesButtonTextureRect(Hover _hover = Hover::No);
+sf::IntRect getNoButtonTextureRect(Hover _hover = Hover::No);
+
 } // namespace cn::client::game::spriteSheet

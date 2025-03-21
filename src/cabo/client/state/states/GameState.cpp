@@ -196,7 +196,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
     matchedCardImage->setActivationOption(core::object::Object::ActivationOption::Manually);
     getContainer(core::object::Container::Type::Menu).add(matchedCardImage);
 
-    game::Board::DecideButtons buttons;
+    game::Board::DecideActionButtons decideActionButtons;
     {
         auto matchButton = std::make_shared<menu::item::Button>(
             menu::Position{
@@ -207,13 +207,13 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
             game::spriteSheet::getMatchButtonTextureRect(),
             game::spriteSheet::getMatchButtonTextureRect(game::spriteSheet::Hover::Yes),
             [this, &eventDispatcherRef](){
-                eventDispatcherRef.send<events::LocalPlayerClickDecideButtonEvent>(game::DecideButton::Match);
+                eventDispatcherRef.send<events::LocalPlayerClickDecideButtonEvent>(game::ActionType::Match);
             },
             sf::Mouse::Button::Left
         );
         matchButton->setActivationOption(core::object::Object::ActivationOption::Manually);
         getContainer(core::object::Container::Type::Menu).add(matchButton);
-        buttons.push_back(matchButton.get());
+        decideActionButtons.push_back(matchButton.get());
 
         auto takeButton = std::make_shared<menu::item::Button>(
             menu::Position{
@@ -224,13 +224,13 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
             game::spriteSheet::getTakeButtonTextureRect(),
             game::spriteSheet::getTakeButtonTextureRect(game::spriteSheet::Hover::Yes),
             [this, &eventDispatcherRef](){
-                eventDispatcherRef.send<events::LocalPlayerClickDecideButtonEvent>(game::DecideButton::Take);
+                eventDispatcherRef.send<events::LocalPlayerClickDecideButtonEvent>(game::ActionType::Take);
             },
             sf::Mouse::Button::Left
         );
         takeButton->setActivationOption(core::object::Object::ActivationOption::Manually);
         getContainer(core::object::Container::Type::Menu).add(takeButton);
-        buttons.push_back(takeButton.get());
+        decideActionButtons.push_back(takeButton.get());
 
         auto actionButton = std::make_shared<menu::item::Button>(
             menu::Position{
@@ -241,13 +241,13 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
             game::spriteSheet::getActionButtonTextureRect(),
             game::spriteSheet::getActionButtonTextureRect(game::spriteSheet::Hover::Yes),
             [this, &eventDispatcherRef](){
-                eventDispatcherRef.send<events::LocalPlayerClickDecideButtonEvent>(game::DecideButton::Action);
+                eventDispatcherRef.send<events::LocalPlayerClickDecideButtonEvent>(game::ActionType::Ability);
             },
             sf::Mouse::Button::Left
         );
         actionButton->setActivationOption(core::object::Object::ActivationOption::Manually);
         getContainer(core::object::Container::Type::Menu).add(actionButton);
-        buttons.push_back(actionButton.get());
+        decideActionButtons.push_back(actionButton.get());
 
         auto discardDecideButton = std::make_shared<menu::item::Button>(
             menu::Position{
@@ -258,13 +258,49 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
             game::spriteSheet::getDiscardButtonTextureRect(),
             game::spriteSheet::getDiscardButtonTextureRect(game::spriteSheet::Hover::Yes),
             [this, &eventDispatcherRef](){
-                eventDispatcherRef.send<events::LocalPlayerClickDecideButtonEvent>(game::DecideButton::Discard);
+                eventDispatcherRef.send<events::LocalPlayerClickDecideButtonEvent>(game::ActionType::Discard);
             },
             sf::Mouse::Button::Left
         );
         discardDecideButton->setActivationOption(core::object::Object::ActivationOption::Manually);
         getContainer(core::object::Container::Type::Menu).add(discardDecideButton);
-        buttons.push_back(discardDecideButton.get());
+        decideActionButtons.push_back(discardDecideButton.get());
+    }
+    game::Board::DecideSwapButtons decideSwapButtons;
+    {
+        auto yesButton = std::make_shared<menu::item::Button>(
+            menu::Position{
+                .m_position = sf::Vector2f(-50.f, 250.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
+                .m_specPositionX = menu::Position::Special::OFFSET_FROM_CENTER, .m_specPositionY = menu::Position::Special::OFFSET_FROM_CENTER
+            },
+            textureHolderRef.get(TextureIds::YesNoButtons),
+            game::spriteSheet::getYesButtonTextureRect(),
+            game::spriteSheet::getYesButtonTextureRect(game::spriteSheet::Hover::Yes),
+            [this, &eventDispatcherRef](){
+                eventDispatcherRef.send<events::LocalPlayerClickDecideSwapButtonEvent>(true);
+            },
+            sf::Mouse::Button::Left
+        );
+        yesButton->setActivationOption(core::object::Object::ActivationOption::Manually);
+        getContainer(core::object::Container::Type::Menu).add(yesButton);
+        decideSwapButtons.push_back(yesButton.get());
+
+        auto noButton = std::make_shared<menu::item::Button>(
+            menu::Position{
+                .m_position = sf::Vector2f(50.f, 250.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
+                .m_specPositionX = menu::Position::Special::OFFSET_FROM_CENTER, .m_specPositionY = menu::Position::Special::OFFSET_FROM_CENTER
+            },
+            textureHolderRef.get(TextureIds::YesNoButtons),
+            game::spriteSheet::getNoButtonTextureRect(),
+            game::spriteSheet::getNoButtonTextureRect(game::spriteSheet::Hover::Yes),
+            [this, &eventDispatcherRef](){
+                eventDispatcherRef.send<events::LocalPlayerClickDecideSwapButtonEvent>(false);
+            },
+            sf::Mouse::Button::Left
+        );
+        noButton->setActivationOption(core::object::Object::ActivationOption::Manually);
+        getContainer(core::object::Container::Type::Menu).add(noButton);
+        decideSwapButtons.push_back(noButton.get());
     }
 
     std::vector<menu::item::SimpleText*> images;
@@ -296,7 +332,8 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
     getContainer(core::object::Container::Type::Menu).add(queue);
 
     m_board = std::make_unique<game::Board>(
-        getContext(), std::move(participants), *queue, *finishButton, *deckCardImage, *discardCardImage, *matchedCardImage, std::move(buttons)
+        getContext(), std::move(participants), *queue, *finishButton, *deckCardImage, *discardCardImage, *matchedCardImage,
+        std::move(decideActionButtons), std::move(decideSwapButtons)
     );
 
     m_listenerId = core::event::getNewListenerId();

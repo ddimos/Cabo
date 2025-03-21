@@ -30,9 +30,9 @@ enum class BoardState
     Cabo
 };
 
-enum class DecideButton
+enum class ActionType
 {
-    Action,
+    Ability,
     Discard,
     Match,
     Take
@@ -46,11 +46,12 @@ enum class PileType
 
 enum class InputType
 {
+    Action,
     Cabo,
     ClickPile,
     ClickSlot,
-    DecideButton,
-    Finish
+    Finish,
+    SwapDecision
 };
 
 struct ClickSlotInputData
@@ -59,6 +60,6 @@ struct ClickSlotInputData
     PlayerId playerId = PlayerIdInvalid;
 };
 
-using InputDataVariant = std::variant<DecideButton, ClickSlotInputData, PileType, std::monostate>;
+using InputDataVariant = std::variant<ActionType, ClickSlotInputData, PileType, bool, std::monostate>;
 
 } // namespace cn::shared::game

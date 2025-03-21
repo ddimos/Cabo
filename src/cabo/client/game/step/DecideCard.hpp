@@ -25,7 +25,7 @@ private:
     };
 
     Board& m_boardRef;
-    DecideButton m_button = DecideButton::Action;
+    ActionType m_button = ActionType::Ability;
 
     Card::Rank m_rank;
     Card::Suit m_suit;

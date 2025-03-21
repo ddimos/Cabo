@@ -7,6 +7,7 @@
 #include "client/game/step/Finish.hpp"
 #include "client/game/step/MatchCard.hpp"
 #include "client/game/step/SeeCard.hpp"
+#include "client/game/step/SwapCard.hpp"
 #include "client/game/step/TakeCard.hpp"
 
 #include "client/player/Manager.hpp"
@@ -23,7 +24,7 @@ namespace cn::client::game
 
 Board::Board(const core::Context& _context, std::vector<game::Participant*>&& _participants, menu::item::NotificationQueue& _queue,
              menu::item::Button& _finishButton, menu::item::SimpleImage& _deckCardImage, menu::item::SimpleImage& _discardCardImage,
-             menu::item::SimpleImage& _matchedCardImageRef, DecideButtons&& _decideButtons)
+             menu::item::SimpleImage& _matchedCardImageRef, DecideActionButtons&& _decideActionButtons, DecideSwapButtons&& _decideSwapButtons)
     : m_contextRef(_context)
     , m_participants(std::move(_participants))
     , m_queueRef(_queue)
@@ -31,7 +32,8 @@ Board::Board(const core::Context& _context, std::vector<game::Participant*>&& _p
     , m_deckCardImageRef(_deckCardImage)
     , m_discardCardImageRef(_discardCardImage)
     , m_matchedCardImageRef(_matchedCardImageRef)
-    , m_decideButtons(std::move(_decideButtons))
+    , m_decideActionButtons(std::move(_decideActionButtons))
+    , m_decideSwapButtons(std::move(_decideSwapButtons))
 {
     auto& eventDispatcherRef = getContext().get<core::event::Dispatcher>();
     auto& playerManagerRef = getContext().get<player::Manager>();
@@ -142,14 +144,26 @@ void Board::onParticipantStartDeciding(Card _card)
     m_drawnCard = _card;
     m_deckCardImageRef.setTextureRect(game::spriteSheet::getCardTextureRect(_card.getRank(), _card.getSuit()));
     m_deckCardImageRef.requestActivated();
-    for (auto& button : m_decideButtons)
+    for (auto& button : m_decideActionButtons)
         button->requestActivated();
 }
 
 void Board::onParticipantFinishDeciding()
 {
     m_deckCardImageRef.requestDeactivated();
-    for (auto& button : m_decideButtons)
+    for (auto& button : m_decideActionButtons)
+        button->requestDeactivated();
+}
+
+void Board::onParticipantStartDecidingSwap()
+{
+    for (auto& button : m_decideSwapButtons)
+        button->requestActivated();
+}
+
+void Board::onParticipantFinishDecidingSwap()
+{
+    for (auto& button : m_decideSwapButtons)
         button->requestDeactivated();
 }
 
@@ -215,6 +229,14 @@ void Board::changeStep(StepId _nextStepId)
     case StepId::SeeSomeonesCard:
         m_queueRef.push("You can peek any card except yours");
         m_localPlayerStep = std::make_unique<step::SeeCard>(*this, m_localPlayerId, false);
+        break;
+    case StepId::SwapCardBlindly:
+        m_queueRef.push("You can pick any card except yours");
+        m_localPlayerStep = std::make_unique<step::SwapCard>(*this, m_localPlayerId, false);
+        break;
+    case StepId::SwapCardOpenly:
+        m_queueRef.push("You can pick any card except yours");
+        m_localPlayerStep = std::make_unique<step::SwapCard>(*this, m_localPlayerId, true);
         break;
     case StepId::TakeCard:
         m_queueRef.push("You can pick any of your card");

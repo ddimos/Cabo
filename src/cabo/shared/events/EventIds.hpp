@@ -37,6 +37,7 @@ enum : core::event::EventId
 
     // Player action events
     LocalPlayerClickDecideButton,
+    LocalPlayerClickDecideSwapButton,
     LocalPlayerClickDeck,
     LocalPlayerClickDiscard,
     LocalPlayerClickFinishButton,

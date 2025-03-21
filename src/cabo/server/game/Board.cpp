@@ -205,18 +205,18 @@ void Board::processInputEvent(const events::RemotePlayerInputNetEvent& _event)
     case BoardState::Game:
         if (participant.currentStepId == StepId::DecideCard)
         {
-            if (_event.m_inputType != InputType::DecideButton)
+            if (_event.m_inputType != InputType::Action)
             {
                 CN_ASSERT(false);
                 // TODO punish?
                 break;
             }
-            DecideButton button = std::get<DecideButton>(_event.m_data);
+            ActionType button = std::get<ActionType>(_event.m_data);
             participant.currentStepId = shared::game::getNextStepId(button, Card::getAbility(Card(m_drawnCardPtr->getRank(), m_drawnCardPtr->getSuit())));
             
             CN_LOG_FRM("Decide button, participant: {}, button: {}", _event.m_senderPeerId, (int)button);
             
-            if (button == DecideButton::Discard)
+            if (button == ActionType::Discard)
             {
                 events::DiscardCardNetEvent eventDiscard(m_drawnCardPtr->getRank(), m_drawnCardPtr->getSuit());
                 netManRef.send(eventDiscard);
@@ -270,6 +270,10 @@ void Board::processInputEvent(const events::RemotePlayerInputNetEvent& _event)
         else if (participant.currentStepId == StepId::SeeOwnCard || participant.currentStepId == StepId::SeeSomeonesCard)
         {
             processSeeCardStep(_event, participant);
+        }
+        else if (participant.currentStepId == StepId::SwapCardBlindly || participant.currentStepId == StepId::SwapCardOpenly)
+        {
+            processSwapCardStep(_event, participant);
         }
         else if (participant.currentStepId == StepId::TakeCard)
         {
@@ -383,6 +387,65 @@ void Board::processSeeCardStep(const events::RemotePlayerInputNetEvent& _event, 
     CN_LOG_FRM("See card, participant: {}, slotOwner: {}, slot: {}, card: {} {}", 
         _event.m_senderPeerId, dataStruct.playerId, dataStruct.slotId, (int)card->getRank(), (int)card->getSuit()
     );
+}
+
+void Board::processSwapCardStep(const events::RemotePlayerInputNetEvent& _event, BoardParticipant& _participant)
+{
+    if (_event.m_inputType == InputType::ClickSlot)
+    {
+        if (m_isFirstPartOfSwap)
+        {
+            if (_participant.currentStepId == StepId::SwapCardOpenly)
+            {
+                processSeeCardStep(_event, _participant);
+                _participant.currentStepId = StepId::SwapCardOpenly;
+
+            }
+            
+            m_swapData = std::get<ClickSlotInputData>(_event.m_data);
+            m_isFirstPartOfSwap = false;
+        }
+        else
+        {
+            CN_ASSERT(_participant.currentStepId == StepId::SwapCardBlindly);
+            
+            ClickSlotInputData ownData = std::get<ClickSlotInputData>(_event.m_data);
+            CN_ASSERT(ownData.playerId == _event.m_senderPeerId);
+
+            auto& otherParticipant = getBoardParticipant(m_swapData.playerId);
+    
+            auto* ownCard = _participant.participantRef.getCard(ownData.slotId);
+            auto* someonesCard = otherParticipant.participantRef.replace(m_swapData.slotId, ownCard);
+            _participant.participantRef.replace(ownData.slotId, someonesCard);
+            
+            _participant.currentStepId = StepId::FinishTurn;
+            m_isFirstPartOfSwap = true;
+
+            CN_LOG_FRM("Swap card, participant: {}, slot: {}, card: {} {}, other participant: {}, slot: {}, card: {} {}", 
+                _event.m_senderPeerId, ownData.slotId, (int)ownCard->getRank(), (int)ownCard->getSuit(), 
+                m_swapData.playerId, m_swapData.slotId, (int)someonesCard->getRank(), (int)someonesCard->getSuit() 
+            );
+        }
+    }
+    else if (_event.m_inputType == InputType::SwapDecision)
+    {
+        bool swapped = std::get<bool>(_event.m_data);
+        if (swapped)
+        {
+            _participant.currentStepId = StepId::SwapCardBlindly;
+        }
+        else
+        {
+            m_isFirstPartOfSwap = true;
+            _participant.currentStepId = StepId::FinishTurn;
+        }
+        CN_LOG_FRM("Swap decision, participant: {}, swapped: {}", _event.m_senderPeerId, swapped);
+    }
+    else
+    {
+        CN_ASSERT(false);
+        // TODO punish?
+    }
 }
 
 void Board::participantStartsTurn(BoardParticipant& _participant)

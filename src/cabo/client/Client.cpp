@@ -80,11 +80,12 @@ void Client::init()
     m_textureHolder.load(TextureIds::Background, "res/textures/background.png");
     m_textureHolder.load(TextureIds::BackButton, "res/textures/back_button.png");
     m_textureHolder.load(TextureIds::Cards, "res/textures/cards.png");
-    m_textureHolder.load(TextureIds::FinishButton, "res/textures/finish_button.png");
-    m_textureHolder.load(TextureIds::MainMenuStartButton, "res/textures/create_menu_start_button.png");
     m_textureHolder.load(TextureIds::DecideButtons, "res/textures/decide_buttons.png");
+    m_textureHolder.load(TextureIds::FinishButton, "res/textures/finish_button.png");
     m_textureHolder.load(TextureIds::MainMenuJoinButton, "res/textures/join_menu_join_button.png");
+    m_textureHolder.load(TextureIds::MainMenuStartButton, "res/textures/create_menu_start_button.png");
     m_textureHolder.load(TextureIds::Table, "res/textures/table.png");
+    m_textureHolder.load(TextureIds::YesNoButtons, "res/textures/yes_no_buttons.png");
 
 // TODO move states
     m_stateManager.registerState<states::TitleState>(states::id::Title);

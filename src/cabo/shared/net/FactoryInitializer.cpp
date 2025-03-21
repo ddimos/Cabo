@@ -119,9 +119,13 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
                 _buffer << static_cast<uint8_t>(dataStruct.slotId);
                 _buffer << static_cast<uint8_t>(dataStruct.playerId);
             }
-            else if (event.m_inputType == shared::game::InputType::DecideButton)
+            else if (event.m_inputType == shared::game::InputType::Action)
             {
-                _buffer << static_cast<uint8_t>(std::get<shared::game::DecideButton>(event.m_data));
+                _buffer << static_cast<uint8_t>(std::get<shared::game::ActionType>(event.m_data));
+            }
+            else if (event.m_inputType == shared::game::InputType::SwapDecision)
+            {
+                _buffer << static_cast<uint8_t>(std::get<bool>(event.m_data));
             }
         },
         [](core::event::Event& _event, nsf::Buffer& _buffer){
@@ -146,10 +150,15 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
                 dataStruct.playerId = data;
                 event.m_data = dataStruct;
             }
-            else if (event.m_inputType == shared::game::InputType::DecideButton)
+            else if (event.m_inputType == shared::game::InputType::Action)
             {
                 _buffer >> data;
-                event.m_data = static_cast<shared::game::DecideButton>(data);
+                event.m_data = static_cast<shared::game::ActionType>(data);
+            }
+            else if (event.m_inputType == shared::game::InputType::SwapDecision)
+            {
+                _buffer >> data;
+                event.m_data = static_cast<bool>(data);
             }
         },
         [](){

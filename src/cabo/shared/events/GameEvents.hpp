@@ -48,11 +48,23 @@ class LocalPlayerClickDecideButtonEvent final : public core::event::Event
 public:
     CN_EVENT(id::LocalPlayerClickDecideButton)
 
-    LocalPlayerClickDecideButtonEvent(shared::game::DecideButton _button)
+    LocalPlayerClickDecideButtonEvent(shared::game::ActionType _button)
         : m_button(_button)
     {}
 
-    shared::game::DecideButton m_button = shared::game::DecideButton::Action;
+    shared::game::ActionType m_button = shared::game::ActionType::Ability;
+};
+
+class LocalPlayerClickDecideSwapButtonEvent final : public core::event::Event
+{
+public:
+    CN_EVENT(id::LocalPlayerClickDecideSwapButton)
+
+    LocalPlayerClickDecideSwapButtonEvent(bool _swap)
+        : m_swap(_swap)
+    {}
+
+    bool m_swap = false;
 };
 
 class LocalPlayerClickFinishButtonEvent final : public core::event::Event

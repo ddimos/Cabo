@@ -25,11 +25,12 @@ namespace cn::client::game
 class Board final
 {
 public:
-    using DecideButtons = std::vector<client::menu::item::Button*>;
+    using DecideActionButtons = std::vector<client::menu::item::Button*>;
+    using DecideSwapButtons = std::vector<client::menu::item::Button*>;
 
     Board(const core::Context& _context, std::vector<game::Participant*>&& _participants, menu::item::NotificationQueue& _queue,
           menu::item::Button& _finishButton, menu::item::SimpleImage& _deckCardImage, menu::item::SimpleImage& _discardCardImage,
-          menu::item::SimpleImage& _matchedCardImageRef, DecideButtons&& _decideButtons);
+          menu::item::SimpleImage& _matchedCardImageRef, DecideActionButtons&& _decideButtons, DecideSwapButtons&& _decideSwapButtons);
 
     void registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered);
     void update(sf::Time _dt);
@@ -39,6 +40,8 @@ public:
 
     void onParticipantStartDeciding(Card _card);
     void onParticipantFinishDeciding();
+    void onParticipantStartDecidingSwap();
+    void onParticipantFinishDecidingSwap();
     void onParticipantFinishesTurn(PlayerId _id);
     void onParticipantFinishedTurn(PlayerId _id);
 
@@ -59,7 +62,8 @@ private:
     menu::item::SimpleImage& m_deckCardImageRef;
     menu::item::SimpleImage& m_discardCardImageRef;
     menu::item::SimpleImage& m_matchedCardImageRef;
-    DecideButtons m_decideButtons;
+    DecideActionButtons m_decideActionButtons;
+    DecideSwapButtons m_decideSwapButtons;
 
     core::event::ListenerId m_listenerId = core::event::ListenerIdInvalid;
     PlayerId m_localPlayerId = PlayerIdInvalid;

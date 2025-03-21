@@ -24,11 +24,11 @@ inline StepId getFirstStepId(BoardState _boardState)
     return firstStep;
 }
 
-inline StepId getNextStepId(DecideButton _button, Card::Ability _ability)
+inline StepId getNextStepId(ActionType _button, Card::Ability _ability)
 {
     switch (_button)
     {
-    case DecideButton::Action:
+    case ActionType::Ability:
         switch (_ability)
         {
         case Card::Ability::Peek:
@@ -42,11 +42,11 @@ inline StepId getNextStepId(DecideButton _button, Card::Ability _ability)
         default:
             break;
         }
-    case DecideButton::Discard:
+    case ActionType::Discard:
         return StepId::FinishTurn;
-    case DecideButton::Match:
+    case ActionType::Match:
         return StepId::MatchCard;
-    case DecideButton::Take:
+    case ActionType::Take:
         return StepId::TakeCard;
     }
     return StepId::Idle;

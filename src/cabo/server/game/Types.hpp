@@ -16,7 +16,7 @@ struct ParticipantSlot : public shared::game::ParticipantSlot
 
 using shared::game::BoardState;
 using shared::game::StepId;
-using shared::game::DecideButton;
+using shared::game::ActionType;
 using shared::game::PileType;
 using shared::game::InputType;
 using shared::game::ClickSlotInputData;

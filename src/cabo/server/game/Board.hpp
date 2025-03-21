@@ -47,6 +47,7 @@ private:
 
     void processMatchCardStep(const events::RemotePlayerInputNetEvent& _event, BoardParticipant& _participant);
     void processSeeCardStep(const events::RemotePlayerInputNetEvent& _event, BoardParticipant& _participant);
+    void processSwapCardStep(const events::RemotePlayerInputNetEvent& _event, BoardParticipant& _participant);
 
     const core::Context& m_contextRef;
     core::event::ListenerId m_listenerId = core::event::ListenerIdInvalid;
@@ -64,6 +65,8 @@ private:
     std::map<int32_t, events::RemotePlayerInputNetEvent> m_inputBuffer;
 
     Card* m_drawnCardPtr = nullptr;
+    ClickSlotInputData m_swapData;
+    bool m_isFirstPartOfSwap = true;
 };
 
 } // namespace cn::server::game

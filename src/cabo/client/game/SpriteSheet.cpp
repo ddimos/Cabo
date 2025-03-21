@@ -12,6 +12,8 @@ inline constexpr short unsigned DecideButtonHeight = 20;
 inline constexpr short unsigned FinishButtonWidth = 66;
 inline constexpr short unsigned FinishButtonHeight = 20;
 
+inline constexpr short unsigned YesNoButtonWidth = 40;
+inline constexpr short unsigned YesNoButtonHeight = 20;
 
 } // namespace
 
@@ -72,6 +74,20 @@ sf::IntRect getFinishButtonTextureRect(Hover _hover)
     return _hover == Hover::No 
         ? sf::IntRect{ 0,                  0, FinishButtonWidth, FinishButtonHeight }
         : sf::IntRect{ 0, FinishButtonHeight, FinishButtonWidth, FinishButtonHeight };
+}
+
+sf::IntRect getYesButtonTextureRect(Hover _hover)
+{
+    return _hover == Hover::No 
+        ? sf::IntRect{ 0,                 0, YesNoButtonWidth, YesNoButtonHeight }
+        : sf::IntRect{ 0, YesNoButtonHeight, YesNoButtonWidth, YesNoButtonHeight };
+}
+
+sf::IntRect getNoButtonTextureRect(Hover _hover)
+{
+    return _hover == Hover::No 
+        ? sf::IntRect{ YesNoButtonWidth,                 0, YesNoButtonWidth, YesNoButtonHeight }
+        : sf::IntRect{ YesNoButtonWidth, YesNoButtonHeight, YesNoButtonWidth, YesNoButtonHeight };
 }
 
 } // namespace cn::client::game::spriteSheet

@@ -18,12 +18,13 @@ void Step::update(sf::Time _dt)
 {
     if (m_nextStateId != m_stateId)
     {
-        CN_LOG_FRM("Next step's state {}", m_nextStateId);
-        auto& nextState = m_states.at(m_nextStateId);
+        StateId currentStateId = m_nextStateId;
+        CN_LOG_FRM("Next step's state {}", currentStateId);
+        auto& nextState = m_states.at(currentStateId);
         if (nextState.onEnter)
             nextState.onEnter();
 
-        m_stateId = m_nextStateId;
+        m_stateId = currentStateId;
     }
 
     auto& state = m_states.at(m_stateId);
