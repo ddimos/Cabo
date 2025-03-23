@@ -1,6 +1,7 @@
 #include "client/player/Manager.hpp"
 
 #include "shared/events/NetworkEvents.hpp"
+#include "shared/net/Manager.hpp"
 #include "shared/player/Types.hpp"
 
 #include "core/Assert.hpp"
@@ -11,7 +12,8 @@
 namespace cn::client::player
 {
 
-Manager::Manager()
+Manager::Manager(core::Context& _context)
+    : m_contextRef(_context)
 {
     m_listenerId = core::event::getNewListenerId();
 }
@@ -26,10 +28,16 @@ void Manager::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeing
             [this](const events::PlayerJoinAcceptNetEvent& _event){
                 CN_LOG_FRM("Player id: {}", _event.m_playerId);
                 m_localPlayerId = _event.m_playerId;
+
+                auto& netManRef = m_contextRef.get<net::Manager>();
+                events::PlayerUpdateNetEvent event({ Player{ .name = "Player Name"} });
+                netManRef.send(event);
+
+                m_players.emplace_back(Player{ .name = "Player Name", .id = m_localPlayerId, .isLocal = true});
             }
         );
-        _dispatcher.registerEvent<events::PlayerInfoUpdateNetEvent>(m_listenerId,
-            [this](const events::PlayerInfoUpdateNetEvent& _event){
+        _dispatcher.registerEvent<events::PlayerUpdateNetEvent>(m_listenerId,
+            [this](const events::PlayerUpdateNetEvent& _event){
                 CN_LOG_FRM("Player info.. players count: {}", _event.m_players.size());
                 m_players.clear();
                 m_players = _event.m_players;
@@ -39,8 +47,19 @@ void Manager::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeing
     else
     {
         _dispatcher.unregisterEvent<events::PlayerJoinAcceptNetEvent>(m_listenerId);
-        _dispatcher.unregisterEvent<events::PlayerInfoUpdateNetEvent>(m_listenerId);
+        _dispatcher.unregisterEvent<events::PlayerUpdateNetEvent>(m_listenerId);
     }
+}
+
+const Player* Manager::getPlayer(PlayerId _playerId) const
+{
+    for (const auto& player : m_players)
+    {
+        if (player.id == _playerId)
+            return &player;
+    }
+    CN_ASSERT_FRM(false, "Couldn't find the player {}", _playerId);
+    return nullptr;
 }
 
 size_t Manager::getIndexOfLocalPlayer() const

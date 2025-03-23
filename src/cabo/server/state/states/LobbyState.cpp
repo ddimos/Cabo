@@ -25,19 +25,24 @@ void LobbyState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _is
             [this](const events::PeerConnectedEvent& _event){
                 (void)_event;
                 m_players.insert(_event.m_peerId);
+                // TODO send the update to the peer
             }
         );
-        _dispatcher.registerEvent<events::PlayerReadyNetEvent>(m_listenerId,
-            [this](const events::PlayerReadyNetEvent& _event){
+        _dispatcher.registerEvent<events::PlayerReadyStatusUpdateNetEvent>(m_listenerId,
+            [this](const events::PlayerReadyStatusUpdateNetEvent& _event){
                 (void)_event;
                 CN_LOG_FRM("Player ready.. {}", _event.m_senderPeerId);
+                CN_ASSERT(_event.m_ready); // TODO to implement m_ready == false;
                 m_players.erase(_event.m_senderPeerId);
+
+                auto& netManRef = getContext().get<net::Manager>();
+                events::PlayerReadyStatusUpdateNetEvent event(_event.m_senderPeerId, true);
+                netManRef.send(event);
 
                 if (m_players.empty())
                 {
                     CN_LOG("All players ready..");
                     events::StartGameNetEvent event;
-                    auto& netManRef = getContext().get<net::Manager>();
                     netManRef.send(event);
                 
                     pop();
@@ -49,7 +54,7 @@ void LobbyState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _is
     else
     {
         _dispatcher.unregisterEvent<events::PeerConnectedEvent>(m_listenerId);
-        _dispatcher.unregisterEvent<events::PlayerReadyNetEvent>(m_listenerId);
+        _dispatcher.unregisterEvent<events::PlayerReadyStatusUpdateNetEvent>(m_listenerId);
     }
 }
 

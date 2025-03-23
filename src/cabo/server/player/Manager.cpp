@@ -50,8 +50,8 @@ void Manager::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeing
             }
         );
 
-        _dispatcher.registerEvent<events::PlayerInfoUpdateNetEvent>(m_listenerId,
-            [this](const events::PlayerInfoUpdateNetEvent& _event){
+        _dispatcher.registerEvent<events::PlayerUpdateNetEvent>(m_listenerId,
+            [this](const events::PlayerUpdateNetEvent& _event){
                 auto it = std::find_if(m_players.begin(), m_players.end(),
                     [_event](const Player& _player){
                         return _player.id == _event.m_senderPeerId;
@@ -63,7 +63,7 @@ void Manager::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeing
                 CN_LOG_FRM("Player info.. id: {}, name: {}", it->id, it->name);
 
                 auto& netManRef = m_contextRef.get<net::Manager>();
-                events::PlayerInfoUpdateNetEvent event(m_players);
+                events::PlayerUpdateNetEvent event(m_players);
                 netManRef.send(event);
             }
         );        
@@ -72,7 +72,7 @@ void Manager::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeing
     {
         _dispatcher.unregisterEvent<events::PeerConnectedEvent>(m_listenerId);
         _dispatcher.unregisterEvent<events::PeerDisconnectedEvent>(m_listenerId);
-        _dispatcher.unregisterEvent<events::PlayerInfoUpdateNetEvent>(m_listenerId);
+        _dispatcher.unregisterEvent<events::PlayerUpdateNetEvent>(m_listenerId);
     }
 }
 

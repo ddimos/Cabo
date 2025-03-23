@@ -23,9 +23,9 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
         }
     );
     _factoryRef.add(
-        events::id::PlayerInfoUpdate,
+        events::id::PlayerUpdate,
         [](const core::event::Event& _event, nsf::Buffer& _buffer){
-            auto& event = static_cast<const events::PlayerInfoUpdateNetEvent&>(_event);
+            auto& event = static_cast<const events::PlayerUpdateNetEvent&>(_event);
             _buffer << static_cast<uint8_t>(event.m_players.size());
             for (const auto& player : event.m_players)
             {
@@ -34,7 +34,7 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
             }
         },
         [](core::event::Event& _event, nsf::Buffer& _buffer){
-            auto& event = static_cast<events::PlayerInfoUpdateNetEvent&>(_event);
+            auto& event = static_cast<events::PlayerUpdateNetEvent&>(_event);
             uint8_t size = 0;
             _buffer >> size;
             event.m_players.reserve(size);
@@ -47,17 +47,23 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
             }
         },
         [](){
-            return std::make_unique<events::PlayerInfoUpdateNetEvent>();
+            return std::make_unique<events::PlayerUpdateNetEvent>();
         }
     );
     _factoryRef.add(
-        events::id::PlayerReady,
+        events::id::PlayerReadyStatusUpdate,
         [](const core::event::Event& _event, nsf::Buffer& _buffer){
+            auto& event = static_cast<const events::PlayerReadyStatusUpdateNetEvent&>(_event);
+            _buffer << event.m_id;
+            _buffer << event.m_ready;
         },
         [](core::event::Event& _event, nsf::Buffer& _buffer){
+            auto& event = static_cast<events::PlayerReadyStatusUpdateNetEvent&>(_event);
+            _buffer >> event.m_id;
+            _buffer >> event.m_ready;
         },
         [](){
-            return std::make_unique<events::PlayerReadyNetEvent>();
+            return std::make_unique<events::PlayerReadyStatusUpdateNetEvent>();
         }
     );
     _factoryRef.add(

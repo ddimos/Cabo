@@ -39,25 +39,31 @@ public:
     PlayerId m_playerId = PlayerIdInvalid; 
 };
 
-class PlayerInfoUpdateNetEvent final : public BaseNetEvent
+class PlayerUpdateNetEvent final : public BaseNetEvent
 {
 public:
-    CN_EVENT(id::PlayerInfoUpdate)
+    CN_EVENT(id::PlayerUpdate)
 
-    PlayerInfoUpdateNetEvent() = default;
-    PlayerInfoUpdateNetEvent(const std::vector<Player>& _players)
+    PlayerUpdateNetEvent() = default;
+    PlayerUpdateNetEvent(const std::vector<Player>& _players)
         : m_players(_players)
     {}
 
     std::vector<Player> m_players;
 };
 
-class PlayerReadyNetEvent final : public BaseNetEvent
+class PlayerReadyStatusUpdateNetEvent final : public BaseNetEvent
 {
 public:
-    CN_EVENT(id::PlayerReady)
+    CN_EVENT(id::PlayerReadyStatusUpdate)
 
-    PlayerReadyNetEvent() = default;
+    PlayerReadyStatusUpdateNetEvent() = default;
+    PlayerReadyStatusUpdateNetEvent(PlayerId _id, bool _ready)
+        : m_id(_id), m_ready(_ready)
+    {}
+
+    PlayerId m_id = PlayerIdInvalid;
+    bool m_ready = false;
 };
 
 class StartGameNetEvent final : public BaseNetEvent

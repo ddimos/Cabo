@@ -19,7 +19,7 @@ namespace cn::client
 
 Client::Client()
     : m_window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "CABOn", sf::Style::Close)
-    , m_netManager(m_context, false), m_stateManager(m_context)
+    , m_netManager(m_context, false), m_stateManager(m_context), m_playerManager(m_context)
 {
     m_context.insert(m_window);
     m_context.insert(m_textureHolder);
