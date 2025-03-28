@@ -54,13 +54,26 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
         events::id::PlayerReadyStatusUpdate,
         [](const core::event::Event& _event, nsf::Buffer& _buffer){
             auto& event = static_cast<const events::PlayerReadyStatusUpdateNetEvent&>(_event);
-            _buffer << event.m_id;
-            _buffer << event.m_ready;
+            _buffer << static_cast<uint8_t>(event.m_players.size());
+            for (const auto& [id, ready] : event.m_players)
+            {
+                _buffer << id;
+                _buffer << ready;
+            }
         },
         [](core::event::Event& _event, nsf::Buffer& _buffer){
             auto& event = static_cast<events::PlayerReadyStatusUpdateNetEvent&>(_event);
-            _buffer >> event.m_id;
-            _buffer >> event.m_ready;
+            uint8_t size = 0;
+            _buffer >> size;
+            event.m_players.reserve(size);
+            for (uint8_t i = 0; i < size; ++i)
+            {
+                PlayerId id;
+                bool ready;
+                _buffer >> id;
+                _buffer >> ready;
+                event.m_players.emplace(id, ready);
+            }
         },
         [](){
             return std::make_unique<events::PlayerReadyStatusUpdateNetEvent>();

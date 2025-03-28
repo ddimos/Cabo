@@ -10,6 +10,19 @@
 namespace cn::events
 {
 
+class PlayerPresenceChangedEvent final : public core::event::Event
+{
+public:
+    CN_EVENT(id::PlayerPresenceChanged)
+
+    PlayerPresenceChangedEvent(PlayerId _id, bool _joined)
+        : m_id(_id), m_joined(_joined)
+    {}
+
+    PlayerId m_id = PlayerIdInvalid;
+    bool m_joined = false;
+};
+
 class LocalPlayerClickDeckEvent final : public core::event::Event
 {
 public:

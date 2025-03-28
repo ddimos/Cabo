@@ -1,9 +1,11 @@
 #include "server/state/states/LobbyState.hpp"
 #include "server/state/StateIds.hpp"
 
+#include "server/player/Manager.hpp"
+
 #include "core/event/Dispatcher.hpp"
 
-#include "shared/events/ConnectionEvents.hpp"
+#include "shared/events/GameEvents.hpp"
 #include "shared/events/NetworkEvents.hpp"
 #include "shared/net/Manager.hpp"
 
@@ -21,40 +23,87 @@ void LobbyState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _is
 {
     if (_isBeingRegistered)
     {
-        _dispatcher.registerEvent<events::PeerConnectedEvent>(m_listenerId,
-            [this](const events::PeerConnectedEvent& _event){
-                (void)_event;
-                m_players.insert(_event.m_peerId);
-                // TODO send the update to the peer
+        _dispatcher.registerEvent<events::PlayerPresenceChangedEvent>(m_listenerId,
+            [this](const events::PlayerPresenceChangedEvent& _event){
+
+                if (_event.m_joined)
+                {
+                    m_players.emplace(_event.m_id, false);
+                    m_startGame = false;
+                }
+                else
+                {
+                    m_players.erase(_event.m_id);
+                    startGameIfAllPlayersReady();
+                }
+
+                events::PlayerReadyStatusUpdateNetEvent event(m_players);
+                getContext().get<net::Manager>().send(event);
             }
         );
         _dispatcher.registerEvent<events::PlayerReadyStatusUpdateNetEvent>(m_listenerId,
             [this](const events::PlayerReadyStatusUpdateNetEvent& _event){
-                (void)_event;
-                CN_LOG_FRM("Player ready.. {}", _event.m_senderPeerId);
-                CN_ASSERT(_event.m_ready); // TODO to implement m_ready == false;
-                m_players.erase(_event.m_senderPeerId);
+                CN_ASSERT(_event.m_players.size() == 1);
+                CN_ASSERT(_event.m_players.begin()->second); // TODO to implement m_ready == false;
+                
+                CN_LOG_FRM("Player is ready.. {}", _event.m_senderPeerId);
+
+                auto it = m_players.find(_event.m_players.begin()->first);
+                it->second = true;
 
                 auto& netManRef = getContext().get<net::Manager>();
-                events::PlayerReadyStatusUpdateNetEvent event(_event.m_senderPeerId, true);
+                events::PlayerReadyStatusUpdateNetEvent event(m_players);
                 netManRef.send(event);
 
-                if (m_players.empty())
-                {
-                    CN_LOG("All players ready..");
-                    events::StartGameNetEvent event;
-                    netManRef.send(event);
-                
-                    pop();
-                    push(id::Game);
-                }
+                startGameIfAllPlayersReady();
             }
         );
     }
     else
     {
-        _dispatcher.unregisterEvent<events::PeerConnectedEvent>(m_listenerId);
+        _dispatcher.unregisterEvent<events::PlayerPresenceChangedEvent>(m_listenerId);
         _dispatcher.unregisterEvent<events::PlayerReadyStatusUpdateNetEvent>(m_listenerId);
+    }
+}
+
+core::state::Return LobbyState::onUpdate(sf::Time _dt)
+{
+    if (m_startGame)
+    {
+        m_timeToWaitDt -= _dt;
+
+        if (m_timeToWaitDt.asSeconds() <= 0.f)
+        {
+            CN_LOG("Start game..");
+
+            events::StartGameNetEvent event;
+            getContext().get<net::Manager>().send(event);
+        
+            pop();
+            push(id::Game);
+        }
+    }
+
+    return core::state::Return::Break;
+}
+
+void LobbyState::startGameIfAllPlayersReady()
+{
+    bool allPlayersReady = true;
+    for (const auto& [id, ready] : m_players)
+    {
+        if (!ready)
+        {
+            allPlayersReady = false;
+            break;
+        }
+    }
+
+    if (allPlayersReady)
+    {
+        CN_LOG("All players ready..");
+        m_startGame = true;
+        m_timeToWaitDt = m_timeToWait;
     }
 }
 

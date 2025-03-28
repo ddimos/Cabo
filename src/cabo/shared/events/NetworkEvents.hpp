@@ -58,12 +58,11 @@ public:
     CN_EVENT(id::PlayerReadyStatusUpdate)
 
     PlayerReadyStatusUpdateNetEvent() = default;
-    PlayerReadyStatusUpdateNetEvent(PlayerId _id, bool _ready)
-        : m_id(_id), m_ready(_ready)
+    PlayerReadyStatusUpdateNetEvent(const std::unordered_map<PlayerId, bool>& _players)
+        : m_players(_players)
     {}
 
-    PlayerId m_id = PlayerIdInvalid;
-    bool m_ready = false;
+    std::unordered_map<PlayerId, bool> m_players;
 };
 
 class StartGameNetEvent final : public BaseNetEvent

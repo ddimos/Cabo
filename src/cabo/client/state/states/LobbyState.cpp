@@ -53,7 +53,6 @@ LobbyState::LobbyState(core::state::Manager& _stateManagerRef)
             24,
             sf::Color::White
         );
-        playerName->setActivationOption(core::object::Object::ActivationOption::Manually);
         getContainer(core::object::Container::Type::Menu).add(playerName);
 
         auto status = std::make_shared<menu::item::SimpleText>(
@@ -61,12 +60,11 @@ LobbyState::LobbyState(core::state::Manager& _stateManagerRef)
                 .m_position = sf::Vector2f(100.f, 40.f * i), .m_parentPos = globalPos, .m_parentSize = sf::Vector2f(300.f, 400.f),
                 .m_specPositionX = menu::Position::Special::OFFSET_FROM_END, .m_specPositionY = menu::Position::Special::OFFSET_FROM_START
             },
-            "Not ready",
+            "",
             fontHolderRef.get(FontIds::Main),
             24,
             sf::Color::White
         );
-        status->setActivationOption(core::object::Object::ActivationOption::Manually);
         getContainer(core::object::Container::Type::Menu).add(status);
 
         m_players.emplace_back(PlayerItem{ .m_nameTextRef = *playerName, .m_statusTextRef = *status });
@@ -81,15 +79,22 @@ LobbyState::LobbyState(core::state::Manager& _stateManagerRef)
         sf::IntRect{0,   0, 200, 62},
         sf::IntRect{200, 0, 200, 62},
         [&netManRef, &playerManRef](){
-            events::PlayerReadyStatusUpdateNetEvent event(playerManRef.getLocalPlayerId(), true);
+            events::PlayerReadyStatusUpdateNetEvent event({{playerManRef.getLocalPlayerId(), true}});
             netManRef.send(event);
         },
         sf::Mouse::Button::Left
     );
     getContainer(core::object::Container::Type::Menu).add(startButton);
 
-    for (auto& player : playerManRef.getPlayers())
-        addPlayer(player.id, player.name);
+    {
+        size_t index = 0;
+        for (const auto& player : playerManRef.getPlayers())
+        {
+            m_players[index].m_nameTextRef.updateText(player.name);
+            m_players[index].m_statusTextRef.updateText("Not ready");
+            ++index;
+        }
+    }
 
     m_listenerId = core::event::getNewListenerId();
 }
@@ -107,11 +112,21 @@ void LobbyState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _is
         );
         _dispatcher.registerEvent<events::PlayerReadyStatusUpdateNetEvent>(m_listenerId,
             [this](const events::PlayerReadyStatusUpdateNetEvent& _event){
-                if (!hasPlayer(_event.m_id))
+
+                auto& playerMan = getContext().get<player::Manager>();
+                size_t index = 0;
+                for (auto [id, ready]  : _event.m_players)
                 {
-                    addPlayer(_event.m_id, getContext().get<player::Manager>().getPlayer(_event.m_id)->name);
+                    m_players[index].m_nameTextRef.updateText(playerMan.getPlayer(id)->name);
+                    m_players[index].m_statusTextRef.updateText(ready ? "Ready" : "Not ready");
+                    index++;
                 }
-                updatePlayer(_event.m_id, _event.m_ready);
+                while (index < m_players.size())
+                {
+                    m_players[index].m_nameTextRef.updateText("");
+                    m_players[index].m_statusTextRef.updateText("");
+                    index++;
+                }
             }
         );
     }
@@ -120,46 +135,6 @@ void LobbyState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _is
         _dispatcher.unregisterEvent<events::StartGameNetEvent>(m_listenerId);
         _dispatcher.unregisterEvent<events::PlayerReadyStatusUpdateNetEvent>(m_listenerId);
     }
-}
-
-bool LobbyState::hasPlayer(PlayerId _playerId) const
-{
-    for (const auto& player : m_players)
-    {
-        if (player.m_playerId == _playerId)
-            return true;
-    }
-    return false;
-}
-
-void LobbyState::addPlayer(PlayerId _playerId, const std::string& _name)
-{
-    for (auto& player : m_players)
-    {
-        if (player.m_playerId != PlayerIdInvalid)
-            continue;
-        
-        player.m_playerId = _playerId;
-        player.m_nameTextRef.updateText(_name);
-        player.m_nameTextRef.requestActivated();
-        player.m_statusTextRef.requestActivated();
-        return;
-    }
-    CN_ASSERT_FRM(false, "The player with id {} wasn't found", _playerId);
-}
-
-void LobbyState::updatePlayer(PlayerId _playerId, bool _isReady)
-{
-    for (auto& player : m_players)
-    {
-        if (player.m_playerId != _playerId)
-            continue;
-
-        player.m_statusTextRef.updateText(_isReady ? "Ready" : "Not ready");
-        return;
-    }
-
-    CN_ASSERT_FRM(false, "The player with id {} wasn't found", _playerId);
 }
 
 } // namespace cn::client::states

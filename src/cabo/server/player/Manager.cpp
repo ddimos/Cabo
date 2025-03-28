@@ -2,6 +2,7 @@
 
 #include "shared/events/ConnectionEvents.hpp"
 #include "shared/events/NetworkEvents.hpp"
+#include "shared/events/GameEvents.hpp"
 #include "shared/net/Manager.hpp"
 
 #include "core/Assert.hpp"
@@ -38,7 +39,7 @@ void Manager::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeing
         );
 
         _dispatcher.registerEvent<events::PeerDisconnectedEvent>(m_listenerId,
-            [this](const events::PeerDisconnectedEvent& _event){
+            [&_dispatcher, this](const events::PeerDisconnectedEvent& _event){
                 CN_LOG_FRM("Player left.. id: {}", _event.m_peerId);
                 m_players.erase( 
                     std::remove_if(m_players.begin(), m_players.end(),
@@ -47,11 +48,17 @@ void Manager::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeing
                     }),
                     m_players.end()
                 );
+
+                auto& netManRef = m_contextRef.get<net::Manager>();
+                events::PlayerUpdateNetEvent event(m_players);
+                netManRef.send(event);
+
+                _dispatcher.sendDelayed<events::PlayerPresenceChangedEvent>(_event.m_peerId, false);
             }
         );
 
         _dispatcher.registerEvent<events::PlayerUpdateNetEvent>(m_listenerId,
-            [this](const events::PlayerUpdateNetEvent& _event){
+            [&_dispatcher, this](const events::PlayerUpdateNetEvent& _event){
                 auto it = std::find_if(m_players.begin(), m_players.end(),
                     [_event](const Player& _player){
                         return _player.id == _event.m_senderPeerId;
@@ -65,6 +72,8 @@ void Manager::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeing
                 auto& netManRef = m_contextRef.get<net::Manager>();
                 events::PlayerUpdateNetEvent event(m_players);
                 netManRef.send(event);
+
+                _dispatcher.sendDelayed<events::PlayerPresenceChangedEvent>(_event.m_senderPeerId, true);
             }
         );        
     }

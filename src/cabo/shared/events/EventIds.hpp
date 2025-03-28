@@ -34,6 +34,8 @@ enum : core::event::EventId
     ShowCardInSlot,
     StartGame,
 
+    // Player related
+    PlayerPresenceChanged,
 
     // Player action events
     LocalPlayerClickDecideButton,
