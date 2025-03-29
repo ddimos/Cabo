@@ -11,6 +11,8 @@
 
 #include "shared/events/NetworkEvents.hpp"
 
+#include <SFML/System/Time.hpp>
+
 #include <map>
 #include <vector>
 
@@ -39,15 +41,29 @@ private:
         Participant& participantRef;
         StepId currentStepId = StepId::Idle;
     };
+
+    BoardState getNextState(BoardState _state) const;
+    void enterState(BoardState _state);
+    void updateState(BoardState _state, sf::Time _dt);
+    void processInputs();
+
     BoardParticipant& getBoardParticipant(PlayerId _id);
     void participantStartsTurn(BoardParticipant& _participant);
+    void onParticipantTimeout(BoardParticipant& _participant);
+
     void setParticipantStep(StepId _stepId, BoardParticipant& _participantRef);
     size_t getIndexOfNextParticipantTurn(size_t _currentIndex) const;
     void processInputEvent(const events::RemotePlayerInputNetEvent& _event);
 
+    void processDecideCardStep(const events::RemotePlayerInputNetEvent& _event, BoardParticipant& _participant);
+    void processDrawCardStep(const events::RemotePlayerInputNetEvent& _event, BoardParticipant& _participant);
+    void processFinishTurnStep(const events::RemotePlayerInputNetEvent& _event, BoardParticipant& _participant);
     void processMatchCardStep(const events::RemotePlayerInputNetEvent& _event, BoardParticipant& _participant);
     void processSeeCardStep(const events::RemotePlayerInputNetEvent& _event, BoardParticipant& _participant);
     void processSwapCardStep(const events::RemotePlayerInputNetEvent& _event, BoardParticipant& _participant);
+    void processTakeCardStep(const events::RemotePlayerInputNetEvent& _event, BoardParticipant& _participant);
+
+    void discardCard(Card* _card);
 
     const core::Context& m_contextRef;
     core::event::ListenerId m_listenerId = core::event::ListenerIdInvalid;
@@ -61,6 +77,7 @@ private:
 
     BoardState m_state = BoardState::Start;
     bool m_newStateRequested = false;
+    sf::Time m_timeoutDt = {};
 
     std::map<int32_t, events::RemotePlayerInputNetEvent> m_inputBuffer;
 

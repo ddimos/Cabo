@@ -61,6 +61,10 @@ void DecideCard::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBe
             {    
                 if (getCurrentStateId() != Id::WaitInput)
                     return;
+
+                if (_event.m_button == shared::game::ActionType::Ability && !Card::hasAbility(Card(m_rank, m_suit)))
+                    return;
+
                 m_button = _event.m_button;
                 requestFollowingState();
             }

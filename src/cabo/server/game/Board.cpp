@@ -9,6 +9,12 @@
 
 #include <algorithm>
 
+namespace
+{
+    // Add an offset on the server 
+    inline constexpr short unsigned TimeForPlayerTurnServerS = cn::shared::game::TimeForPlayerTurnS + 2;
+} // namespace
+
 namespace cn::server::game
 {
 
@@ -33,7 +39,8 @@ Board::Board(const core::Context& _context, Deck& _deck, Discard& _discard, std:
     }
 
     m_listenerId = core::event::getNewListenerId();
-    m_newStateRequested = true;
+    m_state = BoardState::Start;
+    m_timeoutDt = sf::seconds(shared::game::TimeBeforeStartS);
 }
 
 Board::~Board() = default;
@@ -60,64 +67,109 @@ void Board::update(sf::Time _dt)
     if (m_newStateRequested)
     {
         m_newStateRequested = false;
-        {
-            BoardState newState;
-            switch (m_state)
-            {
-                case BoardState::Start:
-                newState = BoardState::Peek;
-                break;
-                case BoardState::Peek:
-                newState = BoardState::Game;
-                break;
-                case BoardState::Game:
-                newState = BoardState::Cabo;
-                break;
-                case BoardState::Cabo:
-                newState = BoardState::Cabo;//?finish
-                break;
-            }
-            m_state = newState;
-        }
+        m_state = getNextState(m_state);
+
         CN_LOG_FRM("Board state {}", (int)m_state);
 
         auto& netManRef = getContext().get<net::Manager>();
         events::BoardStateUpdateNetEvent event(m_state);
         netManRef.send(event);
 
-        // On Enter
-        switch (m_state)
-        {
-        case BoardState::Start:
-            break;
-        case BoardState::Peek:
-            for (auto& participant : m_participants)
-                participantStartsTurn(participant);
-            break;
-        case BoardState::Game:
-            break;
-        case BoardState::Cabo:
-            break;
-        }
+        enterState(m_state);
     }
-    if (m_state == BoardState::Peek)
+
+    updateState(m_state, _dt);
+
+    processInputs();
+}
+
+BoardState Board::getNextState(BoardState _state) const
+{
+    BoardState newState;
+    switch (_state)
+    {
+    case BoardState::Start:
+        newState = BoardState::Peek;
+        break;
+    case BoardState::Peek:
+        newState = BoardState::Game;
+        break;
+    case BoardState::Game:
+        newState = BoardState::Cabo;
+        break;
+    case BoardState::Cabo:
+        newState = BoardState::Cabo;
+        break;
+    }
+    return newState;
+}
+
+void Board::enterState(BoardState _state)
+{
+    switch (_state)
+    {
+    case BoardState::Start:
+        break;
+    case BoardState::Peek:
+        m_timeoutDt = sf::seconds(TimeForPlayerTurnServerS);
+        for (auto& participant : m_participants)
+            participantStartsTurn(participant);
+        break;
+    case BoardState::Game:
+        break;
+    case BoardState::Cabo:
+        break;
+    }
+}
+
+void Board::updateState(BoardState _state, sf::Time _dt)
+{
+    switch (_state)
+    {
+    case BoardState::Start:
+        m_timeoutDt -= _dt;
+        if (m_timeoutDt.asSeconds() <= 0.f)
+        {
+            m_newStateRequested = true;
+        }
+        break;
+    case BoardState::Peek:
     {
         bool allParticipantFinished = true;
         for (auto& participant : m_participants)
         {
             if (participant.currentStepId != StepId::Idle)
-                allParticipantFinished = false;
+            allParticipantFinished = false;
+        }
+        
+        m_timeoutDt -= _dt;
+        if (m_timeoutDt.asSeconds() <= 0.f)
+        {
+            allParticipantFinished = true;
+            for (auto& participant : m_participants)
+            {
+                if (participant.currentStepId != StepId::Idle)
+                onParticipantTimeout(participant);
+            }
         }
         if (allParticipantFinished)
         {
             m_newStateRequested = true;
             m_currentParticipantFinishedTurn = true;
         }
+        break;
     }
-    else if (m_state == BoardState::Game || m_state == BoardState::Cabo)
-    {
+    case BoardState::Game:
+    case BoardState::Cabo:
         if (m_participants.at(m_indexOfCurrentParticipantTurn).currentStepId == StepId::Idle)
             m_currentParticipantFinishedTurn = true;
+
+        m_timeoutDt -= _dt;
+        if (m_timeoutDt.asSeconds() <= 0.f)
+        {
+            onParticipantTimeout(m_participants.at(m_indexOfCurrentParticipantTurn));
+            m_currentParticipantFinishedTurn = true;
+        }
 
         if (m_currentParticipantFinishedTurn)
         {
@@ -125,9 +177,14 @@ void Board::update(sf::Time _dt)
 
             m_indexOfCurrentParticipantTurn = getIndexOfNextParticipantTurn(m_indexOfCurrentParticipantTurn);
             participantStartsTurn(m_participants.at(m_indexOfCurrentParticipantTurn));
+            m_timeoutDt = sf::seconds(TimeForPlayerTurnServerS);
         }
+        break;
     }
+}
 
+void Board::processInputs()
+{
     constexpr int32_t TimeInInputBufferMs = 100; // TODO configure this or add to constants 
     
     for (auto it = m_inputBuffer.cbegin(); it != m_inputBuffer.cend();)
@@ -173,7 +230,6 @@ size_t Board::getIndexOfNextParticipantTurn(size_t _currentIndex) const
 void Board::processInputEvent(const events::RemotePlayerInputNetEvent& _event)
 {
     auto& participant = getBoardParticipant(_event.m_senderPeerId);
-   /*/*/ auto& netManRef = getContext().get<net::Manager>(); // ?from outside
     bool forwardEvent = true;
 
     switch (m_state)
@@ -185,14 +241,7 @@ void Board::processInputEvent(const events::RemotePlayerInputNetEvent& _event)
         }
         else if (participant.currentStepId == StepId::FinishTurn)
         {
-            if (_event.m_inputType != InputType::Finish)
-            {
-                CN_ASSERT(false);
-                break;
-            }
-            CN_ASSERT(_event.m_senderPeerId == _event.m_playerId);
-            CN_LOG_FRM("Participant {} finishes turn.", _event.m_senderPeerId);
-            participant.currentStepId = StepId::Idle;
+            processFinishTurnStep(_event, participant);
         }
         else
         {
@@ -203,63 +252,15 @@ void Board::processInputEvent(const events::RemotePlayerInputNetEvent& _event)
     case BoardState::Game:
         if (participant.currentStepId == StepId::DecideCard)
         {
-            if (_event.m_inputType != InputType::Action)
-            {
-                CN_ASSERT(false);
-                // TODO punish?
-                break;
-            }
-            ActionType button = std::get<ActionType>(_event.m_data);
-            participant.currentStepId = shared::game::getNextStepId(button, Card::getAbility(Card(m_drawnCardPtr->getRank(), m_drawnCardPtr->getSuit())));
-            
-            CN_LOG_FRM("Decide button, participant: {}, button: {}", _event.m_senderPeerId, (int)button);
-            
-            if (button == ActionType::Discard)
-            {
-                events::DiscardCardNetEvent eventDiscard(m_drawnCardPtr->getRank(), m_drawnCardPtr->getSuit());
-                netManRef.send(eventDiscard);
-                CN_LOG_FRM("Discard card, participant: {}, card: {} {}", _event.m_senderPeerId, (int)m_drawnCardPtr->getRank(), (int)m_drawnCardPtr->getSuit());
-            }
+            processDecideCardStep(_event, participant);
         }
         else if (participant.currentStepId == StepId::DrawCard)
         {
-            if (_event.m_inputType != InputType::ClickPile)
-            {
-                CN_ASSERT(false);
-                // TODO punish?
-                break;
-            }
-            PileType pileType = std::get<PileType>(_event.m_data);
-            Card* card = nullptr;
-            if (pileType == PileType::Deck)
-            {
-                card = m_deckRef.getNextCard();
-                m_drawnCardPtr = card;
-                participant.currentStepId = StepId::DecideCard;
-                events::ProvideCardNetEvent event(card->getRank(), card->getSuit());
-                netManRef.send(event, _event.m_senderPeerId); 
-            }
-            else
-            {
-                // m_discardRef
-                CN_ASSERT(false);
-                participant.currentStepId = StepId::TakeCard; // Idle?
-            }
-
-            CN_LOG_FRM("Draw a card, participant: {}, pile: {}, card: {} {}", 
-                _event.m_senderPeerId, (int)pileType, (int)card->getRank(), (int)card->getSuit()
-            );
+            processDrawCardStep(_event, participant);
         }
         else if (participant.currentStepId == StepId::FinishTurn)
         {
-            if (_event.m_inputType != InputType::Finish)
-            {
-                CN_ASSERT(false);
-                break;
-            }
-            CN_ASSERT(_event.m_senderPeerId == _event.m_playerId);
-            participant.currentStepId = StepId::Idle;
-            CN_LOG_FRM("Participant {} finishes turn.", _event.m_senderPeerId);
+            processFinishTurnStep(_event, participant);
         }
         else if (participant.currentStepId == StepId::MatchCard)
         {
@@ -275,33 +276,14 @@ void Board::processInputEvent(const events::RemotePlayerInputNetEvent& _event)
         }
         else if (participant.currentStepId == StepId::TakeCard)
         {
-            if (_event.m_inputType != InputType::ClickSlot)
-            {
-                CN_ASSERT(false);
-                // TODO punish?
-                break;
-            }
-
-            ClickSlotInputData dataStruct = std::get<ClickSlotInputData>(_event.m_data);
-            auto* card = participant.participantRef.replace(dataStruct.slotId, m_drawnCardPtr);
-            m_discardRef.discard(card);
-
-            events::DiscardCardNetEvent event(card->getRank(), card->getSuit());
-            netManRef.send(event); 
-
-            participant.currentStepId = StepId::FinishTurn;
-
-            CN_LOG_FRM("Take card, participant: {}, slot: {}, drawn card: {} {}, discarded card: {} {}", 
-                _event.m_senderPeerId, dataStruct.slotId, (int)m_drawnCardPtr->getRank(), (int)m_drawnCardPtr->getSuit(),
-                (int)card->getRank(), (int)card->getSuit() 
-            );
+            processTakeCardStep(_event, participant);
         }
         else
         {
             CN_ASSERT(false);
             // TODO ?punish
         } 
-    break;
+        break;
     case BoardState::Cabo:
         CN_ASSERT(false);
         break;
@@ -310,7 +292,69 @@ void Board::processInputEvent(const events::RemotePlayerInputNetEvent& _event)
     }
 
     if (forwardEvent)
-        netManRef.send(_event, nsf::MessageInfo::Type::EXCLUDE_BRODCAST, true, _event.m_senderPeerId);
+        getContext().get<net::Manager>().send(_event, nsf::MessageInfo::Type::EXCLUDE_BRODCAST, true, _event.m_senderPeerId);
+}
+
+void Board::processDecideCardStep(const events::RemotePlayerInputNetEvent& _event, BoardParticipant& _participant)
+{
+    if (_event.m_inputType != InputType::Action)
+    {
+        CN_ASSERT(false);
+        // TODO punish?
+        return;
+    }
+    ActionType button = std::get<ActionType>(_event.m_data);
+    _participant.currentStepId = shared::game::getNextStepId(button, Card::getAbility(Card(m_drawnCardPtr->getRank(), m_drawnCardPtr->getSuit())));
+    
+    CN_LOG_FRM("Decide button, participant: {}, button: {}", _event.m_senderPeerId, (int)button);
+    
+    if (button == ActionType::Discard)
+    {
+        discardCard(m_drawnCardPtr);
+        CN_LOG_FRM("Discard card, participant: {}, card: {} {}", _event.m_senderPeerId, (int)m_drawnCardPtr->getRank(), (int)m_drawnCardPtr->getSuit());
+    }
+}
+
+void Board::processDrawCardStep(const events::RemotePlayerInputNetEvent& _event, BoardParticipant& _participant)
+{
+    if (_event.m_inputType != InputType::ClickPile)
+    {
+        CN_ASSERT(false);
+        // TODO punish?
+        return;
+    }
+    PileType pileType = std::get<PileType>(_event.m_data);
+    Card* card = nullptr;
+    if (pileType == PileType::Deck)
+    {
+        card = m_deckRef.getNextCard();
+        m_drawnCardPtr = card;
+        _participant.currentStepId = StepId::DecideCard;
+        events::ProvideCardNetEvent event(card->getRank(), card->getSuit());
+        getContext().get<net::Manager>().send(event, _event.m_senderPeerId); 
+    }
+    else
+    {
+        // m_discardRef
+        CN_ASSERT(false);
+        _participant.currentStepId = StepId::TakeCard; // Idle?
+    }
+
+    CN_LOG_FRM("Draw a card, participant: {}, pile: {}, card: {} {}", 
+        _event.m_senderPeerId, (int)pileType, (int)card->getRank(), (int)card->getSuit()
+    );
+}
+
+void Board::processFinishTurnStep(const events::RemotePlayerInputNetEvent& _event, BoardParticipant& _participant)
+{
+    if (_event.m_inputType != InputType::Finish)
+    {
+        CN_ASSERT(false);
+        return;
+    }
+    CN_ASSERT(_event.m_senderPeerId == _event.m_playerId);
+    _participant.currentStepId = StepId::Idle;
+    CN_LOG_FRM("Participant {} finishes turn.", _event.m_senderPeerId);
 }
 
 void Board::processMatchCardStep(const events::RemotePlayerInputNetEvent& _event, BoardParticipant& _participant)
@@ -328,9 +372,7 @@ void Board::processMatchCardStep(const events::RemotePlayerInputNetEvent& _event
 
     bool success = card->getRank() == m_drawnCardPtr->getRank();
 
-    m_discardRef.discard(m_drawnCardPtr);
-    events::DiscardCardNetEvent event(m_drawnCardPtr->getRank(), m_drawnCardPtr->getSuit());
-    netManRef.send(event); 
+    discardCard(m_drawnCardPtr);
     
     events::MatchCardNetEvent eventMatch(card->getRank(), card->getSuit(), success);
     netManRef.send(eventMatch); 
@@ -446,6 +488,28 @@ void Board::processSwapCardStep(const events::RemotePlayerInputNetEvent& _event,
     }
 }
 
+void Board::processTakeCardStep(const events::RemotePlayerInputNetEvent& _event, BoardParticipant& _participant)
+{
+    if (_event.m_inputType != InputType::ClickSlot)
+    {
+        CN_ASSERT(false);
+        // TODO punish?
+        return;
+    }
+
+    ClickSlotInputData dataStruct = std::get<ClickSlotInputData>(_event.m_data);
+    auto* card = _participant.participantRef.replace(dataStruct.slotId, m_drawnCardPtr);
+    
+    discardCard(card);
+
+    _participant.currentStepId = StepId::FinishTurn;
+
+    CN_LOG_FRM("Take card, participant: {}, slot: {}, drawn card: {} {}, discarded card: {} {}", 
+        _event.m_senderPeerId, dataStruct.slotId, (int)m_drawnCardPtr->getRank(), (int)m_drawnCardPtr->getSuit(),
+        (int)card->getRank(), (int)card->getSuit() 
+    );
+}
+
 void Board::participantStartsTurn(BoardParticipant& _participant)
 {
     PlayerId playerId = _participant.participantRef.getId();
@@ -459,6 +523,43 @@ void Board::participantStartsTurn(BoardParticipant& _participant)
     setParticipantStep(nextStepId, _participant);
 }
 
+void Board::onParticipantTimeout(BoardParticipant& _participant)
+{
+    switch (_participant.currentStepId)
+    {
+    case StepId::DecideCard:
+    {
+        discardCard(m_drawnCardPtr);
+        break;
+    }
+    case StepId::DiscardCard:
+        break;
+    case StepId::DrawCard:
+        break;
+    case StepId::FinishTurn:
+        break;
+    case StepId::Idle:
+        break;
+    case StepId::MatchCard:
+        break;
+    case StepId::SeeOwnCard:
+        break;
+    case StepId::SeeSomeonesCard:
+        break;
+    case StepId::SwapCardBlindly:
+        m_isFirstPartOfSwap = true;
+        break;
+    case StepId::SwapCardOpenly:
+        m_isFirstPartOfSwap = true;
+        break;
+    case StepId::TakeCard:
+        break;
+    }
+
+    _participant.currentStepId = StepId::Idle;
+    CN_LOG_FRM("Timeout, Player {} finished their turn", _participant.participantRef.getId());
+}
+
 void Board::setParticipantStep(StepId _stepId, BoardParticipant& _participant)
 {
     CN_ASSERT(_participant.currentStepId != _stepId);
@@ -467,6 +568,13 @@ void Board::setParticipantStep(StepId _stepId, BoardParticipant& _participant)
     _participant.currentStepId = _stepId;
 
     CN_LOG_FRM("Set step {} to participant {}", (unsigned)_stepId, playerId);
+}
+
+void Board::discardCard(Card* _card)
+{
+    events::DiscardCardNetEvent eventDiscard(_card->getRank(), _card->getSuit());
+    getContext().get<net::Manager>().send(eventDiscard);
+    m_discardRef.discard(_card);
 }
 
 } // namespace cn::server::game
