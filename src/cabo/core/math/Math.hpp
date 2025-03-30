@@ -37,4 +37,21 @@ inline sf::Vector2f rotateVectorInverse(sf::Vector2f _v, float _angleDeg)
     return sf::Vector2f{_v.x * cs + _v.y * sn, - _v.x * sn + _v.y * cs}; 
 }
 
+inline float vectorLength(const sf::Vector2f& _v)
+{
+    return std::sqrt(_v.x * _v.x + _v.y * _v.y);
+}
+
+inline sf::Vector2f normalizeVector(sf::Vector2f _v)
+{
+    const float len = vectorLength(_v);
+    sf::Vector2f vOut{_v};
+    if(len > 0.f)
+    {   
+        float invLen = 1.0f / len;
+        vOut = invLen * _v;
+    }
+    return vOut;
+}
+
 } // namespace cn::core::math
