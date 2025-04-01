@@ -14,12 +14,12 @@ public:
     SimpleImage(Position _position, const sf::Texture& _texture);
 
     void setTextureRect(sf::IntRect _rectangle);
-    void setPosition(Position _position);
     void setRotation(float _angleDeg);
 
 private:
     void onDraw(sf::RenderWindow& _window) override;
-    
+    void onPositionUpdated() override;
+
     sf::Sprite m_sprite;
 };
 } // namespace cn::client::menu::item

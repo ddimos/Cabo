@@ -20,11 +20,9 @@ public:
         const sf::IntRect& _textureRectDefault, const sf::IntRect& _textureRectHover,
         component::Clickable::Callback _onClickCallback, sf::Mouse::Button _button);
 
-    Position getPosition() const;
     float getRotation() const;
-
-    void setPosition(Position _position);
     void setRotation(float _angleDeg);
+
     void setClickCallback(component::Clickable::Callback _onClickCallback);
 
     void setTextureRectPosition(sf::Vector2i _posDefault, sf::Vector2i _posHover);
@@ -32,6 +30,7 @@ public:
 protected:
     void onDraw(sf::RenderWindow& _windowRef) override;
     void onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered) override;
+    void onPositionUpdated() override;
 
     component::Clickable m_clickable;
     component::Hoverable m_hoverable;

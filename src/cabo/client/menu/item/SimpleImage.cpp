@@ -39,12 +39,6 @@ void SimpleImage::setTextureRect(sf::IntRect _rectangle)
     // should I recalculate the position?
 }
 
-void SimpleImage::setPosition(Position _position)
-{
-    m_transformable.setPosition(_position);
-    m_sprite.setPosition(m_transformable.calculateGlobalPos(sf::Vector2f{}));
-}
-
 void SimpleImage::setRotation(float _angleDeg)
 {
     m_sprite.setRotation(_angleDeg);
@@ -53,6 +47,11 @@ void SimpleImage::setRotation(float _angleDeg)
 void SimpleImage::onDraw(sf::RenderWindow& _window)
 {
     _window.draw(m_sprite);
+}
+
+void SimpleImage::onPositionUpdated()
+{
+    m_sprite.setPosition(m_transformable.calculateGlobalPos(sf::Vector2f{}));
 }
 
 } // namespace cn::client::menu::item

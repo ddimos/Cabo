@@ -57,22 +57,9 @@ Button::Button(Position _position, const sf::Texture& _texture, const sf::IntRec
     );
 }
 
-Position Button::getPosition() const
-{
-    return m_transformable.getPosition();
-}
-
 float Button::getRotation() const
 {
     return m_sprite.getRotation();
-}
-
-void Button::setPosition(Position _position)
-{
-    m_transformable.setPosition(_position);
-    m_sprite.setPosition(m_transformable.calculateGlobalPos(sf::Vector2f{}));
-    m_clickable.setBounds(sf::FloatRect(m_sprite.getPosition(), m_sprite.getLocalBounds().getSize()));
-    m_hoverable.setBounds(sf::FloatRect(m_sprite.getPosition(), m_sprite.getLocalBounds().getSize()));
 }
 
 void Button::setRotation(float _angleDeg)
@@ -128,6 +115,13 @@ void Button::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isBein
         _dispatcher.unregisterEvent<events::MouseButtonReleasedEvent>(m_listenerId);
         _dispatcher.unregisterEvent<events::MouseMovedEvent>(m_listenerId);
     }
+}
+
+void Button::onPositionUpdated()
+{
+    m_sprite.setPosition(m_transformable.calculateGlobalPos(sf::Vector2f{}));
+    m_clickable.setBounds(sf::FloatRect(m_sprite.getPosition(), m_sprite.getLocalBounds().getSize()));
+    m_hoverable.setBounds(sf::FloatRect(m_sprite.getPosition(), m_sprite.getLocalBounds().getSize()));
 }
 
 } // namespace cn::client::menu::item
