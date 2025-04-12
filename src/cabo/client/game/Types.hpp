@@ -22,9 +22,11 @@ using shared::game::ParticipantSlotId;
 
 struct ParticipantSlot : public shared::game::ParticipantSlot
 {
-    Card card;
-    menu::item::SimpleImage* cardImage = nullptr;
-    menu::item::Button* button; // can be a ref
+    Card* cardPtr = nullptr;
+    // menu::item::SimpleImage* cardImage = nullptr;
+    menu::item::Button& buttonRef;
+    sf::Vector2f position{};
+    float rotation = 0.f;
     bool isCardValid = false;
 };
 
@@ -34,5 +36,6 @@ using shared::game::ActionType;
 using shared::game::PileType;
 using shared::game::InputType;
 using shared::game::ClickSlotInputData;
+using shared::game::InputDataVariant;
 
 } // namespace cn::client::game

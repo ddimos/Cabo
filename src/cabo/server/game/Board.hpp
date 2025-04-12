@@ -3,7 +3,6 @@
 #include "server/game/Deck.hpp"
 #include "server/game/Discard.hpp"
 #include "server/game/Participant.hpp"
-#include "server/game/Step.hpp"
 #include "server/game/Types.hpp"
 
 #include "core/event/Types.hpp"

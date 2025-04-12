@@ -23,7 +23,6 @@ Card::Card(const core::Context& _context, sf::Vector2f _position)
 void Card::set(Rank _rank, Suit _suit)
 {
     shared::game::Card::set(_rank, _suit);
-    m_isCardAvailable = true;
 }
 
 void Card::changeState(ChangeStateParams _params)
@@ -31,6 +30,19 @@ void Card::changeState(ChangeStateParams _params)
     m_params = _params;
     m_sprite.setRotation(m_params.desiredRotation);
     enterTransitingState();
+}
+
+void Card::show(bool _visible)
+{
+    if (_visible)
+        m_sprite.setTextureRect(game::spriteSheet::getCardTextureRect(getRank(), getSuit()));
+    else
+        m_sprite.setTextureRect(game::spriteSheet::getBlurredCardTextureRect());
+}
+
+void Card::hide()
+{
+    m_sprite.setTextureRect(game::spriteSheet::getCardBackTextureRect());
 }
 
 void Card::onUpdate(sf::Time _dt)

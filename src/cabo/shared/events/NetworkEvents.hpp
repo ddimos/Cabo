@@ -124,10 +124,13 @@ public:
     CN_EVENT(id::ProvideCard)
 
     ProvideCardNetEvent() = default;
-    ProvideCardNetEvent(shared::game::Card::Rank _rank, shared::game::Card::Suit _suit)
-        : m_rank(_rank), m_suit(_suit)
+    ProvideCardNetEvent(PlayerId _slotOwnerId, shared::game::ParticipantSlotId _slotId,
+                        shared::game::Card::Rank _rank, shared::game::Card::Suit _suit)
+        : m_slotOwnerId(_slotOwnerId), m_slotId(_slotId), m_rank(_rank), m_suit(_suit)
     {}
 
+    PlayerId m_slotOwnerId = PlayerIdInvalid;
+    shared::game::ParticipantSlotId m_slotId = shared::game::ParticipantSlotIdInvalid;
     shared::game::Card::Rank m_rank = shared::game::Card::Rank::Ace;
     shared::game::Card::Suit m_suit = shared::game::Card::Suit::Clubs;
 };

@@ -14,7 +14,6 @@ struct Player
 {
     std::string name;
     PlayerId id = PlayerIdInvalid;
-    bool isLocal = false;
 };
 
 } // namespace cn

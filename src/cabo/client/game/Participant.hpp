@@ -2,7 +2,6 @@
 
 #include "client/game/Card.hpp"
 #include "client/game/Types.hpp"
-#include "client/menu/Types.hpp"
 
 #include "shared/player/Types.hpp"
 
@@ -24,17 +23,20 @@ namespace cn::client::game
 class Participant final : public core::object::Object
 {
 public:
-    Participant(const core::Context& _context, PlayerId _id, bool _isLocal,
-        std::vector<ParticipantSlot>&& _slots, menu::item::SimpleImage& _openCardImageRef,
-        unsigned short _initialNumberOfSlots);
+    Participant(const core::Context& _context, PlayerId _id, bool _isLocal, std::vector<ParticipantSlot>&& _slots, unsigned short _initialNumberOfSlots);
 
     PlayerId getId() const { return m_id; }
     bool isLocal() const { return m_isLocal; }
+
+    sf::Vector2f getOpenCardPosition() const { return m_openCardPosition; }
+    float getOpenCardRotation() const { return m_openCardRotation; }
 
     void setSpawnPoint(PlayerSpawnPoint _spawnPoint);
 
     void addSlot(ParticipantSlotId _id);
     void removeSlot(ParticipantSlotId _id);
+
+    void setCardInSlot(ParticipantSlotId _id, Card::Rank _rank, Card::Suit _suit); 
 
     // These methods called on the viewer of the card
     void onStartShowingCard(Card _card);
@@ -42,11 +44,9 @@ public:
     // These methods called on the owner of the card 
     void onStartShowingOwnCardInSlot(ParticipantSlotId _id);
     void onFinishShowingOwnCardInSlot(ParticipantSlotId _id);
-    
-    // TODO to think how to unite with onCardRecievedInSlot
-    void onProvideCardInSlot(ParticipantSlotId _id, Card _card); 
 
     const ParticipantSlot& getSlot(ParticipantSlotId _id) const;
+    void visitSlots(std::function<void(ParticipantSlot&)> _visitor);
 
 private:
     void onDraw(sf::RenderWindow& _window) override;
@@ -59,7 +59,8 @@ private:
     bool m_isLocal = false;
 
     std::vector<ParticipantSlot> m_slots;
-    menu::item::SimpleImage& m_openCardImageRef;
+    sf::Vector2f m_openCardPosition{};
+    float m_openCardRotation = 0.f;
     PlayerSpawnPoint m_spawnPoint;
     unsigned short m_currentNumberOfSlots = 0;
 };

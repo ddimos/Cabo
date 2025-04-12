@@ -188,11 +188,15 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
         events::id::ProvideCard,
         [](const core::event::Event& _event, nsf::Buffer& _buffer){
             auto& event = static_cast<const events::ProvideCardNetEvent&>(_event);
+            _buffer << event.m_slotOwnerId;
+            _buffer << event.m_slotId;
             _buffer << static_cast<uint8_t>(event.m_rank);
             _buffer << static_cast<uint8_t>(event.m_suit);
         },
         [](core::event::Event& _event, nsf::Buffer& _buffer){
             auto& event = static_cast<events::ProvideCardNetEvent&>(_event);
+            _buffer >> event.m_slotOwnerId;
+            _buffer >> event.m_slotId;
             uint8_t rank;
             uint8_t suit;
             _buffer >> rank;

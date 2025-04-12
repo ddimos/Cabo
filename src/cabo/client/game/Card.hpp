@@ -21,6 +21,7 @@ public:
         InDeck,
         OnTable,
         InHand,
+        Viewed,
         TopInDiscard,
         InDiscard,
         Transiting
@@ -36,8 +37,13 @@ public:
 
     Card(const core::Context& _context, sf::Vector2f _position);
 
+    bool isTransiting() const { return m_state == State::Transiting; }
+
     void set(Rank _rank, Suit _suit);
-    void changeState(ChangeStateParams _params);
+    void changeState(ChangeStateParams _params); // TODO ? rename to StartTransition
+
+    void show(bool _visible);
+    void hide();
 
 private:
     void onUpdate(sf::Time _dt) override;
@@ -48,8 +54,6 @@ private:
     const core::Context& m_contextRef;
 
     State m_state = State::InDeck;
-
-    bool m_isCardAvailable = false;
 
     sf::Sprite m_sprite;
 

@@ -1,9 +1,7 @@
 #include "client/game/step/SeeCard.hpp"
 #include "client/game/Participant.hpp"
 
-#include "shared/events/GameEvents.hpp"
 #include "shared/events/NetworkEvents.hpp"
-
 #include "shared/net/Manager.hpp"
 
 namespace cn::client::game::step
@@ -12,90 +10,107 @@ namespace cn::client::game::step
 SeeCard::SeeCard(Board& _board, PlayerId _managedPlayerId, bool _seeOwnCard)
     : Step(_managedPlayerId,
         {
-            {Id::WaitInput, {}},
+            {Id::WaitInput, {
+                .onEnter = [this](){
+                    if (m_boardRef.getLocalPlayerId() != getManagedPlayerId())
+                        return;
+
+                    if (m_seeOwnCard)
+                        m_boardRef.fillNotificationQueue("You can peek any of your card");
+                    else
+                        m_boardRef.fillNotificationQueue("You can peek any card except yours");
+                }
+            }},
             {Id::RequestSeeCard, {            
                 .onEnter = [this](){
-                    auto* owner = m_boardRef.getParticipant(m_slotOwnerId);
-                    owner->onStartShowingOwnCardInSlot(m_slotId);
-                    
-                    events::RemotePlayerInputNetEvent event(getManagedPlayerId(), InputType::ClickSlot, ClickSlotInputData{m_slotId, m_slotOwnerId});
-                    m_boardRef.getContext().get<net::Manager>().send(event);
+                    const auto* viewer = m_boardRef.getParticipant(getManagedPlayerId());
+                    const auto* owner = m_boardRef.getParticipant(m_slotOwnerId);
+                    const auto& slot = owner->getSlot(m_slotId);
+
+                    slot.cardPtr->changeState({ 
+                        .desiredPosition = viewer->getOpenCardPosition(),
+                        .desiredRotation = viewer->getOpenCardRotation(),
+                        .desiredState = Card::State::Viewed,
+                        .onFinishCallback = [this, &slot](){
+                            if (slot.isCardValid || m_boardRef.getLocalPlayerId() != getManagedPlayerId())
+                                requestFollowingState();
+                        }
+                    });
+
+                    if (m_boardRef.getLocalPlayerId() == getManagedPlayerId())
+                    {
+                        events::RemotePlayerInputNetEvent event(getManagedPlayerId(), InputType::ClickSlot, ClickSlotInputData{m_slotId, m_slotOwnerId});
+                        m_boardRef.getContext().get<net::Manager>().send(event);
+                    }
                 },
-                .onUpdate = {}
+                .onUpdate = [this](sf::Time){
+                    const auto* owner = m_boardRef.getParticipant(m_slotOwnerId);
+                    const auto& slot = owner->getSlot(m_slotId);
+                    
+                    if (slot.isCardValid && !slot.cardPtr->isTransiting())
+                        requestFollowingState();
+                }
             }},
-            {Id::Look, {
+            {Id::View, {
                 .onEnter = [this](){
-                    auto* participant = m_boardRef.getParticipant(getManagedPlayerId());
-                    participant->onStartShowingCard(Card(m_rank, m_suit));
+                    const auto* owner = m_boardRef.getParticipant(m_slotOwnerId);
+                    const auto& slot = owner->getSlot(m_slotId);
+
+                    slot.cardPtr->show(m_boardRef.getLocalPlayerId() == getManagedPlayerId());
                 },
                 .onUpdate = [this](sf::Time _dt){
                     m_seeCardTimeDt -= _dt;
                     if (m_seeCardTimeDt.asSeconds() <= 0.f)
-                        requestFollowingState();
+                       requestFollowingState();
                 }
             }},
-            {Id::Finished, {
+            {Id::WaitReturn, {
                 .onEnter = [this](){
-                    auto* owner = m_boardRef.getParticipant(m_slotOwnerId);
-                    owner->onFinishShowingOwnCardInSlot(m_slotId);
-
-                    auto* participant = m_boardRef.getParticipant(getManagedPlayerId());
-                    participant->onFinishShowingCard();
+                    const auto* owner = m_boardRef.getParticipant(m_slotOwnerId);
+                    const auto& slot = owner->getSlot(m_slotId);
+    
+                    slot.cardPtr->hide();
+                    slot.cardPtr->changeState({ 
+                        .desiredPosition = slot.position,
+                        .desiredRotation = slot.rotation,
+                        .desiredState = Card::State::InHand,
+                        .onFinishCallback = [this](){
+                            requestFollowingState();
+                        }
+                    });
                 },
                 .onUpdate = {}
-                //     [this](sf::Time){
-                //     // for debugging
-                //     // requestState(Id::WaitInput);
-                //     // m_seeCardTimeDt = m_seeCardTime;
-                // }
             }},
+            {Id::Finished, {}}
         })
     , m_boardRef(_board)
     , m_seeOwnCard(_seeOwnCard)
 {
 }
 
-void SeeCard::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered)
+void SeeCard::processPlayerInput(InputType _inputType, InputDataVariant _data)
 {
-    if (_isBeingRegistered)
+    if (_inputType == InputType::ClickSlot)
     {
-        _dispatcher.registerEvent<events::LocalPlayerClickSlotEvent>(getListenerId(),
-            [this](const events::LocalPlayerClickSlotEvent& _event)
-            {
-                if (getCurrentStateId() != Id::WaitInput)
-                    return;
-                if (m_seeOwnCard)
-                {
-                    if (_event.slotOwnerId != getManagedPlayerId()) // TODO give feedback to the player
-                        return;
-                }
-                else
-                {
-                    if (_event.slotOwnerId == getManagedPlayerId())
-                        return;
-                }
+        if (getCurrentStateId() != Id::WaitInput)
+            return;
+            
+        auto dataStruct = std::get<shared::game::ClickSlotInputData>(_data);
+        if (m_seeOwnCard)
+        {
+            if (dataStruct.playerId != getManagedPlayerId()) // TODO give feedback to the player
+                return;
+        }
+        else
+        {
+            if (dataStruct.playerId == getManagedPlayerId())
+                return;
+        }
 
-                requestFollowingState();
-                m_slotId = _event.slotId;
-                m_slotOwnerId = _event.slotOwnerId;
-            }
-        );
-        _dispatcher.registerEvent<events::ProvideCardNetEvent>(getListenerId(),
-            [this](const events::ProvideCardNetEvent& _event)
-            {    
-                if (getCurrentStateId() != Id::RequestSeeCard)
-                    return;
+        m_slotOwnerId = dataStruct.playerId;
+        m_slotId = dataStruct.slotId;
 
-                requestFollowingState();
-                m_rank = _event.m_rank;
-                m_suit = _event.m_suit;
-            }
-        );
-    }
-    else
-    {
-        _dispatcher.unregisterEvent<events::LocalPlayerClickSlotEvent>(getListenerId());
-        _dispatcher.unregisterEvent<events::ProvideCardNetEvent>(getListenerId());
+        requestFollowingState();
     }
 }
 

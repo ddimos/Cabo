@@ -33,7 +33,7 @@ void Manager::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeing
                 events::PlayerUpdateNetEvent event({ Player{ .name = "Player Name"} });
                 netManRef.send(event);
 
-                m_players.emplace_back(Player{ .name = "Player Name", .id = m_localPlayerId, .isLocal = true});
+                m_players.emplace_back(Player{ .name = "Player Name", .id = m_localPlayerId});
             }
         );
         _dispatcher.registerEvent<events::PlayerUpdateNetEvent>(m_listenerId,

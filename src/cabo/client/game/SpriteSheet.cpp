@@ -27,6 +27,12 @@ sf::IntRect getCardTextureRect(shared::game::Card::Rank _rank, shared::game::Car
     return sf::IntRect{ CardWidth * rankNum , CardHeight * suitNum, CardWidth, CardHeight };
 }
 
+sf::IntRect getBlurredCardTextureRect()
+{
+    // TODO real blurred card
+    return sf::IntRect{ 0, 2 * CardHeight, CardWidth, CardHeight };
+}
+
 sf::IntRect getCardBackTextureRect(Hover _hover)
 {
     return _hover == Hover::No 

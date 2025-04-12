@@ -3,7 +3,6 @@
 #include "client/ResourceIds.hpp"
 
 #include "client/menu/item/Button.hpp"
-#include "client/menu/item/SimpleImage.hpp"
 #include "client/menu/item/SimpleText.hpp"
 
 #include "client/player/Manager.hpp"
@@ -66,7 +65,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
                 auto slotButton = std::make_shared<menu::item::Button>(
                     menu::Position{},
                     textureHolderRef.get(TextureIds::Cards),
-                    game::spriteSheet::getCardBackTextureRect(),
+                    game::spriteSheet::getCardBackTextureRect(),// todo button image
                     game::spriteSheet::getCardBackTextureRect(game::spriteSheet::Hover::Yes),
                     [this, slotId, playerId](){
                         auto& eventDispatcherRef = getContext().get<core::event::Dispatcher>();
@@ -78,28 +77,11 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
 
                 getContainer(core::object::Container::Type::Menu).add(slotButton);
 
-                auto cardPair = shared::game::Card::getCardFromIndex(0);
-                auto cardImage = std::make_shared<menu::item::SimpleImage>(
-                    menu::Position{},
-                    textureHolderRef.get(TextureIds::Cards),
-                    game::spriteSheet::getCardTextureRect(cardPair.first, cardPair.second)
-                );
-                cardImage->setActivationOption(core::object::Object::ActivationOption::Manually);
-                getContainer(core::object::Container::Type::Menu).add(cardImage);
-
-                slots.emplace_back(game::ParticipantSlot{ slotId, false, game::Card{cardPair.first, cardPair.second}, cardImage.get(), slotButton.get()});
+                slots.emplace_back(game::ParticipantSlot{ slotId, false, nullptr, *slotButton, {} });
             }
 
-            auto openCardCardImage = std::make_shared<menu::item::SimpleImage>(
-                menu::Position{},
-                textureHolderRef.get(TextureIds::Cards),
-                game::spriteSheet::getCardBackTextureRect()
-            );
-            openCardCardImage->setActivationOption(core::object::Object::ActivationOption::Manually);
-            getContainer(core::object::Container::Type::Menu).add(openCardCardImage);
-
             auto participant = std::make_shared<game::Participant>(
-                getContext(), playerId, true, std::move(slots), *openCardCardImage, shared::game::DefaultInitNumberOfParticipantSlots
+                getContext(), playerId, true, std::move(slots), shared::game::DefaultInitNumberOfParticipantSlots
             );
             participant->setSpawnPoint(spawnPoints[index]);
             getContainer(core::object::Container::Type::Game).add(participant);
@@ -145,6 +127,24 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
         sf::Mouse::Button::Left
     );
     getContainer(core::object::Container::Type::Menu).add(discardButton);
+    
+    std::vector<game::Card*> cards;
+    {
+        auto pos = menu::Position{
+            .m_position = sf::Vector2f(75.f, 0.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
+            .m_specPositionX = menu::Position::Special::OFFSET_FROM_CENTER, .m_specPositionY = menu::Position::Special::CENTER_ALLIGNED
+        };
+
+        unsigned short deckSize = shared::game::StandartDeckSize;
+        cards.reserve(deckSize);
+        for (unsigned short i = 0; i < deckSize; ++i)
+        {
+            auto cardPair = game::Card::getCardFromIndex(i);
+            auto card = std::make_shared<game::Card>(getContext(), pos.calculateGlobalPos());
+            getContainer(core::object::Container::Type::Game).add(card);
+            cards.push_back(card.get());
+        }
+    }
 
     auto finishButton = std::make_shared<menu::item::Button>(
         menu::Position{
@@ -161,40 +161,6 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
     );
     finishButton->setActivationOption(core::object::Object::ActivationOption::Manually);
     getContainer(core::object::Container::Type::Menu).add(finishButton);
-
-    auto cardPair = shared::game::Card::getCardFromIndex(0);
-    auto deckCardImage = std::make_shared<menu::item::SimpleImage>(
-        menu::Position{
-            .m_position = sf::Vector2f(0.f, 80.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
-            .m_specPositionX = menu::Position::Special::CENTER_ALLIGNED, .m_specPositionY = menu::Position::Special::OFFSET_FROM_CENTER
-        },
-        textureHolderRef.get(TextureIds::Cards),
-        game::spriteSheet::getCardTextureRect(cardPair.first, cardPair.second)
-    );
-    deckCardImage->setActivationOption(core::object::Object::ActivationOption::Manually);
-    getContainer(core::object::Container::Type::Menu).add(deckCardImage);
-
-    auto discardCardImage = std::make_shared<menu::item::SimpleImage>(
-        menu::Position{
-            .m_position = sf::Vector2f(-75.f, 0.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
-            .m_specPositionX = menu::Position::Special::OFFSET_FROM_CENTER, .m_specPositionY = menu::Position::Special::CENTER_ALLIGNED
-        },
-        textureHolderRef.get(TextureIds::Cards),
-        game::spriteSheet::getCardTextureRect(cardPair.first, cardPair.second)
-    );
-    discardCardImage->setActivationOption(core::object::Object::ActivationOption::Manually);
-    getContainer(core::object::Container::Type::Menu).add(discardCardImage);
-
-    auto matchedCardImage = std::make_shared<menu::item::SimpleImage>(
-        menu::Position{
-            .m_position = sf::Vector2f(-120.f, 70.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
-            .m_specPositionX = menu::Position::Special::OFFSET_FROM_CENTER, .m_specPositionY = menu::Position::Special::OFFSET_FROM_CENTER
-        },
-        textureHolderRef.get(TextureIds::Cards),
-        game::spriteSheet::getCardTextureRect(cardPair.first, cardPair.second)
-    );
-    matchedCardImage->setActivationOption(core::object::Object::ActivationOption::Manually);
-    getContainer(core::object::Container::Type::Menu).add(matchedCardImage);
 
     game::Board::DecideActionButtons decideActionButtons;
     {
@@ -303,7 +269,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
         decideSwapButtons.push_back(noButton.get());
     }
 
-    std::vector<menu::item::SimpleText*> images;
+    std::vector<menu::item::SimpleText*> texts;
     {
         constexpr unsigned NumberOfTextElements = 5;
         for (unsigned num = NumberOfTextElements; num > 0; --num)
@@ -317,8 +283,8 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
             );
             text->setActivationOption(core::object::Object::ActivationOption::Manually);
             getContainer(core::object::Container::Type::Menu).add(text);
-            images.push_back(text.get());
-        }    
+            texts.push_back(text.get());
+        }
     }
     auto queue = std::make_shared<menu::item::NotificationQueue>(
         menu::Position{
@@ -327,12 +293,12 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
         },
         sf::Time(sf::seconds(5.f)),
         50.f,
-        images
+        texts
     );
     getContainer(core::object::Container::Type::Menu).add(queue);
 
     m_board = std::make_unique<game::Board>(
-        getContext(), std::move(participants), *queue, *finishButton, *deckCardImage, *discardCardImage, *matchedCardImage,
+        getContext(), std::move(participants), std::move(cards), *queue, *finishButton,
         std::move(decideActionButtons), std::move(decideSwapButtons)
     );
 

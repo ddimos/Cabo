@@ -419,7 +419,7 @@ void Board::processSeeCardStep(const events::RemotePlayerInputNetEvent& _event, 
     
     auto* card = slotOwner.participantRef.getCard(dataStruct.slotId);
     
-    events::ProvideCardNetEvent event(card->getRank(), card->getSuit());
+    events::ProvideCardNetEvent event(dataStruct.playerId, dataStruct.slotId, card->getRank(), card->getSuit());
     getContext().get<net::Manager>().send(event, _event.m_senderPeerId);            
     
     _participant.currentStepId = StepId::FinishTurn;

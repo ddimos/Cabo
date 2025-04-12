@@ -1,5 +1,4 @@
 #include "client/game/Participant.hpp"
-#include "client/game/Card.hpp"
 #include "client/game/SpriteSheet.hpp"
 
 #include "client/menu/item/Button.hpp"
@@ -13,12 +12,10 @@
 namespace cn::client::game
 {
 
-Participant::Participant(const core::Context& _context, PlayerId _id, bool _isLocal, std::vector<ParticipantSlot>&& _slots,
-                         menu::item::SimpleImage& _openCardImageRef, unsigned short _initialNumberOfSlots)
+Participant::Participant(const core::Context& _context, PlayerId _id, bool _isLocal, std::vector<ParticipantSlot>&& _slots, unsigned short _initialNumberOfSlots)
     : m_id(_id)
     , m_isLocal(_isLocal)
     , m_slots(std::move(_slots))
-    , m_openCardImageRef(_openCardImageRef)
     , m_currentNumberOfSlots(_initialNumberOfSlots)
 {
     auto& fontHolderRef = _context.get<client::FontHolder>();
@@ -28,9 +25,6 @@ Participant::Participant(const core::Context& _context, PlayerId _id, bool _isLo
     m_nameText.setFillColor(sf::Color::White);
     m_nameText.setCharacterSize(24);
     m_nameText.setOrigin(m_nameText.getGlobalBounds().getSize() / 2.f);
-
-    for (unsigned i = 0; i < m_currentNumberOfSlots; ++i)
-        m_slots[i].button->requestActivated();
 }
 
 void Participant::setSpawnPoint(PlayerSpawnPoint _spawnPoint)
@@ -48,8 +42,8 @@ void Participant::setSpawnPoint(PlayerSpawnPoint _spawnPoint)
     {
         sf::Vector2f localPos = sf::Vector2f(0, 210.f);
         localPos = core::math::rotateVector(localPos, rotation);
-        m_openCardImageRef.setPosition(client::menu::Position{ .m_position = (m_spawnPoint.pos + localPos) });
-        m_openCardImageRef.setRotation(rotation + 180.f);
+        m_openCardPosition = m_spawnPoint.pos + localPos;
+        m_openCardRotation = rotation + 180.f;
     }
 
     // TODO add to consts
@@ -67,10 +61,10 @@ void Participant::setSpawnPoint(PlayerSpawnPoint _spawnPoint)
     {
         sf::Vector2f localPos = sf::Vector2f(i * offsetBetweenCardsX - 127, j * offsetBetweenCardsY + 70);
         localPos = core::math::rotateVector(localPos, rotation);
-        slot.button->setPosition(client::menu::Position{ .m_position = (m_spawnPoint.pos + localPos) });
-        slot.button->setRotation(rotation);
-        slot.cardImage->setPosition(client::menu::Position{ .m_position = (m_spawnPoint.pos + localPos) });
-        slot.cardImage->setRotation(imageRotation);
+        slot.position = (m_spawnPoint.pos + localPos);
+        slot.rotation = imageRotation;
+        slot.buttonRef.setPosition(client::menu::Position{ .m_position = (m_spawnPoint.pos + localPos) });
+        slot.buttonRef.setRotation(rotation);
         ++i;
         if(i >= cardsInRow)
         {
@@ -91,7 +85,6 @@ void Participant::addSlot(ParticipantSlotId _id)
     m_currentNumberOfSlots++;
     auto& slot = getSlot(_id);
     CN_ASSERT(!slot.wasRemoved);
-    slot.button->requestActivated();
 }
 
 void Participant::removeSlot(ParticipantSlotId _id)
@@ -105,13 +98,19 @@ void Participant::removeSlot(ParticipantSlotId _id)
 
     auto& slot = getSlot(_id);
     CN_ASSERT(!slot.wasRemoved);
-    if (slot.button->isActivated())
-        slot.button->requestDeactivated();
-    if (slot.cardImage->isActivated())
-        slot.cardImage->requestDeactivated();
+    if (slot.buttonRef.isActivated())
+        slot.buttonRef.requestDeactivated();
     
     // Or should I just erase it? 
     slot.wasRemoved = true;
+}
+
+void Participant::setCardInSlot(ParticipantSlotId _id, Card::Rank _rank, Card::Suit _suit)
+{
+    auto& slot = getSlot(_id);
+
+    slot.cardPtr->set(_rank, _suit);
+    slot.isCardValid = true;
 }
 
 void Participant::onStartShowingCard(Card _card)
@@ -142,13 +141,21 @@ void Participant::onFinishShowingOwnCardInSlot(ParticipantSlotId _id)
     slot.button->requestActivated();
 }
 
-void Participant::onProvideCardInSlot(ParticipantSlotId _id, Card _card)
+void Participant::visitSlots(std::function<void(ParticipantSlot&)> _visitor)
 {
-    auto& slot = getSlot(_id);
+    unsigned short slotLeft = m_currentNumberOfSlots;
+    // Visit only active slots
+    for (auto& slot : m_slots)
+    {
+        if (slot.wasRemoved)
+            continue;
+        
+        _visitor(slot);
 
-    slot.card = _card;
-    slot.cardImage->setTextureRect(game::spriteSheet::getCardTextureRect(_card.getRank(), _card.getSuit()));
-    slot.isCardValid = true;
+        --slotLeft;
+        if (slotLeft == 0)
+            break;
+    }
 }
 
 const ParticipantSlot& Participant::getSlot(ParticipantSlotId _id) const

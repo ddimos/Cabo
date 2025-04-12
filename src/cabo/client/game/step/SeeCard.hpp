@@ -1,7 +1,6 @@
 #pragma once
 
 #include "client/game/Board.hpp"
-#include "client/game/Card.hpp"
 #include "client/game/Step.hpp"
 
 namespace cn::client::game::step
@@ -13,7 +12,7 @@ public:
     SeeCard(Board& _board, PlayerId _managedPlayerId, bool _seeOwnCard);
 
 private:
-    void registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered) override;
+    void processPlayerInput(InputType _inputType, InputDataVariant _data) override;
     bool isFinished() const override;
     StepId getNextStepId() const override;
     
@@ -21,7 +20,8 @@ private:
     {
         WaitInput,
         RequestSeeCard,
-        Look,
+        View,
+        WaitReturn,
         Finished
     };
 
@@ -30,9 +30,6 @@ private:
 
     ParticipantSlotId m_slotId = shared::game::ParticipantSlotIdInvalid;
     PlayerId m_slotOwnerId = PlayerIdInvalid;
-
-    Card::Rank m_rank;
-    Card::Suit m_suit;
 
     const sf::Time m_seeCardTime = sf::seconds(2.f);
     sf::Time m_seeCardTimeDt = m_seeCardTime;
