@@ -43,14 +43,6 @@ public:
         SwapOpenly
     };
 
-    enum class State
-    {
-        InDeck,
-        OnTable,
-        OnHand,
-        InDiscard
-    };
-
     static std::pair<Rank, Suit> getCardFromIndex(unsigned _index);
     static bool hasAbility(Card _card);
     static Ability getAbility(Card _card);
@@ -61,15 +53,12 @@ public:
     Rank getRank() const { return m_rank; }
     Suit getSuit() const { return m_suit; }
     
-    // TODO to figure out if I need these methods, State, inheritance from Object
-    void deal(/*player id*/ /*position*/);
-    void discard();
+protected:
+    void set(Rank _rank, Suit _suit);
 
 private:
     Rank m_rank = Rank::Ace;
     Suit m_suit = Suit::Clubs;
-
-    State m_state = State::InDeck;
 };
 
 } // namespace cn::shared::game

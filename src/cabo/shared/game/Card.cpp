@@ -60,12 +60,10 @@ Card::Card(Rank _rank, Suit _suit)
 {
 }
 
-void Card::deal(/*player id*/ /*position*/)
+void Card::set(Rank _rank, Suit _suit)
 {
-}
-
-void Card::discard()
-{
+    m_rank = _rank;
+    m_suit = _suit;
 }
 
 } // namespace cn::shared::game
