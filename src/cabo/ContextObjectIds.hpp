@@ -2,6 +2,7 @@
 #include "core/Context.hpp"
 #include "core/event/Dispatcher.hpp"
 #include "shared/net/Manager.hpp"
+#include "shared/Types.hpp"
 
 #include "client/ResourceIds.hpp"
 #include "client/player/Manager.hpp"
@@ -22,6 +23,7 @@ enum : core::ContextObjectId
     FontHolder,
     NetManager,
     PlayerManager,
+    Seed,
     SystemClock,
     TextureHolder,
     Window
@@ -41,6 +43,8 @@ template <>
 core::ContextObjectId core::getContextObjectId<net::Manager>();
 template <>
 core::ContextObjectId core::getContextObjectId<sf::Clock>();
+template <>
+core::ContextObjectId core::getContextObjectId<shared::Seed>();
 // TODO to fix this, create two version of this file
 template <>
 core::ContextObjectId core::getContextObjectId<client::player::Manager>();

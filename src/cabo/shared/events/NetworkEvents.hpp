@@ -71,6 +71,11 @@ public:
     CN_EVENT(id::StartGame)
     
     StartGameNetEvent() = default;
+    StartGameNetEvent(uint32_t _seed)
+        : m_seed(_seed)
+    {}
+
+    uint32_t m_seed = 0;
 };
 
 class BoardStateUpdateNetEvent final : public BaseNetEvent

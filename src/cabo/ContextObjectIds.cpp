@@ -34,6 +34,11 @@ core::ContextObjectId core::getContextObjectId<sf::Clock>()
     return context::id::SystemClock;
 }
 template <>
+core::ContextObjectId core::getContextObjectId<shared::Seed>()
+{
+    return context::id::Seed;
+}
+template <>
 core::ContextObjectId core::getContextObjectId<client::player::Manager>()
 {
     return context::id::PlayerManager;

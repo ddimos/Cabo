@@ -8,6 +8,9 @@
 #include "shared/events/GameEvents.hpp"
 #include "shared/events/NetworkEvents.hpp"
 #include "shared/net/Manager.hpp"
+#include "shared/Types.hpp"
+
+#include <ctime>
 
 namespace cn::server::states
 {
@@ -15,8 +18,11 @@ namespace cn::server::states
 LobbyState::LobbyState(core::state::Manager& _stateManagerRef)
     : State(_stateManagerRef)
 {
+    uint32_t seed = static_cast<uint32_t>(std::time(nullptr));
+    getContext().get<shared::Seed>().seed = seed;
+
     m_listenerId = core::event::getNewListenerId();
-    CN_LOG("Lobby state..");
+    CN_LOG_FRM("Lobby state.., seed {}", seed);
 }
 
 void LobbyState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered)
@@ -76,7 +82,7 @@ core::state::Return LobbyState::onUpdate(sf::Time _dt)
         {
             CN_LOG("Start game..");
 
-            events::StartGameNetEvent event;
+            events::StartGameNetEvent event(getContext().get<shared::Seed>().seed);
             getContext().get<net::Manager>().send(event);
         
             pop();

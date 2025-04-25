@@ -26,6 +26,7 @@ Server::Server()
     m_context.insert(m_eventManager.getDispatcher());
     m_context.insert(m_playerManager);
     m_context.insert(m_systemClock);
+    m_context.insert(m_seed);
 
     m_netManager.init();
 }

@@ -5,6 +5,7 @@
 #include "core/Context.hpp"
 
 #include "shared/net/Manager.hpp"
+#include "shared/Types.hpp"
 
 #include "server/player/Manager.hpp"
 
@@ -32,6 +33,7 @@ private:
     core::event::Manager m_eventManager;
     core::state::Manager m_stateManager;
     player::Manager m_playerManager;
+    shared::Seed m_seed{};
 
     bool m_isRunning = false;
 };

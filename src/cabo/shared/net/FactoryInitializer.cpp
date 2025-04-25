@@ -82,8 +82,12 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
     _factoryRef.add(
         events::id::StartGame,
         [](const core::event::Event& _event, nsf::Buffer& _buffer){
+            auto& event = static_cast<const events::StartGameNetEvent&>(_event);
+            _buffer << event.m_seed;
         },
         [](core::event::Event& _event, nsf::Buffer& _buffer){
+            auto& event = static_cast<events::StartGameNetEvent&>(_event);
+            _buffer >> event.m_seed;
         },
         [](){
             return std::make_unique<events::StartGameNetEvent>();

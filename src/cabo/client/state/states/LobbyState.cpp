@@ -8,12 +8,14 @@
 #include "client/player/Manager.hpp"
 
 #include "core/event/Dispatcher.hpp"
+#include "core/Log.hpp"
 
 #include "shared/events/InputEvents.hpp"
 #include "shared/events/NetworkEvents.hpp"
 #include "shared/game/Constants.hpp"
 #include "shared/net/Manager.hpp"
 #include "shared/player/Types.hpp"
+#include "shared/Types.hpp"
 
 #include "LaunchTarget.hpp"
 
@@ -106,6 +108,8 @@ void LobbyState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _is
         _dispatcher.registerEvent<events::StartGameNetEvent>(m_listenerId,
             [this](const events::StartGameNetEvent& _event){
                 (void)_event;
+                getContext().get<shared::Seed>().seed = _event.m_seed;
+                CN_LOG_FRM("Seed {}", _event.m_seed);
                 pop();
                 push(id::Game);
             }
