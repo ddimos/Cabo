@@ -304,11 +304,13 @@ Card* Board::drawCard(bool _fromDeck)
 
 void Board::preDiscardCard(Card* _card)
 {
+    CN_LOG_FRM("Pre discard {}, {} {}", _card->getId().value(), (int)_card->getRank(), (int)_card->getSuit());
     m_cardsToDiscard.push_back(_card);
 }
 
 void Board::discardCard(Card* _card)
 {
+    CN_LOG_FRM("Discard {}, {} {}", _card->getId().value(), (int)_card->getRank(), (int)_card->getSuit());
     m_cardsToDiscard.erase(
         std::remove_if(m_cardsToDiscard.begin(), m_cardsToDiscard.end(),
             [_card](Card* _preCard){ return _preCard->getId() == _card->getId(); }),

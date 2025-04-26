@@ -17,7 +17,7 @@ Card::Card(const core::Context& _context, sf::Vector2f _position)
     m_sprite.setTextureRect(game::spriteSheet::getCardBackTextureRect());
     m_sprite.setOrigin(m_sprite.getLocalBounds().getSize() / 2.f);
 
-    m_transitionSpeed = 450.f;
+    m_transitionSpeed = 600.f;
 }
 
 void Card::set(Rank _rank, Suit _suit)

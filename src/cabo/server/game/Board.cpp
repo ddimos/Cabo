@@ -584,6 +584,8 @@ void Board::setParticipantStep(StepId _stepId, BoardParticipant& _participant)
 
 void Board::discardCard(Card* _card)
 {
+    CN_LOG_FRM("Discard {}, {} {}", _card->getId().value(), (int)_card->getRank(), (int)_card->getSuit());
+
     events::ProvideCardNetEvent eventDiscard(_card->getRank(), _card->getSuit(), _card->getId());
     getContext().get<net::Manager>().send(eventDiscard);
     m_discardRef.discard(_card);

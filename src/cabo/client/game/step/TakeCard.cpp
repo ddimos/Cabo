@@ -41,7 +41,7 @@ TakeCard::TakeCard(Board& _board, PlayerId _managedPlayerId, Card& _takenCard)
                     m_boardRef.preDiscardCard(m_discardedCardPtr);
                 },
                 .onUpdate = [this](sf::Time){
-                    if (!m_takenCardRef.isTransiting() && !m_discardedCardPtr->isTransiting())
+                    if (!m_takenCardRef.isTransiting() && !m_discardedCardPtr->isTransiting() && m_discardedCardPtr->isCardValueValid())
                         requestFollowingState();
                 }
             }},
