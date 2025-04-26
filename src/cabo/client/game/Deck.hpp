@@ -2,9 +2,9 @@
 
 #include "shared/game/Deck.hpp"
 
-namespace cn::server::game
+namespace cn::client::game
 {
 
 using shared::game::Deck;
 
-} // namespace cn::game
+} // namespace cn::client::game

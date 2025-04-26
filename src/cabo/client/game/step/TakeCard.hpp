@@ -10,20 +10,23 @@ namespace cn::client::game::step
 class TakeCard : public Step
 {
 public:
-    TakeCard(Board& _board, PlayerId _managedPlayerId);
+    TakeCard(Board& _board, PlayerId _managedPlayerId, Card& _takenCard);
 
 private:
-    void registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered) override;
+    void processPlayerInput(InputType _inputType, InputDataVariant _data) override;
     bool isFinished() const override;
     StepId getNextStepId() const override;
     
     enum Id : Step::StateId
     {
         WaitInput,
+        Take,
         Finished
     };
 
     Board& m_boardRef;
+    Card& m_takenCardRef;
+    Card* m_discardedCardPtr;
 
     ParticipantSlotId m_slotId = shared::game::ParticipantSlotIdInvalid;
 };

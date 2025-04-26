@@ -31,23 +31,14 @@ SeeCard::SeeCard(Board& _board, PlayerId _managedPlayerId, bool _seeOwnCard)
                         .desiredPosition = viewer->getOpenCardPosition(),
                         .desiredRotation = viewer->getOpenCardRotation(),
                         .desiredState = Card::State::Viewed,
-                        .onFinishCallback = [this, &slot](){
-                            if (slot.isCardValid || m_boardRef.getLocalPlayerId() != getManagedPlayerId())
-                                requestFollowingState();
-                        }
+                        .onFinishCallback = [](){}
                     });
-
-                    if (m_boardRef.getLocalPlayerId() == getManagedPlayerId())
-                    {
-                        events::RemotePlayerInputNetEvent event(getManagedPlayerId(), InputType::ClickSlot, ClickSlotInputData{m_slotId, m_slotOwnerId});
-                        m_boardRef.getContext().get<net::Manager>().send(event);
-                    }
                 },
                 .onUpdate = [this](sf::Time){
                     const auto* owner = m_boardRef.getParticipant(m_slotOwnerId);
                     const auto& slot = owner->getSlot(m_slotId);
                     
-                    if (slot.isCardValid && !slot.cardPtr->isTransiting())
+                    if ((slot.cardPtr->isCardValueValid() || m_boardRef.getLocalPlayerId() != getManagedPlayerId()) && !slot.cardPtr->isTransiting())
                         requestFollowingState();
                 }
             }},
@@ -95,7 +86,7 @@ void SeeCard::processPlayerInput(InputType _inputType, InputDataVariant _data)
         if (getCurrentStateId() != Id::WaitInput)
             return;
             
-        auto dataStruct = std::get<shared::game::ClickSlotInputData>(_data);
+        auto dataStruct = std::get<ClickSlotInputData>(_data);
         if (m_seeOwnCard)
         {
             if (dataStruct.playerId != getManagedPlayerId()) // TODO give feedback to the player
@@ -111,6 +102,12 @@ void SeeCard::processPlayerInput(InputType _inputType, InputDataVariant _data)
         m_slotId = dataStruct.slotId;
 
         requestFollowingState();
+
+        if (m_boardRef.getLocalPlayerId() == getManagedPlayerId())
+        {
+            events::RemotePlayerInputNetEvent event(getManagedPlayerId(), InputType::ClickSlot, ClickSlotInputData{m_slotId, m_slotOwnerId});
+            m_boardRef.getContext().get<net::Manager>().send(event);
+        }
     }
 }
 

@@ -1,32 +1,65 @@
 #include "client/game/step/MatchCard.hpp"
-
 #include "client/game/Participant.hpp"
 
-#include "shared/events/GameEvents.hpp"
 #include "shared/events/NetworkEvents.hpp"
-
 #include "shared/net/Manager.hpp"
 
 namespace cn::client::game::step
 {
 
-MatchCard::MatchCard(Board& _board, PlayerId _managedPlayerId)
+MatchCard::MatchCard(Board& _board, PlayerId _managedPlayerId, Card& _matchedCard)
     : Step(_managedPlayerId,
         {
-            {Id::WaitInput, {}},
+            {Id::WaitInput, {
+                .onEnter = [this](){
+                    if (m_boardRef.getLocalPlayerId() != getManagedPlayerId())
+                        return;
+
+                    m_boardRef.fillNotificationQueue("You can pick any of your card");
+                }
+            }},
             {Id::WaitServerReply, {
                 .onEnter = [this](){
-                    events::RemotePlayerInputNetEvent event(getManagedPlayerId(), InputType::ClickSlot, ClickSlotInputData{m_slotId, getManagedPlayerId()});
-                    m_boardRef.getContext().get<net::Manager>().send(event);
+                    if (m_boardRef.getLocalPlayerId() == getManagedPlayerId())
+                    {
+                        events::RemotePlayerInputNetEvent event(getManagedPlayerId(), InputType::ClickSlot, ClickSlotInputData{m_slotId, getManagedPlayerId()});
+                        m_boardRef.getContext().get<net::Manager>().send(event);
+                    }
 
-                    auto* participant = m_boardRef.getParticipant(getManagedPlayerId());
-                    participant->onStartShowingOwnCardInSlot(m_slotId);
+                    m_matchedCardRef.changeState({
+                        .desiredPosition = m_boardRef.getCardPositions().discardPos,
+                        .desiredRotation = 0.f,
+                        .desiredState = Card::State::InDiscard,
+                        .onFinishCallback = [](){}
+                    });
+                    m_boardRef.preDiscardCard(&m_matchedCardRef);
+
+                    auto* owner = m_boardRef.getParticipant(getManagedPlayerId());
+                    const auto& slot = static_cast<const Participant*>(owner)->getSlot(m_slotId);
+                    m_secondMatchedCardPtr = slot.cardPtr;
+                    m_secondMatchedCardPtr->changeState({
+                        .desiredPosition = m_boardRef.getCardPositions().firstMatchPos,
+                        .desiredRotation = 0.f,
+                        .desiredState = Card::State::Matched,
+                        .onFinishCallback = [](){}
+                    });
                 },
-                .onUpdate = {}
+                .onUpdate = [this](sf::Time){
+                    bool isReadyForNewState = true;
+                    if (!m_matchedCardRef.isCardValueValid() || m_matchedCardRef.isTransiting())
+                        isReadyForNewState = false;
+                    if (!m_secondMatchedCardPtr->isCardValueValid() || m_secondMatchedCardPtr->isTransiting())
+                        isReadyForNewState = false;
+
+                    if (isReadyForNewState)
+                        requestFollowingState();
+                }
             }},
             {Id::SeeCard, {
                 .onEnter = [this](){
-                    m_boardRef.onShowMatchedCard(Card(m_rank, m_suit));
+                    m_matchedCardRef.show(true);
+                    m_secondMatchedCardPtr->show(true);
+                    m_boardRef.discardCard(&m_matchedCardRef);
                 },
                 .onUpdate = [this](sf::Time _dt){
                     m_seeCardTimeDt -= _dt;
@@ -35,53 +68,62 @@ MatchCard::MatchCard(Board& _board, PlayerId _managedPlayerId)
                         requestFollowingState();
                 }
             }},
-            {Id::Finished, {
+            {Id::ReturnCard, {
                 .onEnter = [this](){
-                    auto* participant = m_boardRef.getParticipant(getManagedPlayerId());
-                    participant->onFinishShowingOwnCardInSlot(m_slotId);
+                    if (m_matchedCardRef.getRank() == m_secondMatchedCardPtr->getRank())
+                    {
+                        m_boardRef.discardCard(m_secondMatchedCardPtr);
+                        auto* participant = m_boardRef.getParticipant(getManagedPlayerId());
 
-                    m_boardRef.onHideMatchedCard(m_isMatched);
+                        m_secondMatchedCardPtr->changeState({
+                            .desiredPosition = m_boardRef.getCardPositions().discardPos,
+                            .desiredRotation = 0.f,
+                            .desiredState = Card::State::InDiscard,
+                            .onFinishCallback = [](){}
+                        });
+                    }
+                    else
+                    {
+                        auto* participant = m_boardRef.getParticipant(getManagedPlayerId());
+                        const auto& slot = static_cast<const Participant*>(participant)->getSlot(m_slotId);
+
+                        m_secondMatchedCardPtr->changeState({
+                            .desiredPosition = slot.position,
+                            .desiredRotation = slot.rotation,
+                            .desiredState = Card::State::InHand,
+                            .onFinishCallback = [this](){
+                                m_secondMatchedCardPtr->hide();
+                            }
+                        });
+                    }
                 },
-                .onUpdate = {}
+                .onUpdate = [this](sf::Time){
+                    if (!m_secondMatchedCardPtr->isTransiting())
+                    {
+                        requestFollowingState();
+                    }
+                }
             }},
+            {Id::Finished, {}}
         })
     , m_boardRef(_board)
+    , m_matchedCardRef(_matchedCard)
 {
 }
 
-void MatchCard::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered)
+void MatchCard::processPlayerInput(InputType _inputType, InputDataVariant _data)
 {
-    if (_isBeingRegistered)
+    if (_inputType == InputType::ClickSlot)
     {
-        _dispatcher.registerEvent<events::LocalPlayerClickSlotEvent>(getListenerId(),
-            [this](const events::LocalPlayerClickSlotEvent& _event)
-            {
-                if (getCurrentStateId() != Id::WaitInput)
-                    return;
-                if (_event.slotOwnerId != getManagedPlayerId()) // TODO give feedback to the player
-                    return;
+        if (getCurrentStateId() != Id::WaitInput)
+            return;
 
-                requestFollowingState();
-                m_slotId = _event.slotId;
-            }
-        );
-        _dispatcher.registerEvent<events::MatchCardNetEvent>(getListenerId(),
-            [this](const events::MatchCardNetEvent& _event)
-            {    
-                if (getCurrentStateId() != Id::WaitServerReply)
-                    return;
+        auto dataStruct = std::get<ClickSlotInputData>(_data);
+        if (dataStruct.playerId != getManagedPlayerId()) // TODO give feedback to the player
+            return;
 
-                requestFollowingState();
-                m_rank = _event.m_rank;
-                m_suit = _event.m_suit;
-                m_isMatched = _event.m_isMatched;
-            }
-        );
-    }
-    else
-    {
-        _dispatcher.unregisterEvent<events::LocalPlayerClickSlotEvent>(getListenerId());
-        _dispatcher.unregisterEvent<events::MatchCardNetEvent>(getListenerId());
+        m_slotId = dataStruct.slotId;
+        requestFollowingState();
     }
 }
 

@@ -22,16 +22,17 @@
 namespace cn::client::game
 {
 
-Board::Board(const core::Context& _context, std::vector<game::Participant*>&& _participants, std::vector<Card*>&& _cards, 
+Board::Board(const core::Context& _context, std::vector<game::Participant*>&& _participants, Deck& _deck, 
              menu::item::NotificationQueue& _queue, menu::item::Button& _finishButton, DecideActionButtons&& _decideActionButtons,
-             DecideSwapButtons&& _decideSwapButtons)
+             DecideSwapButtons&& _decideSwapButtons, CardPositions _cardPositions)
     : m_contextRef(_context)
     , m_participants(std::move(_participants))
-    , m_cards(std::move(_cards))
+    , m_deckRef(_deck)
     , m_queueRef(_queue)
     , m_finishButtonRef(_finishButton)
     , m_decideActionButtons(std::move(_decideActionButtons))
     , m_decideSwapButtons(std::move(_decideSwapButtons))
+    , m_cardPositions(_cardPositions)
 {
     auto& eventDispatcherRef = getContext().get<core::event::Dispatcher>();
     auto& playerManagerRef = getContext().get<player::Manager>();
@@ -77,6 +78,22 @@ void Board::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRe
                     it->second->processPlayerInput(_event.m_inputType, _event.m_data);
             }
         );
+        _dispatcher.registerEvent<events::LocalPlayerClickDeckEvent>(m_listenerId,
+            [this](const events::LocalPlayerClickDeckEvent& _event)
+            {
+                auto it = m_steps.find(m_localPlayerId);
+                if (it != m_steps.end() && it->second)
+                    it->second->processPlayerInput(InputType::ClickPile, PileType::Deck);
+            }
+        );
+        _dispatcher.registerEvent<events::LocalPlayerClickDiscardEvent>(m_listenerId,
+            [this](const events::LocalPlayerClickDiscardEvent& _event)
+            {
+                auto it = m_steps.find(m_localPlayerId);
+                if (it != m_steps.end())
+                    it->second->processPlayerInput(InputType::ClickPile, PileType::Discard);
+            }
+        );
         _dispatcher.registerEvent<events::LocalPlayerClickSlotEvent>(m_listenerId,
             [this](const events::LocalPlayerClickSlotEvent& _event)
             {
@@ -85,15 +102,61 @@ void Board::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRe
                     it->second->processPlayerInput(InputType::ClickSlot, ClickSlotInputData{_event.slotId, _event.slotOwnerId});
             }
         );
-        _dispatcher.registerEvent<events::ProvideCardNetEvent>(m_listenerId,
-            [&_dispatcher, this](const events::ProvideCardNetEvent& _event){
-                auto* owner = getParticipant(_event.m_slotOwnerId);
-                owner->setCardInSlot(_event.m_slotId, _event.m_rank, _event.m_suit);
+        _dispatcher.registerEvent<events::LocalPlayerClickDecideButtonEvent>(m_listenerId,
+            [this](const events::LocalPlayerClickDecideButtonEvent& _event)
+            {
+                auto it = m_steps.find(m_localPlayerId);
+                if (it != m_steps.end())
+                    it->second->processPlayerInput(InputType::Action, _event.m_button);
             }
         );
-        _dispatcher.registerEvent<events::DiscardCardNetEvent>(m_listenerId,
-            [&_dispatcher, this](const events::DiscardCardNetEvent& _event){
-                // discardCard(Card(_event.m_rank, _event.m_suit));
+        _dispatcher.registerEvent<events::LocalPlayerClickDecideSwapButtonEvent>(m_listenerId,
+            [this](const events::LocalPlayerClickDecideSwapButtonEvent& _event)
+            {
+                auto it = m_steps.find(m_localPlayerId);
+                if (it != m_steps.end())
+                    it->second->processPlayerInput(InputType::SwapDecision, _event.m_swap);
+            }
+        );
+
+        _dispatcher.registerEvent<events::LocalPlayerClickFinishButtonEvent>(m_listenerId,
+            [this](const events::LocalPlayerClickFinishButtonEvent& _event)
+            {
+                auto it = m_steps.find(m_localPlayerId);
+                if (it != m_steps.end())
+                    it->second->processPlayerInput(InputType::Finish, std::monostate());
+            }
+        );
+        _dispatcher.registerEvent<events::ProvideCardNetEvent>(m_listenerId,
+            [&_dispatcher, this](const events::ProvideCardNetEvent& _event){
+                bool found = false;
+                for (auto* participant : m_participants)
+                {
+                    participant->visitSlots(
+                        [&_event, &found](ParticipantSlot& _slot) {
+                            if (_slot.cardPtr->getId() == _event.m_cardId)
+                            {
+                                _slot.cardPtr->set(_event.m_rank, _event.m_suit);
+                                found = true;
+                                return;
+                            }
+                        }
+                    );
+                }
+
+                if (found)
+                    return;
+                if (m_drawnCardPtr && m_drawnCardPtr->getId() == _event.m_cardId)
+                {
+                    m_drawnCardPtr->set(_event.m_rank, _event.m_suit);
+                    return;
+                }
+                
+                for (auto* card : m_cardsToDiscard)
+                {
+                    if (card->getId() == _event.m_cardId)
+                        card->set(_event.m_rank, _event.m_suit);
+                }
             }
         );
         _dispatcher.registerEvent<events::PlayerSlotUpdateNetEvent>(m_listenerId,
@@ -102,6 +165,18 @@ void Board::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRe
                 if (_event.m_wasAdded)
                 {
                     participant->addSlot(_event.m_slotId);
+                    auto& slot = participant->getSlot(_event.m_slotId);
+                    Card* card = getNextCardFromDeck();
+                    slot.cardPtr = card;
+                    slot.cardPtr->changeState({ 
+                        .desiredPosition = slot.position,
+                        .desiredRotation = slot.rotation,
+                        .desiredState = Card::State::InHand,
+                        .onFinishCallback = [&slot](){
+                            slot.buttonRef.requestActivated();
+                        }
+                    });
+                   
                     m_queueRef.push("Player gets a card");
                 }
                 else
@@ -117,9 +192,13 @@ void Board::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRe
         _dispatcher.unregisterEvent<events::BoardStateUpdateNetEvent>(m_listenerId);
         _dispatcher.unregisterEvent<events::PlayerTurnUpdateNetEvent>(m_listenerId);
         _dispatcher.unregisterEvent<events::RemotePlayerInputNetEvent>(m_listenerId);
+        _dispatcher.unregisterEvent<events::LocalPlayerClickDeckEvent>(m_listenerId);
+        _dispatcher.unregisterEvent<events::LocalPlayerClickDiscardEvent>(m_listenerId);
         _dispatcher.unregisterEvent<events::LocalPlayerClickSlotEvent>(m_listenerId);
+        _dispatcher.unregisterEvent<events::LocalPlayerClickDecideButtonEvent>(m_listenerId);
+        _dispatcher.unregisterEvent<events::LocalPlayerClickDecideSwapButtonEvent>(m_listenerId);
+        _dispatcher.unregisterEvent<events::LocalPlayerClickFinishButtonEvent>(m_listenerId);
         _dispatcher.unregisterEvent<events::ProvideCardNetEvent>(m_listenerId);
-        _dispatcher.unregisterEvent<events::DiscardCardNetEvent>(m_listenerId);
         _dispatcher.unregisterEvent<events::PlayerSlotUpdateNetEvent>(m_listenerId);
     }
 }
@@ -138,9 +217,9 @@ void Board::update(sf::Time _dt)
             {
                 participant->visitSlots(
                     [this, participant](ParticipantSlot& _slot) {
-                        Card* card = getNextCard();
-                        _slot.cardPtr = card;
-                        card->changeState({ 
+                        Card* card = getNextCardFromDeck();
+                         _slot.cardPtr = card;
+                        _slot.cardPtr->changeState({ 
                             .desiredPosition = _slot.position,
                             .desiredRotation = _slot.rotation,
                             .desiredState = Card::State::InHand,
@@ -179,53 +258,70 @@ Participant* Board::getParticipant(PlayerId _id)
     return nullptr;
 }
 
-void Board::onParticipantStartDeciding(Card* _card)
+void Board::showDecideActionButtons()
 {
-    m_drawnCardPtr = _card;
-
     for (auto& button : m_decideActionButtons)
         button->requestActivated();
 }
 
-void Board::onParticipantFinishDeciding()
+void Board::hideDecideActionButtons()
 {
     for (auto& button : m_decideActionButtons)
         button->requestDeactivated();
 }
 
-void Board::onParticipantStartDecidingSwap()
+void Board::showDecideSwapButtons()
 {
     for (auto& button : m_decideSwapButtons)
         button->requestActivated();
 }
 
-void Board::onParticipantFinishDecidingSwap()
+void Board::hideDecideSwapButtons()
 {
     for (auto& button : m_decideSwapButtons)
         button->requestDeactivated();
 }
 
-void Board::onParticipantFinishesTurn(PlayerId _id)
+void Board::showFinishButton()
 {
-    CN_ASSERT(_id == m_localPlayerId); // TODO
     m_finishButtonRef.requestActivated();
 }
 
-void Board::onParticipantFinishedTurn(PlayerId _id)
+void Board::hideFinishButton()
 {
-    CN_ASSERT(_id == m_localPlayerId); // TODO
     m_finishButtonRef.requestDeactivated();
 }
 
-void Board::onShowMatchedCard(Card* _card)
+Card* Board::drawCard(bool _fromDeck)
 {
-    m_matchedCardPtr = _card;
+    if (_fromDeck)
+        m_drawnCardPtr = getNextCardFromDeck();
+    else
+        m_drawnCardPtr = getLastCardFromDiscard();
+
+    return m_drawnCardPtr;
 }
 
-void Board::onHideMatchedCard(bool _discard)
+void Board::preDiscardCard(Card* _card)
 {
-    if (_discard)
-        discardCard(m_matchedCardPtr);
+    m_cardsToDiscard.push_back(_card);
+}
+
+void Board::discardCard(Card* _card)
+{
+    m_cardsToDiscard.erase(
+        std::remove_if(m_cardsToDiscard.begin(), m_cardsToDiscard.end(),
+            [_card](Card* _preCard){ return _preCard->getId() == _card->getId(); }),
+        m_cardsToDiscard.end()
+    );
+
+    if (!m_discard.empty() && m_discard.back()->isActivated())
+    {
+        m_discard.back()->hide();
+        m_discard.back()->requestDeactivated();
+    }
+    _card->show(true);
+    m_discard.push_back(_card);
 }
 
 void Board::fillNotificationQueue(const std::string& _message)
@@ -250,7 +346,7 @@ void Board::changeStep(PlayerId _playerId, StepId _nextStepId, std::unique_ptr<S
         _step = std::make_unique<step::Finish>(*this, _playerId);
         break;
     case StepId::MatchCard:
-        _step = std::make_unique<step::MatchCard>(*this, _playerId);
+        _step = std::make_unique<step::MatchCard>(*this, _playerId, *m_drawnCardPtr);
         break;
     case StepId::SeeOwnCard:
         _step = std::make_unique<step::SeeCard>(*this, _playerId, true);
@@ -265,7 +361,7 @@ void Board::changeStep(PlayerId _playerId, StepId _nextStepId, std::unique_ptr<S
         _step = std::make_unique<step::SwapCard>(*this, _playerId, true);
         break;
     case StepId::TakeCard:
-        _step = std::make_unique<step::TakeCard>(*this, _playerId);
+        _step = std::make_unique<step::TakeCard>(*this, _playerId, *m_drawnCardPtr);
         break;
     default:
         break;
@@ -273,18 +369,18 @@ void Board::changeStep(PlayerId _playerId, StepId _nextStepId, std::unique_ptr<S
     CN_LOG_FRM("Set step {}, player {}", (unsigned)_nextStepId, (unsigned)_playerId);
 }
 
-Card* Board::getNextCard()
+Card* Board::getNextCardFromDeck()
 {
-    CN_ASSERT(!m_cards.empty());
-    Card* card = m_cards.back();
-    m_cards.pop_back();
-
-    return card;
+    return static_cast<Card*>(m_deckRef.getNextCard());
 }
 
-void Board::discardCard(Card* _card)
+Card* Board::getLastCardFromDiscard()
 {
-    ++m_numberOfDiscardCards;
+    CN_ASSERT(!m_discard.empty());
+    Card* card = m_discard.back();
+    m_discard.pop_back();
+    
+    return card;
 }
 
 } // namespace cn::client::game

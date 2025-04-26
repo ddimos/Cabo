@@ -1,6 +1,7 @@
 #pragma once
 
 #include "client/game/Card.hpp"
+#include "client/game/Deck.hpp"
 #include "client/game/Participant.hpp"
 #include "client/game/Step.hpp"
 #include "client/menu/Types.hpp"
@@ -15,6 +16,7 @@
 
 #include <SFML/System/Time.hpp>
 
+#include <deque>
 #include <memory>
 #include <vector>
 #include <unordered_map>
@@ -28,9 +30,9 @@ public:
     using DecideActionButtons = std::vector<client::menu::item::Button*>;
     using DecideSwapButtons = std::vector<client::menu::item::Button*>;
 
-    Board(const core::Context& _context, std::vector<game::Participant*>&& _participants, std::vector<Card*>&& _cards, 
+    Board(const core::Context& _context, std::vector<game::Participant*>&& _participants, Deck& _deck, 
           menu::item::NotificationQueue& _queue, menu::item::Button& _finishButton,
-          DecideActionButtons&& _decideButtons, DecideSwapButtons&& _decideSwapButtons);
+          DecideActionButtons&& _decideButtons, DecideSwapButtons&& _decideSwapButtons, CardPositions _cardPositions);
 
     void registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered);
     void update(sf::Time _dt);
@@ -39,30 +41,36 @@ public:
     Participant* getParticipant(PlayerId _id);
     PlayerId getLocalPlayerId() const { return m_localPlayerId; }
 
-    void onParticipantStartDeciding(Card* _card);
-    void onParticipantFinishDeciding();
-    void onParticipantStartDecidingSwap();
-    void onParticipantFinishDecidingSwap();
-    void onParticipantFinishesTurn(PlayerId _id);
-    void onParticipantFinishedTurn(PlayerId _id);
+    CardPositions getCardPositions() const { return m_cardPositions; }
 
-    void onShowMatchedCard(Card* _card);
-    void onHideMatchedCard(bool _discard);
+    void showDecideActionButtons();
+    void hideDecideActionButtons();
 
+    void showDecideSwapButtons();
+    void hideDecideSwapButtons();
+    void showFinishButton();
+    void hideFinishButton();
+
+    Card* drawCard(bool _fromDeck);
     Card* getDrawnCard() const { return m_drawnCardPtr; }
+    void preDiscardCard(Card* _card);
+    void discardCard(Card* _card);
 
     void fillNotificationQueue(const std::string& _message);
 
 private:
     void changeStep(PlayerId _playerId, StepId _nextStepId, std::unique_ptr<Step> & _step);
 
-    Card* getNextCard();
-    void discardCard(Card* _card);
+    Card* getNextCardFromDeck();
+    Card* getLastCardFromDiscard();
 
     const core::Context& m_contextRef;
     
     std::vector<Participant*> m_participants;
-    std::vector<Card*> m_cards;
+    Deck& m_deckRef;
+    std::vector<Card*> m_discard;
+    std::deque<Card*> m_cardsToDiscard;
+
     menu::item::NotificationQueue& m_queueRef;
     menu::item::Button& m_finishButtonRef;
     DecideActionButtons m_decideActionButtons;
@@ -74,11 +82,11 @@ private:
 
     std::unordered_map<PlayerId, std::unique_ptr<Step>> m_steps;
 
+    CardPositions m_cardPositions;
+
     bool m_isDealt = false;
-    unsigned m_numberOfDiscardCards = 0;
 
     Card* m_drawnCardPtr;
-    Card* m_matchedCardPtr;
 };
    
 } // namespace cn::client::game

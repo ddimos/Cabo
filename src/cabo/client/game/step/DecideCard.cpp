@@ -13,24 +13,55 @@ namespace cn::client::game::step
 DecideCard::DecideCard(Board& _board, PlayerId _managedPlayerId)
     : Step(_managedPlayerId,
         {
-            {Id::WaitCard, {         
+            {Id::WaitInput, {         
                 .onEnter = [this](){
-                    // TODO start a preview animation
+                    bool local = m_boardRef.getLocalPlayerId() == getManagedPlayerId();
+                    m_boardRef.getDrawnCard()->show(local);
+                    if (local)
+                    {
+                        m_boardRef.showDecideActionButtons();
+                        m_boardRef.fillNotificationQueue("Decide the card");
+                    }
                 },
                 .onUpdate = {}
             }},
-            {Id::WaitInput, {         
+            {Id::Discard, {
                 .onEnter = [this](){
-                    m_boardRef.onParticipantStartDeciding(Card(m_rank, m_suit));
+                    Card* card = m_boardRef.getDrawnCard();
+                    if (m_button == ActionType::Discard || m_button == ActionType::Ability)
+                    {
+                        card->changeState({ 
+                            .desiredPosition = m_boardRef.getCardPositions().discardPos,
+                            .desiredRotation = 0.f,
+                            .desiredState = Card::State::InDiscard,
+                            .onFinishCallback = [](){}
+                        });
+                        m_boardRef.preDiscardCard(card);
+                    }
+                    else
+                    {
+                        requestFollowingState();
+                    }
                 },
-                .onUpdate = {}
+                .onUpdate = [this](sf::Time){
+                    if (m_button != ActionType::Discard && m_button != ActionType::Ability)
+                        return;
+
+                    Card* card = m_boardRef.getDrawnCard();
+                    if (!card->isTransiting() && card->isCardValueValid())
+                    {
+                        m_boardRef.discardCard(card);
+                        requestFollowingState();
+                    }
+                }
             }},
             {Id::Finished, {
                 .onEnter = [this](){
-                    m_boardRef.onParticipantFinishDeciding();
-                    // TODO Shouldn't I send the result of deciding
-                    events::RemotePlayerInputNetEvent event(getManagedPlayerId(), InputType::Action, m_button);
-                    m_boardRef.getContext().get<net::Manager>().send(event);
+                    if (m_boardRef.getLocalPlayerId() != getManagedPlayerId())
+                        return;
+
+                    m_boardRef.hideDecideActionButtons();
+
                 },
                 .onUpdate = {}
             }},
@@ -40,40 +71,24 @@ DecideCard::DecideCard(Board& _board, PlayerId _managedPlayerId)
 {
 }
 
-void DecideCard::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered)
+void DecideCard::processPlayerInput(InputType _inputType, InputDataVariant _data)
 {
-    if (_isBeingRegistered)
+    if (_inputType == InputType::Action)
     {
-        _dispatcher.registerEvent<events::ProvideCardNetEvent>(getListenerId(),
-            [this](const events::ProvideCardNetEvent& _event)
-            {    
-                if (getCurrentStateId() != Id::WaitCard)
-                    return;
+        if (getCurrentStateId() != Id::WaitInput)
+            return;
 
-                m_rank = _event.m_rank;
-                m_suit = _event.m_suit;
+        m_button = std::get<ActionType>(_data);
+    
+        if (m_boardRef.getLocalPlayerId() == getManagedPlayerId())
+        {
+            if (m_button == shared::game::ActionType::Ability && !m_boardRef.getDrawnCard()->hasAbility())
+                return;
 
-                requestFollowingState();
-            }
-        );
-        _dispatcher.registerEvent<events::LocalPlayerClickDecideButtonEvent>(getListenerId(),
-            [this](const events::LocalPlayerClickDecideButtonEvent& _event)
-            {    
-                if (getCurrentStateId() != Id::WaitInput)
-                    return;
-
-                if (_event.m_button == shared::game::ActionType::Ability && !Card::hasAbility(Card(m_rank, m_suit)))
-                    return;
-
-                m_button = _event.m_button;
-                requestFollowingState();
-            }
-        );
-    }
-    else
-    {
-        _dispatcher.unregisterEvent<events::ProvideCardNetEvent>(getListenerId());
-        _dispatcher.unregisterEvent<events::LocalPlayerClickDecideButtonEvent>(getListenerId());
+            events::RemotePlayerInputNetEvent event(getManagedPlayerId(), InputType::Action, m_button);
+            m_boardRef.getContext().get<net::Manager>().send(event);
+        }
+        requestFollowingState();
     }
 }
 
@@ -84,7 +99,7 @@ bool DecideCard::isFinished() const
 
 StepId DecideCard::getNextStepId() const
 {
-    return shared::game::getNextStepId(m_button, Card::getAbility(Card(m_rank, m_suit)));
+    return shared::game::getNextStepId(m_button, m_boardRef.getDrawnCard()->getAbility());
 }
 
 } // namespace cn::client::game::step

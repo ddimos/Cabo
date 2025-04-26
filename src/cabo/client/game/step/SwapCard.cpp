@@ -1,7 +1,6 @@
 #include "client/game/step/SwapCard.hpp"
 #include "client/game/Participant.hpp"
 
-#include "shared/events/GameEvents.hpp"
 #include "shared/events/NetworkEvents.hpp"
 
 #include "shared/net/Manager.hpp"
@@ -12,44 +11,66 @@ namespace cn::client::game::step
 SwapCard::SwapCard(Board& _board, PlayerId _managedPlayerId, bool _seeCard)
     : Step(_managedPlayerId,
         {
-            {Id::WaitClickSomeonesSlot, {}},
-            {Id::ClickedSomeonesSlot, {
+            {Id::WaitClickSomeonesSlot, {
                 .onEnter = [this](){
-                    events::RemotePlayerInputNetEvent event(getManagedPlayerId(), InputType::ClickSlot, ClickSlotInputData{m_slotId, m_slotOwnerId});
-                    m_boardRef.getContext().get<net::Manager>().send(event);
-                    
-                    if (m_seeCard)
-                    {
-                        auto* owner = m_boardRef.getParticipant(m_slotOwnerId);
-                        owner->onStartShowingOwnCardInSlot(m_slotId); // hide card in slot
-                    }
-                    else
-                    {
-                        requestState(Id::WaitClickOwnSlot);
-                    }
+                    if (m_boardRef.getLocalPlayerId() == getManagedPlayerId())
+                        m_boardRef.fillNotificationQueue("You can pick any card except yours");
                 },
                 .onUpdate = {}
             }},
+            {Id::ClickedSomeonesSlot, {
+                .onEnter = [this](){
+                    const auto* viewer = m_boardRef.getParticipant(getManagedPlayerId());
+                    const auto* owner = m_boardRef.getParticipant(m_ownerId);
+                    const auto& slot = owner->getSlot(m_ownerSlotId);
+                    m_takenCardPtr = slot.cardPtr;
+
+                    m_takenCardPtr->changeState({ 
+                        .desiredPosition = viewer->getOpenCardPosition(),
+                        .desiredRotation = viewer->getOpenCardRotation(),
+                        .desiredState = Card::State::Viewed,
+                        .onFinishCallback = [](){}
+                    });
+                },
+                .onUpdate = [this](sf::Time){
+                    if ((m_takenCardPtr->isCardValueValid() || m_boardRef.getLocalPlayerId() != getManagedPlayerId() || !m_seeCard) && !m_takenCardPtr->isTransiting())
+                    {
+                        if (m_seeCard)
+                            requestFollowingState();
+                        else
+                            requestState(Id::WaitClickOwnSlot);
+                    }
+                }
+            }},
             {Id::DecideSwap, {
                 .onEnter = [this](){
-                    auto* participant = m_boardRef.getParticipant(getManagedPlayerId());
-                    participant->onStartShowingCard(Card(m_rank, m_suit));
-                    
-                    m_boardRef.onParticipantStartDecidingSwap();
+                    m_takenCardPtr->show(m_boardRef.getLocalPlayerId() == getManagedPlayerId());
+
+                    if (m_boardRef.getLocalPlayerId() == getManagedPlayerId())
+                        m_boardRef.showDecideSwapButtons();
                 },
                 .onUpdate = {}
             }},
             {Id::FinishDecidingSwap, {
                 .onEnter = [this](){
-                    events::RemotePlayerInputNetEvent event(getManagedPlayerId(), InputType::SwapDecision, m_isCardSwapped);
-                    m_boardRef.getContext().get<net::Manager>().send(event);
-
-                    m_boardRef.onParticipantFinishDecidingSwap();
+                    if (m_boardRef.getLocalPlayerId() == getManagedPlayerId())
+                        m_boardRef.hideDecideSwapButtons();
 
                     if (m_isCardSwapped)
                         requestFollowingState();
                     else
-                        requestState(Id::Finished);
+                    {
+                        const auto* owner = m_boardRef.getParticipant(m_ownerId);
+                        const auto& slot = owner->getSlot(m_ownerSlotId);
+
+                        m_takenCardPtr->changeState({ 
+                            .desiredPosition = slot.position,
+                            .desiredRotation = slot.rotation,
+                            .desiredState = Card::State::InHand,
+                            .onFinishCallback = [](){}
+                        });
+                        requestState(Id::SwapOrReturn);
+                    }
                 },
                 .onUpdate = {}
             }},
@@ -59,94 +80,102 @@ SwapCard::SwapCard(Board& _board, PlayerId _managedPlayerId, bool _seeCard)
             }},
             {Id::ClickedOwnSlot, {
                 .onEnter = [this](){
-                    events::RemotePlayerInputNetEvent event(getManagedPlayerId(), InputType::ClickSlot, ClickSlotInputData{m_ownSlotId, getManagedPlayerId()});
-                    m_boardRef.getContext().get<net::Manager>().send(event);
+                    auto* owner = m_boardRef.getParticipant(m_ownerId);
+                    auto& ownerSlot = owner->getSlot(m_ownerSlotId);
+                    auto* viewer = m_boardRef.getParticipant(getManagedPlayerId());
+                    auto& viewerSlot = viewer->getSlot(m_viewerSlotId);
+
+                    m_takenCardPtr->changeState({ 
+                        .desiredPosition = viewerSlot.position,
+                        .desiredRotation = viewerSlot.rotation,
+                        .desiredState = Card::State::InHand,
+                        .onFinishCallback = [](){}
+                    });
+
+                    m_returnedCardPtr = viewerSlot.cardPtr;
+                    viewerSlot.cardPtr = m_takenCardPtr;
+
+                    m_returnedCardPtr->changeState({
+                        .desiredPosition = ownerSlot.position,
+                        .desiredRotation = ownerSlot.rotation,
+                        .desiredState = Card::State::InHand,
+                        .onFinishCallback = [](){}
+                    });
+                    ownerSlot.cardPtr = m_returnedCardPtr;
 
                     requestFollowingState();
                 },
                 .onUpdate = {}
             }},
-            {Id::Swap, {
+            {Id::SwapOrReturn, {
                 .onEnter = [this](){
-                    // TODO Swap animation
-                    requestFollowingState();
+                    m_takenCardPtr->hide();
                 },
-            }},
-            {Id::Finished, {
-                .onEnter = [this](){
-                    if (m_seeCard)
+                .onUpdate = [this](sf::Time){
+                    if (!m_takenCardPtr->isTransiting() && (m_returnedCardPtr == nullptr || !m_returnedCardPtr->isTransiting()))
                     {
-                        auto* owner = m_boardRef.getParticipant(m_slotOwnerId);
-                        owner->onFinishShowingOwnCardInSlot(m_slotId);
-                        
-                        auto* participant = m_boardRef.getParticipant(getManagedPlayerId());
-                        participant->onFinishShowingCard();
+                        requestFollowingState();
                     }
-                },
-                .onUpdate = {}
+                }
             }},
+            {Id::Finished, {}},
         })
     , m_boardRef(_board)
     , m_seeCard(_seeCard)
 {
 }
 
-void SwapCard::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered)
+void SwapCard::processPlayerInput(InputType _inputType, InputDataVariant _data)
 {
-    if (_isBeingRegistered)
+    if (_inputType == InputType::ClickSlot)
     {
-        _dispatcher.registerEvent<events::LocalPlayerClickSlotEvent>(getListenerId(),
-            [this](const events::LocalPlayerClickSlotEvent& _event)
+        auto dataStruct = std::get<ClickSlotInputData>(_data);
+        if (getCurrentStateId() == Id::WaitClickSomeonesSlot)
+        {
+            if (dataStruct.playerId == getManagedPlayerId()) // TODO give feedback to the player
+                return;
+
+            m_ownerSlotId = dataStruct.slotId;
+            m_ownerId = dataStruct.playerId;
+
+            if (m_boardRef.getLocalPlayerId() == getManagedPlayerId())
             {
-                if (getCurrentStateId() == Id::WaitClickSomeonesSlot)
-                {
-                    if (_event.slotOwnerId == getManagedPlayerId()) // TODO give feedback to the player
-                       return;
-
-                    m_slotId = _event.slotId;
-                    m_slotOwnerId = _event.slotOwnerId;
-                }
-                else if (getCurrentStateId() == Id::WaitClickOwnSlot)
-                {
-                    if (_event.slotOwnerId != getManagedPlayerId()) // TODO give feedback to the player
-                        return;
-                    m_ownSlotId = _event.slotId;
-                }
-                else
-                {
-                    return;
-                }
-
-                requestFollowingState();
+                events::RemotePlayerInputNetEvent event(getManagedPlayerId(), InputType::ClickSlot, ClickSlotInputData{m_ownerSlotId, m_ownerId});
+                m_boardRef.getContext().get<net::Manager>().send(event);
             }
-        );
-        _dispatcher.registerEvent<events::ProvideCardNetEvent>(getListenerId(),
-            [this](const events::ProvideCardNetEvent& _event)
-            {    
-                if (getCurrentStateId() != Id::ClickedSomeonesSlot)
-                    return;
 
-                requestFollowingState();
-                m_rank = _event.m_rank;
-                m_suit = _event.m_suit;
-            }
-        );
-        _dispatcher.registerEvent<events::LocalPlayerClickDecideSwapButtonEvent>(getListenerId(),
-            [this](const events::LocalPlayerClickDecideSwapButtonEvent& _event)
-            {    
-                if (getCurrentStateId() != Id::DecideSwap)
-                    return;
+            requestFollowingState();
+        }
+        else if (getCurrentStateId() == Id::WaitClickOwnSlot)
+        {
+            if (dataStruct.playerId != getManagedPlayerId()) // TODO give feedback to the player
+                return;
 
-                m_isCardSwapped = _event.m_swap;
-                requestFollowingState();
+            m_viewerSlotId = dataStruct.slotId;
+
+            if (m_boardRef.getLocalPlayerId() == getManagedPlayerId())
+            {
+                events::RemotePlayerInputNetEvent event(getManagedPlayerId(), InputType::ClickSlot, ClickSlotInputData{m_viewerSlotId, getManagedPlayerId()});
+                m_boardRef.getContext().get<net::Manager>().send(event);
             }
-        );
+
+            requestFollowingState();
+        }
     }
-    else
+    else if (_inputType == InputType::SwapDecision)
     {
-        _dispatcher.unregisterEvent<events::LocalPlayerClickSlotEvent>(getListenerId());
-        _dispatcher.unregisterEvent<events::ProvideCardNetEvent>(getListenerId());
-        _dispatcher.unregisterEvent<events::LocalPlayerClickDecideSwapButtonEvent>(getListenerId());
+        if (getCurrentStateId() != Id::DecideSwap)
+            return;
+
+        m_isCardSwapped = std::get<bool>(_data);
+
+        if (m_boardRef.getLocalPlayerId() == getManagedPlayerId())
+        {
+            events::RemotePlayerInputNetEvent event(getManagedPlayerId(), InputType::SwapDecision, m_isCardSwapped);
+            m_boardRef.getContext().get<net::Manager>().send(event);
+        }
+
+        requestFollowingState();
     }
 }
 

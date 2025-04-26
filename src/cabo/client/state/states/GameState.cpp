@@ -8,6 +8,7 @@
 #include "client/player/Manager.hpp"
 
 #include "client/game/Card.hpp"
+#include "client/game/Deck.hpp"
 #include "client/game/Participant.hpp"
 #include "client/game/SpriteSheet.hpp"
 #include "client/game/Table.hpp"
@@ -17,6 +18,7 @@
 
 #include "shared/events/GameEvents.hpp"
 #include "shared/events/InputEvents.hpp"
+#include "shared/Types.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>
 
@@ -40,21 +42,41 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
     auto& eventDispatcherRef = getContext().get<core::event::Dispatcher>();
     auto& playerManagerRef = getContext().get<player::Manager>();
 
-
     auto table = std::make_shared<game::Table>(getContext());
     getContainer(core::object::Container::Type::Game).add(table);
+
+    std::vector<shared::game::Card*> cards;
+    {
+        auto pos = menu::Position{
+            .m_position = sf::Vector2f(75.f, 0.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
+            .m_specPositionX = menu::Position::Special::OFFSET_FROM_CENTER, .m_specPositionY = menu::Position::Special::CENTER_ALLIGNED
+        };
+
+        unsigned short deckSize = shared::game::StandartDeckSize;
+        cards.reserve(deckSize);
+        for (unsigned short i = 0; i < deckSize; ++i)
+        {
+            auto cardPair = game::Card::getCardFromIndex(i);
+            auto card = std::make_shared<game::Card>(getContext(), pos.calculateGlobalPos());
+            card->setId(game::CardId(static_cast<uint8_t>(i)));
+            getContainer(core::object::Container::Type::Game).add(card);
+            cards.push_back(card.get());
+        }
+    }
+    auto deck = std::make_shared<game::Deck>(
+        std::move(cards), getContext().get<shared::Seed>().seed
+    );
+    getContainer(core::object::Container::Type::Game).add(deck);
+
+
     auto spawnPoints = table->generateSpawnPoints(playerManagerRef.getPlayers().size(), sf::Vector2f(windowRef.getSize()) / 2.f);
     
     std::vector<game::Participant*> participants;
     {
-        const auto& players = playerManagerRef.getPlayers();
-        size_t playerIndex = playerManagerRef.getIndexOfLocalPlayer();
-        size_t countLeft = players.size();
-        size_t index = 0;
-        do
-        {
-            const cn::Player& player = players[playerIndex];
+        size_t index = playerManagerRef.getIndexOfLocalPlayer();
 
+        for (const auto& player : playerManagerRef.getPlayers())
+        {
             auto playerId = player.id;
             unsigned short numberOfSlots = shared::game::MaxNumberOfParticipantSlots;
             std::vector<game::ParticipantSlot> slots;
@@ -65,8 +87,8 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
                 auto slotButton = std::make_shared<menu::item::Button>(
                     menu::Position{},
                     textureHolderRef.get(TextureIds::Cards),
-                    game::spriteSheet::getCardBackTextureRect(),// todo button image
-                    game::spriteSheet::getCardBackTextureRect(game::spriteSheet::Hover::Yes),
+                    game::spriteSheet::getDiscardTextureRect(),
+                    game::spriteSheet::getDiscardTextureRect(game::spriteSheet::Hover::Yes),
                     [this, slotId, playerId](){
                         auto& eventDispatcherRef = getContext().get<core::event::Dispatcher>();
                         eventDispatcherRef.send<events::LocalPlayerClickSlotEvent>(slotId, playerId);
@@ -74,28 +96,24 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
                     sf::Mouse::Button::Left
                 );
                 slotButton->setActivationOption(core::object::Object::ActivationOption::Manually);
-
+                
                 getContainer(core::object::Container::Type::Menu).add(slotButton);
 
                 slots.emplace_back(game::ParticipantSlot{ slotId, false, nullptr, *slotButton, {} });
             }
-
+            
             auto participant = std::make_shared<game::Participant>(
                 getContext(), playerId, true, std::move(slots), shared::game::DefaultInitNumberOfParticipantSlots
             );
             participant->setSpawnPoint(spawnPoints[index]);
             getContainer(core::object::Container::Type::Game).add(participant);
-
+            
             participants.push_back(participant.get());
 
-            playerIndex++;
-            if (playerIndex >= players.size())
-                playerIndex = 0;
-            
             index++;
-            countLeft--;
+            if (index >= spawnPoints.size())
+                index = 0;
         }
-        while (countLeft != 0);
     }
 
     auto deckButton = std::make_shared<menu::item::Button>(
@@ -113,11 +131,12 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
     );
     getContainer(core::object::Container::Type::Menu).add(deckButton);
 
+    menu::Position discardPos = menu::Position{
+        .m_position = sf::Vector2f(-75.f, 0.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
+        .m_specPositionX = menu::Position::Special::OFFSET_FROM_CENTER, .m_specPositionY = menu::Position::Special::CENTER_ALLIGNED
+    };
     auto discardButton = std::make_shared<menu::item::Button>(
-        menu::Position{
-            .m_position = sf::Vector2f(-75.f, 0.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
-            .m_specPositionX = menu::Position::Special::OFFSET_FROM_CENTER, .m_specPositionY = menu::Position::Special::CENTER_ALLIGNED
-        },
+        discardPos,
         textureHolderRef.get(TextureIds::Cards),
         game::spriteSheet::getDiscardTextureRect(),
         game::spriteSheet::getDiscardTextureRect(game::spriteSheet::Hover::Yes),
@@ -127,24 +146,6 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
         sf::Mouse::Button::Left
     );
     getContainer(core::object::Container::Type::Menu).add(discardButton);
-    
-    std::vector<game::Card*> cards;
-    {
-        auto pos = menu::Position{
-            .m_position = sf::Vector2f(75.f, 0.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
-            .m_specPositionX = menu::Position::Special::OFFSET_FROM_CENTER, .m_specPositionY = menu::Position::Special::CENTER_ALLIGNED
-        };
-
-        unsigned short deckSize = shared::game::StandartDeckSize;
-        cards.reserve(deckSize);
-        for (unsigned short i = 0; i < deckSize; ++i)
-        {
-            auto cardPair = game::Card::getCardFromIndex(i);
-            auto card = std::make_shared<game::Card>(getContext(), pos.calculateGlobalPos());
-            getContainer(core::object::Container::Type::Game).add(card);
-            cards.push_back(card.get());
-        }
-    }
 
     auto finishButton = std::make_shared<menu::item::Button>(
         menu::Position{
@@ -298,8 +299,12 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
     getContainer(core::object::Container::Type::Menu).add(queue);
 
     m_board = std::make_unique<game::Board>(
-        getContext(), std::move(participants), std::move(cards), *queue, *finishButton,
-        std::move(decideActionButtons), std::move(decideSwapButtons)
+        getContext(), std::move(participants), *deck, *queue, *finishButton,
+        std::move(decideActionButtons), std::move(decideSwapButtons), 
+        game::CardPositions{ 
+            .discardPos = discardPos.calculateGlobalPos(),
+            .firstMatchPos = discardPos.calculateGlobalPos() + sf::Vector2f(-80.f, 0.f)
+        }
     );
 
     m_listenerId = core::event::getNewListenerId();

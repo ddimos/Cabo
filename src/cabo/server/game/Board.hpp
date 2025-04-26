@@ -63,6 +63,7 @@ private:
     void processTakeCardStep(const events::RemotePlayerInputNetEvent& _event, BoardParticipant& _participant);
 
     void discardCard(Card* _card);
+    Card* getNextCardFromDeck();
 
     const core::Context& m_contextRef;
     core::event::ListenerId m_listenerId = core::event::ListenerIdInvalid;

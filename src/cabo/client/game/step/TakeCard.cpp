@@ -1,7 +1,6 @@
 #include "client/game/step/TakeCard.hpp"
 #include "client/game/Participant.hpp"
 
-#include "shared/events/GameEvents.hpp"
 #include "shared/events/NetworkEvents.hpp"
 
 #include "shared/net/Manager.hpp"
@@ -9,46 +8,74 @@
 namespace cn::client::game::step
 {
 
-TakeCard::TakeCard(Board& _board, PlayerId _managedPlayerId)
+TakeCard::TakeCard(Board& _board, PlayerId _managedPlayerId, Card& _takenCard)
     : Step(_managedPlayerId,
         {
-            {Id::WaitInput, {}},
-            // TODO {Id::StartAnimation, {}} 
+            {Id::WaitInput, {
+                .onEnter = [this](){
+                    if (m_boardRef.getLocalPlayerId() == getManagedPlayerId())
+                        m_boardRef.fillNotificationQueue("You can pick any of your card");
+                },
+                .onUpdate = {}
+            }},
+            {Id::Take, {
+                .onEnter = [this](){
+                    auto* owner = m_boardRef.getParticipant(getManagedPlayerId());
+                    const auto& slot = static_cast<const Participant*>(owner)->getSlot(m_slotId);
+    
+                    m_takenCardRef.hide();
+                    m_takenCardRef.changeState({
+                        .desiredPosition = slot.position,
+                        .desiredRotation = slot.rotation,
+                        .desiredState = Card::State::InHand,
+                        .onFinishCallback = [](){}
+                    });
+                    m_discardedCardPtr = owner->replaceCardInSlot(m_slotId, &m_takenCardRef);
+
+                    m_discardedCardPtr->changeState({ 
+                        .desiredPosition = m_boardRef.getCardPositions().discardPos,
+                        .desiredRotation = 0.f,
+                        .desiredState = Card::State::InDiscard,
+                        .onFinishCallback = [](){}
+                    });
+                    m_boardRef.preDiscardCard(m_discardedCardPtr);
+                },
+                .onUpdate = [this](sf::Time){
+                    if (!m_takenCardRef.isTransiting() && !m_discardedCardPtr->isTransiting())
+                        requestFollowingState();
+                }
+            }},
             {Id::Finished, {
                 .onEnter = [this](){
-                    auto* participant = m_boardRef.getParticipant(getManagedPlayerId());
-                    participant->onProvideCardInSlot(m_slotId, m_boardRef.getDrawnCard());
-
-                    events::RemotePlayerInputNetEvent event(getManagedPlayerId(), InputType::ClickSlot, ClickSlotInputData{m_slotId, getManagedPlayerId()});
-                    m_boardRef.getContext().get<net::Manager>().send(event);
+                    m_boardRef.discardCard(m_discardedCardPtr);
                 },
                 .onUpdate = {}
             }},
         })
     , m_boardRef(_board)
+    , m_takenCardRef(_takenCard)
 {
 }
 
-void TakeCard::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered)
+void TakeCard::processPlayerInput(InputType _inputType, InputDataVariant _data)
 {
-    if (_isBeingRegistered)
+    if (_inputType == InputType::ClickSlot)
     {
-        _dispatcher.registerEvent<events::LocalPlayerClickSlotEvent>(getListenerId(),
-            [this](const events::LocalPlayerClickSlotEvent& _event)
-            {
-                if (getCurrentStateId() != Id::WaitInput)
-                    return;
-                if (_event.slotOwnerId != getManagedPlayerId()) // TODO give feedback to the player
-                    return;
+        if (getCurrentStateId() != Id::WaitInput)
+            return;
 
-                requestFollowingState();
-                m_slotId = _event.slotId;
-            }
-        );
-    }
-    else
-    {
-        _dispatcher.unregisterEvent<events::LocalPlayerClickSlotEvent>(getListenerId());
+        auto dataStruct = std::get<ClickSlotInputData>(_data);
+        if (dataStruct.playerId != getManagedPlayerId()) // TODO give feedback to the player
+            return;
+        
+        requestFollowingState();
+        m_slotId = dataStruct.slotId;
+
+        if (m_boardRef.getLocalPlayerId() == getManagedPlayerId())
+        {
+            events::RemotePlayerInputNetEvent event(getManagedPlayerId(), InputType::ClickSlot, ClickSlotInputData{m_slotId, getManagedPlayerId()});
+            m_boardRef.getContext().get<net::Manager>().send(event);
+        }
     }
 }
 

@@ -13,7 +13,7 @@ enum class StepId : uint8_t
     FinishTurn,
     Idle,
     MatchCard,
-    SeeOwnCard, // ? SeeCardInSlot
+    SeeOwnCard,
     SeeSomeonesCard,
     SwapCardBlindly,
     SwapCardOpenly,

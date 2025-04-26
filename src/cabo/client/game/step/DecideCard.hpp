@@ -13,14 +13,14 @@ public:
     DecideCard(Board& _board, PlayerId _managedPlayerId);
 
 private:
-    void registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered) override;
+    void processPlayerInput(InputType _inputType, InputDataVariant _data) override;
     bool isFinished() const override;
     StepId getNextStepId() const override;
 
     enum Id : Step::StateId
     {
-        WaitCard,
         WaitInput,
+        Discard,
         Finished
     };
 

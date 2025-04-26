@@ -65,4 +65,21 @@ Card* Participant::replace(ParticipantSlotId _id, Card* _card)
     return prevCard;
 }
 
+void Participant::visitSlots(std::function<void(ParticipantSlot&)> _visitor)
+{
+    unsigned short slotLeft = m_currentNumberOfSlots;
+    // Visit only active slots
+    for (auto& slot : m_slots)
+    {
+        if (slot.wasRemoved)
+            continue;
+        
+        _visitor(slot);
+
+        --slotLeft;
+        if (slotLeft == 0)
+            break;
+    }
+}
+
 } // namespace cn::server::game

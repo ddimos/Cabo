@@ -13,7 +13,7 @@ public:
     SwapCard(Board& _board, PlayerId _managedPlayerId, bool _seeCard);
 
 private:
-    void registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered) override;
+    void processPlayerInput(InputType _inputType, InputDataVariant _data) override;
     bool isFinished() const override;
     StepId getNextStepId() const override;
     
@@ -25,19 +25,19 @@ private:
         FinishDecidingSwap,
         WaitClickOwnSlot,
         ClickedOwnSlot,
-        Swap,
+        SwapOrReturn,
         Finished
     };
 
     Board& m_boardRef;
     const bool m_seeCard = true;
 
-    ParticipantSlotId m_slotId = shared::game::ParticipantSlotIdInvalid;
-    PlayerId m_slotOwnerId = PlayerIdInvalid;
-    ParticipantSlotId m_ownSlotId = shared::game::ParticipantSlotIdInvalid;
+    ParticipantSlotId m_ownerSlotId = shared::game::ParticipantSlotIdInvalid;
+    PlayerId m_ownerId = PlayerIdInvalid;
+    ParticipantSlotId m_viewerSlotId = shared::game::ParticipantSlotIdInvalid;
 
-    Card::Rank m_rank;
-    Card::Suit m_suit;
+    Card* m_takenCardPtr = nullptr;
+    Card* m_returnedCardPtr = nullptr;
 
     bool m_isCardSwapped = false;
 };

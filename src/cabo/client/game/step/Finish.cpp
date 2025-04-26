@@ -1,7 +1,6 @@
 #include "client/game/step/Finish.hpp"
 #include "client/game/Participant.hpp"
 
-#include "shared/events/GameEvents.hpp"
 #include "shared/events/NetworkEvents.hpp"
 
 #include "shared/net/Manager.hpp"
@@ -9,22 +8,28 @@
 namespace cn::client::game::step
 {
 
-
 Finish::Finish(Board& _board, PlayerId _managedPlayerId)
     : Step(_managedPlayerId,
         {
             {Id::WaitInput, {
-                .onEnter = [this](){                    
-                    m_boardRef.onParticipantFinishesTurn(getManagedPlayerId());
+                .onEnter = [this](){
+                    if (m_boardRef.getLocalPlayerId() != getManagedPlayerId())
+                        return;
+
+                    m_boardRef.fillNotificationQueue("Finish or cabo");
+                    m_boardRef.showFinishButton();
                 },
                 .onUpdate = {}
             }},
             {Id::Finished, {            
-                .onEnter = [this](){                    
+                .onEnter = [this](){            
+                    if (m_boardRef.getLocalPlayerId() != getManagedPlayerId())
+                        return;     
+
                     events::RemotePlayerInputNetEvent event(getManagedPlayerId(), InputType::Finish);
                     m_boardRef.getContext().get<net::Manager>().send(event);
 
-                    m_boardRef.onParticipantFinishedTurn(getManagedPlayerId());
+                    m_boardRef.hideFinishButton();
                 },
                 .onUpdate = {}
             }}
@@ -34,24 +39,13 @@ Finish::Finish(Board& _board, PlayerId _managedPlayerId)
 {
 }
 
-void Finish::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered)
+void Finish::processPlayerInput(InputType _inputType, InputDataVariant _data)
 {
-    if (_isBeingRegistered)
+    if (_inputType == InputType::Finish)
     {
-        _dispatcher.registerEvent<events::LocalPlayerClickFinishButtonEvent>(getListenerId(),
-            [this](const events::LocalPlayerClickFinishButtonEvent& _event)
-            {    
-                if (getCurrentStateId() != Id::WaitInput)
-                    return;
-                requestFollowingState();
-            }
-        );
-
-        // TODO cabo button
-    }
-    else
-    {
-        _dispatcher.unregisterEvent<events::LocalPlayerClickFinishButtonEvent>(getListenerId());
+        if (getCurrentStateId() != Id::WaitInput)
+            return;
+        requestFollowingState();
     }
 }
 

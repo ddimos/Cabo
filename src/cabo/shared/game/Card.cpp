@@ -37,12 +37,12 @@ std::pair<Card::Rank, Card::Suit> Card::getCardFromIndex(unsigned _index)
     return std::make_pair(static_cast<Rank>(rank), static_cast<Suit>(suit));
 }
 
-bool Card::hasAbility(Card _card)
+bool Card::hasAbility(const Card& _card)
 {
     return getAbility(_card) != Ability::None;
 }
 
-Card::Ability Card::getAbility(Card _card)
+Card::Ability Card::getAbility(const Card& _card)
 {
     if (_card.m_rank == Rank::_7 || _card.m_rank == Rank::_8)
         return Ability::Peek;
@@ -56,14 +56,26 @@ Card::Ability Card::getAbility(Card _card)
 }
 
 Card::Card(Rank _rank, Suit _suit)
-    : m_rank(_rank), m_suit(_suit)
+    : m_rank(_rank), m_suit(_suit), m_isCardValueValid(true)
 {
+}
+
+bool Card::hasAbility() const
+{
+    return Card::hasAbility(*this);
+}
+
+Card::Ability Card::getAbility() const
+{
+    return Card::getAbility(*this);
 }
 
 void Card::set(Rank _rank, Suit _suit)
 {
     m_rank = _rank;
     m_suit = _suit;
+
+    m_isCardValueValid = true;
 }
 
 } // namespace cn::shared::game

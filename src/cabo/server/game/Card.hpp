@@ -5,8 +5,10 @@
 
 namespace cn::server::game
 {
-// Make the card class a game object for a better lifetime management
 
+using shared::game::CardId;
+
+// Make the card class a game object for a better lifetime management
 class Card final: public core::object::Object, public shared::game::Card 
 {
 public:

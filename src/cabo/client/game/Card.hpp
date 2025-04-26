@@ -12,7 +12,8 @@
 
 namespace cn::client::game
 {
- 
+using shared::game::CardId;
+
 class Card final: public core::object::Object, public shared::game::Card 
 {
 public:
@@ -22,7 +23,7 @@ public:
         OnTable,
         InHand,
         Viewed,
-        TopInDiscard,
+        Matched,
         InDiscard,
         Transiting
     };

@@ -37,6 +37,8 @@ public:
 
     Card* replace(ParticipantSlotId _id, Card* _card);
 
+    void visitSlots(std::function<void(ParticipantSlot&)> _visitor);
+
 private:
     ParticipantSlot& getSlot(ParticipantSlotId _id);
 

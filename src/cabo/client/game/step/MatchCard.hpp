@@ -10,10 +10,10 @@ namespace cn::client::game::step
 class MatchCard : public Step
 {
 public:
-    MatchCard(Board& _board, PlayerId _managedPlayerId);
+    MatchCard(Board& _board, PlayerId _managedPlayerId, Card& _matchedCard);
 
 private:
-    void registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered) override;
+    void processPlayerInput(InputType _inputType, InputDataVariant _data) override;
     bool isFinished() const override;
     StepId getNextStepId() const override;
     
@@ -22,10 +22,13 @@ private:
         WaitInput,
         WaitServerReply,
         SeeCard,
+        ReturnCard,
         Finished
     };
 
     Board& m_boardRef;
+    Card& m_matchedCardRef;
+    Card* m_secondMatchedCardPtr;
 
     ParticipantSlotId m_slotId = shared::game::ParticipantSlotIdInvalid;
 

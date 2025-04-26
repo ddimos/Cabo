@@ -110,35 +110,14 @@ void Participant::setCardInSlot(ParticipantSlotId _id, Card::Rank _rank, Card::S
     auto& slot = getSlot(_id);
 
     slot.cardPtr->set(_rank, _suit);
-    slot.isCardValid = true;
 }
 
-void Participant::onStartShowingCard(Card _card)
+Card* Participant::replaceCardInSlot(ParticipantSlotId _id, Card* _card)
 {
-    m_openCardImageRef.setTextureRect(game::spriteSheet::getCardTextureRect(_card.getRank(), _card.getSuit()));
-    m_openCardImageRef.requestActivated();
-}
-
-void Participant::onFinishShowingCard()
-{
-    m_openCardImageRef.requestDeactivated();
-}
-
-void Participant::onStartShowingOwnCardInSlot(ParticipantSlotId _id)
-{
-    const auto& slot = getSlot(_id);
-    slot.button->requestDeactivated();
-    // TODO if card is valid - show card
-
-    // TODO start an animation
-}
-
-void Participant::onFinishShowingOwnCardInSlot(ParticipantSlotId _id)
-{
-    auto slot = getSlot(_id);
-    if (slot.wasRemoved)
-        return;
-    slot.button->requestActivated();
+    // TODO it's looks identical to the one in the server part 
+    auto* prevCard = getSlot(_id).cardPtr;
+    getSlot(_id).cardPtr = _card;
+    return prevCard;
 }
 
 void Participant::visitSlots(std::function<void(ParticipantSlot&)> _visitor)

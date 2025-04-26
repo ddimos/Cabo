@@ -14,11 +14,8 @@
 
 #include "shared/events/NetworkEvents.hpp"
 #include "shared/events/GameEvents.hpp"
-
-// #include "shared/net/Manager.hpp"
-
-
-#include <ctime>
+#include "shared/net/Manager.hpp"
+#include "shared/Types.hpp"
 
 #include "core/Log.hpp"
 
@@ -32,10 +29,10 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
 
     // auto& netManagerRef = getContext().get<net::Manager>();
     auto& playerManagerRef = getContext().get<player::Manager>();
+    unsigned seed = getContext().get<shared::Seed>().seed;
 
-    unsigned seed = static_cast<unsigned>(std::time(nullptr));
 
-    std::vector<game::Card*> cards;
+    std::vector<shared::game::Card*> cards;
     {
         unsigned short deckSize = shared::game::StandartDeckSize;
         cards.reserve(deckSize);
@@ -43,6 +40,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
         {
             auto cardPair = game::Card::getCardFromIndex(i);
             auto card = std::make_shared<game::Card>(cardPair.first, cardPair.second);
+            card->setId(game::CardId(static_cast<uint8_t>(i)));
             getContainer(core::object::Container::Type::Game).add(card);
             cards.push_back(card.get());
         }
@@ -68,7 +66,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
 
         for (game::ParticipantSlotId slotId = 0; slotId < numberOfSlots; ++slotId)
         {
-            slots.emplace_back(game::ParticipantSlot{ slotId, false, deck->getNextCard() });
+            slots.emplace_back(game::ParticipantSlot{ slotId, false, nullptr });
         }
         auto playerId = player.id;
         auto participant = std::make_shared<game::Participant>(

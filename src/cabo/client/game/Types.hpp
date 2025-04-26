@@ -23,11 +23,9 @@ using shared::game::ParticipantSlotId;
 struct ParticipantSlot : public shared::game::ParticipantSlot
 {
     Card* cardPtr = nullptr;
-    // menu::item::SimpleImage* cardImage = nullptr;
     menu::item::Button& buttonRef;
     sf::Vector2f position{};
     float rotation = 0.f;
-    bool isCardValid = false;
 };
 
 using shared::game::StepId;
@@ -37,5 +35,11 @@ using shared::game::PileType;
 using shared::game::InputType;
 using shared::game::ClickSlotInputData;
 using shared::game::InputDataVariant;
+
+struct CardPositions
+{
+    sf::Vector2f discardPos{};
+    sf::Vector2f firstMatchPos{};
+};
 
 } // namespace cn::client::game

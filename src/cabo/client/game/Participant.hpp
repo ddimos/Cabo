@@ -37,21 +37,15 @@ public:
     void removeSlot(ParticipantSlotId _id);
 
     void setCardInSlot(ParticipantSlotId _id, Card::Rank _rank, Card::Suit _suit); 
-
-    // These methods called on the viewer of the card
-    void onStartShowingCard(Card _card);
-    void onFinishShowingCard();
-    // These methods called on the owner of the card 
-    void onStartShowingOwnCardInSlot(ParticipantSlotId _id);
-    void onFinishShowingOwnCardInSlot(ParticipantSlotId _id);
+    Card* replaceCardInSlot(ParticipantSlotId _id, Card* _card);
 
     const ParticipantSlot& getSlot(ParticipantSlotId _id) const;
+    ParticipantSlot& getSlot(ParticipantSlotId _id);
     void visitSlots(std::function<void(ParticipantSlot&)> _visitor);
 
 private:
     void onDraw(sf::RenderWindow& _window) override;
 
-    ParticipantSlot& getSlot(ParticipantSlotId _id);
 
     sf::Text m_nameText; // TODO simpleText
 
