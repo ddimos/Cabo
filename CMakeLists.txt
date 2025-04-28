@@ -1,19 +1,22 @@
 cmake_minimum_required(VERSION 3.24)
 project(Cabo VERSION 0.1.0)
 
-find_package(SFML 2.6 COMPONENTS graphics system window network REQUIRED)
 
 include(FetchContent)
 
-# FetchContent_Declare(SFML
-#     GIT_REPOSITORY https://github.com/SFML/SFML.git
-#     GIT_TAG 2.6.x)
-# FetchContent_MakeAvailable(SFML)
+FetchContent_Declare(SFML
+    GIT_REPOSITORY https://github.com/SFML/SFML.git
+    GIT_TAG 2.6.x)
+FetchContent_MakeAvailable(SFML)
+
+#find_package(SFML 2.6 COMPONENTS graphics system window network REQUIRED)
+
 
 FetchContent_Declare(nsf
     GIT_REPOSITORY https://github.com/ddimos/nsf.git
-    GIT_TAG v0.2.0)
+    GIT_TAG v0.2.1)
 
+option(NSF_FIND_SFML "Use find_package to find SFML" OFF)
 option(NSF_BUILD_EXAMPLE "Build the nsf example" OFF)
 FetchContent_MakeAvailable(nsf)
 
