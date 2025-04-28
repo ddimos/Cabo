@@ -9,62 +9,64 @@
 namespace cn::core
 {
 
-using ContextObjectId = uint8_t;
-
-template <typename TObject> 
-ContextObjectId getContextObjectId()
+class Context final
 {
-    // TODO a way to use the static assert without including the header with specializations.
-    // I don't want to include "game" files to the core
-    CN_ASSERT(false);
-    // static_assert(false, "getContextObjectId function should be specialized");
-    return 0;
-}
+    using ObjectId = uint8_t;
 
-class ContextObjectHolderBase
-{
-public:
-    virtual ~ContextObjectHolderBase() = default;
-};
+    template <typename TObject>
+    class IdHolder final
+    {
+    public:
+        static void assign(ObjectId _id) { m_id = _id; }
+        static ObjectId get() { return m_id; }
 
-template <typename TObject>
-class ContextObjectHolder : public ContextObjectHolderBase
-{
-public:
-    ContextObjectHolder(TObject& _objectRef)
-        : m_objectRef(_objectRef)
-    {}
-    
-    TObject& get() { return m_objectRef; }
-    const TObject& get() const { return m_objectRef; }
+    private:
+        inline static ObjectId m_id = 0;
+    };
 
-private:
-    TObject& m_objectRef;
-};
+    class ObjectHolderBase
+    {
+    public:
+        virtual ~ObjectHolderBase() = default;
+    };
 
-class Context
-{
+    template <typename TObject>
+    class ObjectHolder : public ObjectHolderBase
+    {
+    public:
+        ObjectHolder(TObject& _objectRef) : m_objectRef(_objectRef) {}
+        
+        TObject& get() { return m_objectRef; }
+        const TObject& get() const { return m_objectRef; }
+
+    private:
+        TObject& m_objectRef;
+    };
+
 public:
     template <typename TObject>
     void insert(TObject& _objectRef)
     {
-        ContextObjectId id = getContextObjectId<TObject>();
+        ObjectId id = ++m_objectIdGenerator;
+        CN_ASSERT(IdHolder<TObject>::get() == 0);
+        IdHolder<TObject>::assign(id);
         CN_ASSERT(m_map.find(id) == m_map.end());
-        [[maybe_unused]] auto [it, emplaced] = m_map.emplace(id, std::make_unique<ContextObjectHolder<TObject>>(_objectRef));
+        [[maybe_unused]] auto [it, emplaced] = m_map.emplace(id, std::make_unique<ObjectHolder<TObject>>(_objectRef));
         CN_ASSERT(emplaced);
     }
 
     template <typename TObject>
     TObject& get() const
     {
-        ContextObjectId id = getContextObjectId<TObject>();
+        ObjectId id = IdHolder<TObject>::get();
         auto it = m_map.find(id);
         CN_ASSERT(it != m_map.end());
-        return static_cast<ContextObjectHolder<TObject>&>(*(it->second)).get();
+        return static_cast<ObjectHolder<TObject>&>(*(it->second)).get();
     }
 
 private:
-    std::unordered_map<ContextObjectId, std::unique_ptr<ContextObjectHolderBase>> m_map;
+    ObjectId m_objectIdGenerator = 0;
+    std::unordered_map<ObjectId, std::unique_ptr<ObjectHolderBase>> m_map;
 };
 
 } // namespace cn::core
