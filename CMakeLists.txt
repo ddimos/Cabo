@@ -14,7 +14,7 @@ FetchContent_MakeAvailable(SFML)
 
 FetchContent_Declare(nsf
     GIT_REPOSITORY https://github.com/ddimos/nsf.git
-    GIT_TAG v0.2.1)
+    GIT_TAG v0.2.2)
 
 option(NSF_FIND_SFML "Use find_package to find SFML" OFF)
 option(NSF_BUILD_EXAMPLE "Build the nsf example" OFF)
