@@ -232,6 +232,8 @@ void Board::update(sf::Time _dt)
             }
         }
     }
+    default:
+        break;
     }
     for (auto& [id, step] : m_steps)
     {

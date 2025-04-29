@@ -26,7 +26,7 @@ void Deck::shuffle()
     uint8_t arr[5];
     for (unsigned i = 0; i < 5; ++i)
         arr[i] = m_cards[i]->getId().value();
-    CN_LOG_FRM("Cards {},{},{},{},{}", arr[0], arr[1], arr[2], arr[3], arr[4], arr[5]);
+    CN_LOG_FRM("Cards {},{},{},{},{}", arr[0], arr[1], arr[2], arr[3], arr[4]);
 #endif
 }
 
