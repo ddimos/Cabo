@@ -17,8 +17,8 @@ jobs:
         - { name: macOS,   os: macos-latest,   c_compiler: clang, cpp_compiler: clang }
         build_type: [Release]
         lib_type:
-        # - { name: Shared, flags: -DBUILD_SHARED_LIBS=TRUE  }
-        - { name: Static, flags: -DBUILD_SHARED_LIBS=FALSE }
+        - { name: Shared, flags: -DBUILD_SHARED_LIBS=TRUE  }
+        # - { name: Static, flags: -DBUILD_SHARED_LIBS=FALSE }
         launch_type: 
         - { name: Client, flags: -DLAUNCH_TARGET:STRING=Client }
         # - { name: Server, flags: -DLAUNCH_TARGET:STRING=Server }
