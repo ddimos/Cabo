@@ -41,7 +41,7 @@ MainMenuState::MainMenuState(core::state::Manager& _stateManagerRef)
 void MainMenuState::connect()
 {
     // TODO 
-    getContext().get<net::Manager>().connect(nsf::NetworkAddress(sf::IpAddress("127.0.0.1"), 20475));
+    getContext().get<net::Manager>().connect(nsf::NetworkAddress(sf::IpAddress("192.168.1.165"), 20475));
     push(states::id::Joining);
 }
 
