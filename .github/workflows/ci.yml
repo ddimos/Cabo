@@ -13,7 +13,7 @@ jobs:
       matrix:
         platform:
         - { name: Windows, os: windows-latest, c_compiler: cl,    cpp_compiler: cl      }
-        - { name: Ubuntu,  os: ubuntu-latest,  c_compiler: gcc,   cpp_compiler: gcc++   }
+        - { name: Ubuntu,  os: ubuntu-latest,  c_compiler: gcc,   cpp_compiler: g++   }
         - { name: macOS,   os: macos-latest,   c_compiler: clang, cpp_compiler: clang++ }
         build_type: [Release]
         lib_type:
