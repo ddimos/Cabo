@@ -74,7 +74,7 @@ void Board::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRe
         _dispatcher.registerEvent<events::RemotePlayerInputNetEvent>(m_listenerId,
             [this](const events::RemotePlayerInputNetEvent& _event){
                 auto it = m_steps.find(_event.m_playerId);
-                if (it != m_steps.end())
+                if (it != m_steps.end() && it->second)
                     it->second->processPlayerInput(_event.m_inputType, _event.m_data);
             }
         );
@@ -90,7 +90,7 @@ void Board::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRe
             [this](const events::LocalPlayerClickDiscardEvent& _event)
             {
                 auto it = m_steps.find(m_localPlayerId);
-                if (it != m_steps.end())
+                if (it != m_steps.end() && it->second)
                     it->second->processPlayerInput(InputType::ClickPile, PileType::Discard);
             }
         );
@@ -98,7 +98,7 @@ void Board::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRe
             [this](const events::LocalPlayerClickSlotEvent& _event)
             {
                 auto it = m_steps.find(m_localPlayerId);
-                if (it != m_steps.end())
+                if (it != m_steps.end() && it->second)
                     it->second->processPlayerInput(InputType::ClickSlot, ClickSlotInputData{_event.slotId, _event.slotOwnerId});
             }
         );
@@ -106,7 +106,7 @@ void Board::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRe
             [this](const events::LocalPlayerClickDecideButtonEvent& _event)
             {
                 auto it = m_steps.find(m_localPlayerId);
-                if (it != m_steps.end())
+                if (it != m_steps.end() && it->second)
                     it->second->processPlayerInput(InputType::Action, _event.m_button);
             }
         );
@@ -114,7 +114,7 @@ void Board::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRe
             [this](const events::LocalPlayerClickDecideSwapButtonEvent& _event)
             {
                 auto it = m_steps.find(m_localPlayerId);
-                if (it != m_steps.end())
+                if (it != m_steps.end() && it->second)
                     it->second->processPlayerInput(InputType::SwapDecision, _event.m_swap);
             }
         );
@@ -123,7 +123,7 @@ void Board::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRe
             [this](const events::LocalPlayerClickFinishButtonEvent& _event)
             {
                 auto it = m_steps.find(m_localPlayerId);
-                if (it != m_steps.end())
+                if (it != m_steps.end() && it->second)
                     it->second->processPlayerInput(InputType::Finish, std::monostate());
             }
         );
