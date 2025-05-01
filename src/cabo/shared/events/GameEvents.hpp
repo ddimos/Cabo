@@ -19,7 +19,7 @@ public:
         : m_id(_id), m_joined(_joined)
     {}
 
-    PlayerId m_id = PlayerIdInvalid;
+    PlayerId m_id{};
     bool m_joined = false;
 };
 
@@ -53,7 +53,7 @@ public:
     {}
 
     shared::game::ParticipantSlotId slotId = shared::game::ParticipantSlotIdInvalid;
-    PlayerId slotOwnerId = PlayerIdInvalid;
+    PlayerId slotOwnerId{};
 };
 
 class LocalPlayerClickDecideButtonEvent final : public core::event::Event

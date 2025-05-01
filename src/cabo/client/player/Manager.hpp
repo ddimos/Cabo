@@ -29,7 +29,7 @@ private:
 
     core::event::ListenerId m_listenerId = core::event::ListenerIdInvalid;
     std::vector<Player> m_players;
-    PlayerId m_localPlayerId = PlayerIdInvalid;
+    PlayerId m_localPlayerId{};
 };
 
 } // namespace cn::client::player

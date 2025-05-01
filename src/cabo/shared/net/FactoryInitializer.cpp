@@ -12,11 +12,13 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
         events::id::PlayerJoinAccept,
         [](const core::event::Event& _event, nsf::Buffer& _buffer){
             auto& event = static_cast<const events::PlayerJoinAcceptNetEvent&>(_event);
-            _buffer << event.m_playerId;
+            _buffer << event.m_playerId.value();
         },
         [](core::event::Event& _event, nsf::Buffer& _buffer){
             auto& event = static_cast<events::PlayerJoinAcceptNetEvent&>(_event);
-            _buffer >> event.m_playerId;
+            PlayerId::Type id = 0;
+            _buffer >> id;
+            event.m_playerId = PlayerId(id);
         },
         [](){
             return std::make_unique<events::PlayerJoinAcceptNetEvent>();
@@ -29,7 +31,7 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
             _buffer << static_cast<uint8_t>(event.m_players.size());
             for (const auto& player : event.m_players)
             {
-                _buffer << player.id;
+                _buffer << player.id.value();
                 _buffer << player.name;
             }
         },
@@ -41,7 +43,9 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
             for (uint8_t i = 0; i < size; ++i)
             {
                 Player player;
-                _buffer >> player.id;
+                PlayerId::Type id = 0;
+                _buffer >> id;
+                player.id = PlayerId(id);
                 _buffer >> player.name;
                 event.m_players.emplace_back(std::move(player));
             }
@@ -57,7 +61,7 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
             _buffer << static_cast<uint8_t>(event.m_players.size());
             for (const auto& [id, ready] : event.m_players)
             {
-                _buffer << id;
+                _buffer << id.value();
                 _buffer << ready;
             }
         },
@@ -68,11 +72,11 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
             event.m_players.reserve(size);
             for (uint8_t i = 0; i < size; ++i)
             {
-                PlayerId id;
+                PlayerId::Type id;
                 bool ready;
                 _buffer >> id;
                 _buffer >> ready;
-                event.m_players.emplace(id, ready);
+                event.m_players.emplace(PlayerId(id), ready);
             }
         },
         [](){
@@ -113,12 +117,14 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
         events::id::PlayerTurnUpdate,
         [](const core::event::Event& _event, nsf::Buffer& _buffer){
             auto& event = static_cast<const events::PlayerTurnUpdateNetEvent&>(_event);
-            _buffer << event.m_playerId;
+            _buffer << event.m_playerId.value();
             _buffer << event.m_hasTurnStarted;
         },
         [](core::event::Event& _event, nsf::Buffer& _buffer){
             auto& event = static_cast<events::PlayerTurnUpdateNetEvent&>(_event);
-            _buffer >> event.m_playerId;
+            PlayerId::Type id;
+            _buffer >> id;
+            event.m_playerId = PlayerId(id);
             _buffer >> event.m_hasTurnStarted;
         },
         [](){
@@ -129,7 +135,7 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
         events::id::RemotePlayerInput,
         [](const core::event::Event& _event, nsf::Buffer& _buffer){
             auto& event = static_cast<const events::RemotePlayerInputNetEvent&>(_event);
-            _buffer << event.m_playerId;
+            _buffer << event.m_playerId.value();
             _buffer << static_cast<uint8_t>(event.m_inputType);
 
             if (event.m_inputType == shared::game::InputType::ClickPile)
@@ -140,7 +146,7 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
             {
                 auto dataStruct = std::get<shared::game::ClickSlotInputData>(event.m_data);
                 _buffer << static_cast<uint8_t>(dataStruct.slotId);
-                _buffer << static_cast<uint8_t>(dataStruct.playerId);
+                _buffer << static_cast<uint8_t>(dataStruct.playerId.value());
             }
             else if (event.m_inputType == shared::game::InputType::Action)
             {
@@ -153,7 +159,9 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
         },
         [](core::event::Event& _event, nsf::Buffer& _buffer){
             auto& event = static_cast<events::RemotePlayerInputNetEvent&>(_event);
-            _buffer >> event.m_playerId;
+            PlayerId::Type id;
+            _buffer >> id;
+            event.m_playerId = PlayerId(id);
             uint8_t inputType = 0;
             _buffer >> inputType;
             event.m_inputType = static_cast<shared::game::InputType>(inputType);
@@ -170,7 +178,7 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
                 _buffer >> data;
                 dataStruct.slotId = data;
                 _buffer >> data;
-                dataStruct.playerId = data;
+                dataStruct.playerId = PlayerId(static_cast<PlayerId::Type>(data));
                 event.m_data = dataStruct;
             }
             else if (event.m_inputType == shared::game::InputType::Action)
@@ -256,13 +264,15 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
         events::id::PlayerSlotUpdate,
         [](const core::event::Event& _event, nsf::Buffer& _buffer){
             auto& event = static_cast<const events::PlayerSlotUpdateNetEvent&>(_event);
-            _buffer << event.m_playerId;
+            _buffer << event.m_playerId.value();
             _buffer << event.m_slotId;
             _buffer << event.m_wasAdded;
         },
         [](core::event::Event& _event, nsf::Buffer& _buffer){
             auto& event = static_cast<events::PlayerSlotUpdateNetEvent&>(_event);
-            _buffer >> event.m_playerId;
+            PlayerId::Type id;
+            _buffer >> id;
+            event.m_playerId = PlayerId(id);
             _buffer >> event.m_slotId;
             _buffer >> event.m_wasAdded;
         },

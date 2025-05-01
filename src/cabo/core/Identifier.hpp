@@ -14,6 +14,8 @@ class Identifier final
 public:
     static Identifier invalid() { return Identifier(); }
 
+    using Type = T;
+
     Identifier()
      : m_id(DefaultValue)
     {}

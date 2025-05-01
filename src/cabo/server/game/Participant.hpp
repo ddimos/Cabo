@@ -42,7 +42,7 @@ public:
 private:
     ParticipantSlot& getSlot(ParticipantSlotId _id);
 
-    PlayerId m_id = PlayerIdInvalid;
+    PlayerId m_id{};
 
     std::vector<ParticipantSlot> m_slots;
     unsigned short m_currentNumberOfSlots = 0;

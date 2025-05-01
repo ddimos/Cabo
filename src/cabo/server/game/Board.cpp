@@ -52,7 +52,7 @@ void Board::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRe
     {
         _dispatcher.registerEvent<events::RemotePlayerInputNetEvent>(m_listenerId,
             [this] (const events::RemotePlayerInputNetEvent& _event){
-                CN_LOG_FRM("Input {} from {} received", (unsigned)_event.m_inputType, (unsigned)_event.m_playerId);
+                CN_LOG_FRM("Input {} from {} received", (unsigned)_event.m_inputType, _event.m_playerId.value());
                 m_inputBuffer.emplace(_event.m_sentTimeRttBased.asMilliseconds(), _event);
             }
         );
@@ -240,7 +240,7 @@ size_t Board::getIndexOfNextParticipantTurn(size_t _currentIndex) const
 
 void Board::processInputEvent(const events::RemotePlayerInputNetEvent& _event)
 {
-    auto& participant = getBoardParticipant(_event.m_senderPeerId);
+    auto& participant = getBoardParticipant(_event.m_playerId);
     bool forwardEvent = true;
 
     switch (m_state)
@@ -363,7 +363,7 @@ void Board::processFinishTurnStep(const events::RemotePlayerInputNetEvent& _even
         CN_ASSERT(false);
         return;
     }
-    CN_ASSERT(_event.m_senderPeerId == _event.m_playerId);
+    CN_ASSERT(_event.m_senderPeerId == _event.m_playerId.value());
     _participant.currentStepId = StepId::Idle;
     CN_LOG_FRM("Participant {} finishes turn.", _event.m_senderPeerId);
 }
@@ -404,7 +404,7 @@ void Board::processMatchCardStep(const events::RemotePlayerInputNetEvent& _event
     // if slot id is invalid, it means no available space left
     if (updatedSlotId != shared::game::ParticipantSlotIdInvalid)
     {
-        events::PlayerSlotUpdateNetEvent event(_event.m_senderPeerId, updatedSlotId, !success);
+        events::PlayerSlotUpdateNetEvent event(_event.m_playerId, updatedSlotId, !success);
         netManRef.send(event);
     }
 
@@ -435,7 +435,7 @@ void Board::processSeeCardStep(const events::RemotePlayerInputNetEvent& _event, 
     _participant.currentStepId = StepId::FinishTurn;
 
     CN_LOG_FRM("See card, participant: {}, slotOwner: {}, slot: {}, card: {} {}", 
-        _event.m_senderPeerId, dataStruct.playerId, dataStruct.slotId, (int)card->getRank(), (int)card->getSuit()
+        _event.m_senderPeerId, dataStruct.playerId.value(), dataStruct.slotId, (int)card->getRank(), (int)card->getSuit()
     );
 }
 
@@ -460,7 +460,7 @@ void Board::processSwapCardStep(const events::RemotePlayerInputNetEvent& _event,
             CN_ASSERT(_participant.currentStepId == StepId::SwapCardBlindly);
             
             ClickSlotInputData ownData = std::get<ClickSlotInputData>(_event.m_data);
-            CN_ASSERT(ownData.playerId == _event.m_senderPeerId);
+            CN_ASSERT(ownData.playerId.value() == _event.m_senderPeerId);
 
             auto& otherParticipant = getBoardParticipant(m_swapData.playerId);
     
@@ -473,7 +473,7 @@ void Board::processSwapCardStep(const events::RemotePlayerInputNetEvent& _event,
 
             CN_LOG_FRM("Swap card, participant: {}, slot: {}, card: {} {}, other participant: {}, slot: {}, card: {} {}", 
                 _event.m_senderPeerId, ownData.slotId, (int)ownCard->getRank(), (int)ownCard->getSuit(), 
-                m_swapData.playerId, m_swapData.slotId, (int)someonesCard->getRank(), (int)someonesCard->getSuit() 
+                m_swapData.playerId.value(), m_swapData.slotId, (int)someonesCard->getRank(), (int)someonesCard->getSuit() 
             );
         }
     }
@@ -525,7 +525,7 @@ void Board::processTakeCardStep(const events::RemotePlayerInputNetEvent& _event,
 void Board::participantStartsTurn(BoardParticipant& _participant)
 {
     PlayerId playerId = _participant.participantRef.getId();
-    CN_LOG_FRM("Participant {} starts turn", playerId);
+    CN_LOG_FRM("Participant {} starts turn", playerId.value());
 
     auto& netManRef = getContext().get<net::Manager>();
     events::PlayerTurnUpdateNetEvent event(playerId, true);
@@ -569,7 +569,7 @@ void Board::onParticipantTimeout(BoardParticipant& _participant)
     }
 
     _participant.currentStepId = StepId::Idle;
-    CN_LOG_FRM("Timeout, Player {} finished their turn", _participant.participantRef.getId());
+    CN_LOG_FRM("Timeout, Player {} finished their turn", _participant.participantRef.getId().value());
 }
 
 void Board::setParticipantStep(StepId _stepId, BoardParticipant& _participant)
@@ -579,7 +579,7 @@ void Board::setParticipantStep(StepId _stepId, BoardParticipant& _participant)
     PlayerId playerId = _participant.participantRef.getId();
     _participant.currentStepId = _stepId;
 
-    CN_LOG_FRM("Set step {} to participant {}", (unsigned)_stepId, playerId);
+    CN_LOG_FRM("Set step {} to participant {}", (unsigned)_stepId, playerId.value());
 }
 
 void Board::discardCard(Card* _card)

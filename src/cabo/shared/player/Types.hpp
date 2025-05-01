@@ -1,19 +1,28 @@
 #pragma once
 
-#include <nsf/Types.hpp>
+#include "core/Identifier.hpp"
 
 #include <string>
 
 namespace cn
 {
 
-using PlayerId = nsf::PeerID;
-constexpr PlayerId PlayerIdInvalid = nsf::PEER_ID_INVALID;
+struct Player;
+using PlayerId = core::Identifier<Player, uint8_t>;
 
 struct Player
 {
     std::string name;
-    PlayerId id = PlayerIdInvalid;
+    PlayerId id{};
 };
 
 } // namespace cn
+
+template <>
+struct std::hash<cn::PlayerId>
+{
+    std::size_t operator()(const cn::PlayerId& _id) const
+    {
+        return std::hash<cn::PlayerId::Type>()(_id.value());
+    }
+};

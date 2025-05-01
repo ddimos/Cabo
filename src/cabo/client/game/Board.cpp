@@ -55,7 +55,7 @@ void Board::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRe
         );
         _dispatcher.registerEvent<events::PlayerTurnUpdateNetEvent>(m_listenerId,
             [&_dispatcher, this](const events::PlayerTurnUpdateNetEvent& _event){
-                CN_LOG_FRM("Turn {} started {}", (unsigned)_event.m_playerId, _event.m_hasTurnStarted);
+                CN_LOG_FRM("Turn {} started {}", (unsigned)_event.m_playerId.value(), _event.m_hasTurnStarted);
                 
                 if (_event.m_playerId == m_localPlayerId)
                     m_queueRef.push("Your turn");   
@@ -256,7 +256,7 @@ Participant* Board::getParticipant(PlayerId _id)
         if (participant->getId() == _id)
             return participant;
     }
-    CN_ASSERT_FRM(false, "Couldn't find a participant {}", _id);
+    CN_ASSERT_FRM(false, "Couldn't find a participant {}", _id.value());
     return nullptr;
 }
 
@@ -370,7 +370,7 @@ void Board::changeStep(PlayerId _playerId, StepId _nextStepId, std::unique_ptr<S
     default:
         break;
     }
-    CN_LOG_FRM("Set step {}, player {}", (unsigned)_nextStepId, (unsigned)_playerId);
+    CN_LOG_FRM("Set step {}, player {}", (unsigned)_nextStepId, _playerId.value());
 }
 
 Card* Board::getNextCardFromDeck()

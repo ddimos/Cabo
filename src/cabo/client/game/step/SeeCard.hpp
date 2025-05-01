@@ -29,7 +29,7 @@ private:
     const bool m_seeOwnCard = true;
 
     ParticipantSlotId m_slotId = shared::game::ParticipantSlotIdInvalid;
-    PlayerId m_slotOwnerId = PlayerIdInvalid;
+    PlayerId m_slotOwnerId{};
 
     const sf::Time m_seeCardTime = sf::seconds(2.f);
     sf::Time m_seeCardTimeDt = m_seeCardTime;

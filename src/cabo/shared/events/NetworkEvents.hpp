@@ -36,7 +36,7 @@ public:
         : m_playerId(_playerId)
     {}
 
-    PlayerId m_playerId = PlayerIdInvalid; 
+    PlayerId m_playerId{}; 
 };
 
 class PlayerUpdateNetEvent final : public BaseNetEvent
@@ -101,7 +101,7 @@ public:
         : m_playerId(_playerId), m_hasTurnStarted(_hasTurnStarted)
     {}
 
-    PlayerId m_playerId = PlayerIdInvalid;
+    PlayerId m_playerId{};
     bool m_hasTurnStarted = true;
 };
 
@@ -118,7 +118,7 @@ public:
         : m_playerId(_playerId), m_inputType(_inputType), m_data(_data)
     {}
 
-    PlayerId m_playerId = PlayerIdInvalid;
+    PlayerId m_playerId{};
     shared::game::InputType m_inputType = shared::game::InputType::Cabo;
     shared::game::InputDataVariant m_data = std::monostate();
 };
@@ -177,7 +177,7 @@ public:
         : m_playerId(_playerId), m_slotId(_slotId), m_wasAdded(_wasAdded)
     {}
 
-    PlayerId m_playerId = PlayerIdInvalid;
+    PlayerId m_playerId{};
     shared::game::ParticipantSlotId m_slotId = shared::game::ParticipantSlotIdInvalid;
     bool m_wasAdded = false;
 };

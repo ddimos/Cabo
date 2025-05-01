@@ -57,7 +57,7 @@ enum class InputType
 struct ClickSlotInputData
 {
     ParticipantSlotId slotId = ParticipantSlotIdInvalid;
-    PlayerId playerId = PlayerIdInvalid;
+    PlayerId playerId{};
 };
 
 using InputDataVariant = std::variant<ActionType, ClickSlotInputData, PileType, bool, std::monostate>;

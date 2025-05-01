@@ -33,7 +33,7 @@ private:
     const bool m_seeCard = true;
 
     ParticipantSlotId m_ownerSlotId = shared::game::ParticipantSlotIdInvalid;
-    PlayerId m_ownerId = PlayerIdInvalid;
+    PlayerId m_ownerId{};
     ParticipantSlotId m_viewerSlotId = shared::game::ParticipantSlotIdInvalid;
 
     Card* m_takenCardPtr = nullptr;

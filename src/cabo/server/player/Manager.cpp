@@ -30,7 +30,7 @@ void Manager::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeing
             [this](const events::PeerConnectedEvent& _event){
                 (void)_event;
                 CN_LOG_FRM("Player joined.. id: {}", _event.m_peerId);
-                auto& player = m_players.emplace_back(Player{ .id = _event.m_peerId });
+                auto& player = m_players.emplace_back(Player{ .id = PlayerId(static_cast<PlayerId::Type>(_event.m_peerId)) });
 
                 auto& netManRef = m_contextRef.get<net::Manager>();
                 events::PlayerJoinAcceptNetEvent event(player.id);
@@ -44,7 +44,7 @@ void Manager::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeing
                 m_players.erase( 
                     std::remove_if(m_players.begin(), m_players.end(),
                     [_event](const Player& _player){
-                        return _player.id == _event.m_peerId;
+                        return _player.id.value() == _event.m_peerId;
                     }),
                     m_players.end()
                 );
@@ -53,7 +53,7 @@ void Manager::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeing
                 events::PlayerUpdateNetEvent event(m_players);
                 netManRef.send(event);
 
-                _dispatcher.sendDelayed<events::PlayerPresenceChangedEvent>(_event.m_peerId, false);
+                _dispatcher.sendDelayed<events::PlayerPresenceChangedEvent>(PlayerId(static_cast<PlayerId::Type>(_event.m_peerId)), false);
             }
         );
 
@@ -61,19 +61,19 @@ void Manager::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeing
             [&_dispatcher, this](const events::PlayerUpdateNetEvent& _event){
                 auto it = std::find_if(m_players.begin(), m_players.end(),
                     [_event](const Player& _player){
-                        return _player.id == _event.m_senderPeerId;
+                        return _player.id.value() == _event.m_senderPeerId;
                     }
                 );
                 CN_ASSERT(m_players.end() != it);
                 CN_ASSERT(!m_players.empty());
                 it->name = _event.m_players.front().name;
-                CN_LOG_FRM("Player info.. id: {}, name: {}", it->id, it->name);
+                CN_LOG_FRM("Player info.. id: {}, name: {}", it->id.value(), it->name);
 
                 auto& netManRef = m_contextRef.get<net::Manager>();
                 events::PlayerUpdateNetEvent event(m_players);
                 netManRef.send(event);
 
-                _dispatcher.sendDelayed<events::PlayerPresenceChangedEvent>(_event.m_senderPeerId, true);
+                _dispatcher.sendDelayed<events::PlayerPresenceChangedEvent>(it->id, true);
             }
         );        
     }

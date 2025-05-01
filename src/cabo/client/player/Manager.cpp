@@ -26,7 +26,7 @@ void Manager::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeing
     {
         _dispatcher.registerEvent<events::PlayerJoinAcceptNetEvent>(m_listenerId,
             [this](const events::PlayerJoinAcceptNetEvent& _event){
-                CN_LOG_FRM("Player id: {}", _event.m_playerId);
+                CN_LOG_FRM("Player id: {}", _event.m_playerId.value());
                 m_localPlayerId = _event.m_playerId;
 
                 auto& netManRef = m_contextRef.get<net::Manager>();
@@ -58,20 +58,20 @@ const Player* Manager::getPlayer(PlayerId _playerId) const
         if (player.id == _playerId)
             return &player;
     }
-    CN_ASSERT_FRM(false, "Couldn't find the player {}", _playerId);
+    CN_ASSERT_FRM(false, "Couldn't find the player {}", _playerId.value());
     return nullptr;
 }
 
 size_t Manager::getIndexOfLocalPlayer() const
 {
-    CN_ASSERT(m_localPlayerId != PlayerIdInvalid);
+    CN_ASSERT(m_localPlayerId.isValid());
     
     for (size_t i = 0; i < m_players.size(); ++i)
     {
         if (m_players[i].id == m_localPlayerId)
             return i;
     }
-    CN_ASSERT_FRM(false, "No player with a local id: {}", m_localPlayerId);
+    CN_ASSERT_FRM(false, "No player with a local id: {}", m_localPlayerId.value());
     return 0;
 }
 } // namespace cn::client::player

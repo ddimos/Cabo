@@ -21,7 +21,7 @@ Participant::Participant(const core::Context& _context, PlayerId _id, bool _isLo
     auto& fontHolderRef = _context.get<client::FontHolder>();
 
     m_nameText.setFont(fontHolderRef.get(client::FontIds::Main));
-    m_nameText.setString("Player " + std::to_string(m_id)); // TODO a proper name
+    m_nameText.setString("Player " + std::to_string(m_id.value())); // TODO a proper name
     m_nameText.setFillColor(sf::Color::White);
     m_nameText.setCharacterSize(24);
     m_nameText.setOrigin(m_nameText.getGlobalBounds().getSize() / 2.f);

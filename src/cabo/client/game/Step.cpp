@@ -17,7 +17,7 @@ void Step::update(sf::Time _dt)
     if (m_nextStateId != m_stateId)
     {
         StateId currentStateId = m_nextStateId;
-        CN_LOG_FRM("Next step's state {}, player {}", currentStateId, m_managedPlayerId);
+        CN_LOG_FRM("Next step's state {}, player {}", currentStateId, m_managedPlayerId.value());
         auto& nextState = m_states.at(currentStateId);
         if (nextState.onEnter)
             nextState.onEnter();

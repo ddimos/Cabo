@@ -49,7 +49,7 @@ private:
 
     sf::Text m_nameText; // TODO simpleText
 
-    PlayerId m_id = PlayerIdInvalid;
+    PlayerId m_id{};
     bool m_isLocal = false;
 
     std::vector<ParticipantSlot> m_slots;

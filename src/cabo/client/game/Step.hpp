@@ -45,7 +45,7 @@ private:
     std::map<StateId, State> m_states;
     StateId m_stateId = StateIdInvalid;
     StateId m_nextStateId = StateIdInvalid;
-    PlayerId m_managedPlayerId = PlayerIdInvalid;
+    PlayerId m_managedPlayerId{};
 };
 
 } // namespace cn::client::game

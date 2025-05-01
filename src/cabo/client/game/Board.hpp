@@ -77,7 +77,7 @@ private:
     DecideSwapButtons m_decideSwapButtons;
 
     core::event::ListenerId m_listenerId = core::event::ListenerIdInvalid;
-    PlayerId m_localPlayerId = PlayerIdInvalid;
+    PlayerId m_localPlayerId{};
     BoardState m_boardState = BoardState::Start;
 
     std::unordered_map<PlayerId, std::unique_ptr<Step>> m_steps;
