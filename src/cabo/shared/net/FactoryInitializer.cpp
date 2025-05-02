@@ -3,6 +3,19 @@
 
 #include "shared/events/NetworkEvents.hpp"
 
+namespace
+{
+
+template<typename TId>
+void deserializeId(TId& _id, nsf::Buffer& _buffer)
+{
+    typename TId::Type id = 0;
+    _buffer >> id;
+    _id = TId(id);
+}
+
+} // namespace
+
 namespace cn::net
 {
 
@@ -16,9 +29,7 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
         },
         [](core::event::Event& _event, nsf::Buffer& _buffer){
             auto& event = static_cast<events::PlayerJoinAcceptNetEvent&>(_event);
-            PlayerId::Type id = 0;
-            _buffer >> id;
-            event.m_playerId = PlayerId(id);
+            deserializeId(event.m_playerId, _buffer);
         },
         [](){
             return std::make_unique<events::PlayerJoinAcceptNetEvent>();
@@ -43,9 +54,7 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
             for (uint8_t i = 0; i < size; ++i)
             {
                 Player player;
-                PlayerId::Type id = 0;
-                _buffer >> id;
-                player.id = PlayerId(id);
+                deserializeId(player.id, _buffer);
                 _buffer >> player.name;
                 event.m_players.emplace_back(std::move(player));
             }
@@ -72,11 +81,11 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
             event.m_players.reserve(size);
             for (uint8_t i = 0; i < size; ++i)
             {
-                PlayerId::Type id;
+                PlayerId id;
                 bool ready;
-                _buffer >> id;
+                deserializeId(id, _buffer);
                 _buffer >> ready;
-                event.m_players.emplace(PlayerId(id), ready);
+                event.m_players.emplace(id, ready);
             }
         },
         [](){
@@ -122,9 +131,7 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
         },
         [](core::event::Event& _event, nsf::Buffer& _buffer){
             auto& event = static_cast<events::PlayerTurnUpdateNetEvent&>(_event);
-            PlayerId::Type id;
-            _buffer >> id;
-            event.m_playerId = PlayerId(id);
+            deserializeId(event.m_playerId, _buffer);
             _buffer >> event.m_hasTurnStarted;
         },
         [](){
@@ -145,7 +152,7 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
             else if (event.m_inputType == shared::game::InputType::ClickSlot)
             {
                 auto dataStruct = std::get<shared::game::ClickSlotInputData>(event.m_data);
-                _buffer << static_cast<uint8_t>(dataStruct.slotId);
+                _buffer << static_cast<uint8_t>(dataStruct.slotId.value());
                 _buffer << static_cast<uint8_t>(dataStruct.playerId.value());
             }
             else if (event.m_inputType == shared::game::InputType::Action)
@@ -176,9 +183,9 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
             {
                 shared::game::ClickSlotInputData dataStruct;
                 _buffer >> data;
-                dataStruct.slotId = data;
+                dataStruct.slotId = shared::game::ParticipantSlotId(data);
                 _buffer >> data;
-                dataStruct.playerId = PlayerId(static_cast<PlayerId::Type>(data));
+                dataStruct.playerId = PlayerId(data);
                 event.m_data = dataStruct;
             }
             else if (event.m_inputType == shared::game::InputType::Action)
@@ -265,15 +272,13 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
         [](const core::event::Event& _event, nsf::Buffer& _buffer){
             auto& event = static_cast<const events::PlayerSlotUpdateNetEvent&>(_event);
             _buffer << event.m_playerId.value();
-            _buffer << event.m_slotId;
+            _buffer << event.m_slotId.value();
             _buffer << event.m_wasAdded;
         },
         [](core::event::Event& _event, nsf::Buffer& _buffer){
             auto& event = static_cast<events::PlayerSlotUpdateNetEvent&>(_event);
-            PlayerId::Type id;
-            _buffer >> id;
-            event.m_playerId = PlayerId(id);
-            _buffer >> event.m_slotId;
+            deserializeId(event.m_playerId, _buffer);
+            deserializeId(event.m_slotId, _buffer);
             _buffer >> event.m_wasAdded;
         },
         [](){

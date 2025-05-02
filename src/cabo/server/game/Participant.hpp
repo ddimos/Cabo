@@ -46,7 +46,7 @@ private:
 
     std::vector<ParticipantSlot> m_slots;
     unsigned short m_currentNumberOfSlots = 0;
-    ParticipantSlotId m_nextSlotIdToAdd = shared::game::ParticipantSlotIdInvalid;
+    ParticipantSlotId::Type m_nextSlotIdToAdd = 0;
 };
 
 } // namespace cn::server::game

@@ -28,7 +28,7 @@ private:
     Card& m_takenCardRef;
     Card* m_discardedCardPtr;
 
-    ParticipantSlotId m_slotId = shared::game::ParticipantSlotIdInvalid;
+    ParticipantSlotId m_slotId{};
 };
 
 } // namespace cn::client::game::step

@@ -388,7 +388,7 @@ void Board::processMatchCardStep(const events::RemotePlayerInputNetEvent& _event
     events::ProvideCardNetEvent eventDiscard(card->getRank(), card->getSuit(), card->getId());
     getContext().get<net::Manager>().send(eventDiscard);
 
-    ParticipantSlotId updatedSlotId = shared::game::ParticipantSlotIdInvalid;
+    ParticipantSlotId updatedSlotId{};
     if (success)
     {
         discardCard(card);
@@ -398,11 +398,11 @@ void Board::processMatchCardStep(const events::RemotePlayerInputNetEvent& _event
     else
     {
         updatedSlotId = _participant.participantRef.addSlot();
-        if (updatedSlotId != shared::game::ParticipantSlotIdInvalid)
+        if (updatedSlotId.isValid())
             _participant.participantRef.replace(updatedSlotId, getNextCardFromDeck());
     }
     // if slot id is invalid, it means no available space left
-    if (updatedSlotId != shared::game::ParticipantSlotIdInvalid)
+    if (updatedSlotId.isValid())
     {
         events::PlayerSlotUpdateNetEvent event(_event.m_playerId, updatedSlotId, !success);
         netManRef.send(event);
@@ -411,7 +411,7 @@ void Board::processMatchCardStep(const events::RemotePlayerInputNetEvent& _event
     _participant.currentStepId = StepId::FinishTurn;
 
     CN_LOG_FRM("Match card, participant: {}, slot: {}, new slot: {}, drawn card: {} {}, matched card: {} {}", 
-        _event.m_senderPeerId, dataStruct.slotId, updatedSlotId, (int)m_drawnCardPtr->getRank(), (int)m_drawnCardPtr->getSuit(),
+        _event.m_senderPeerId, dataStruct.slotId.value(), updatedSlotId.value(), (int)m_drawnCardPtr->getRank(), (int)m_drawnCardPtr->getSuit(),
         (int)card->getRank(), (int)card->getSuit() 
     );
 }
@@ -435,7 +435,7 @@ void Board::processSeeCardStep(const events::RemotePlayerInputNetEvent& _event, 
     _participant.currentStepId = StepId::FinishTurn;
 
     CN_LOG_FRM("See card, participant: {}, slotOwner: {}, slot: {}, card: {} {}", 
-        _event.m_senderPeerId, dataStruct.playerId.value(), dataStruct.slotId, (int)card->getRank(), (int)card->getSuit()
+        _event.m_senderPeerId, dataStruct.playerId.value(), dataStruct.slotId.value(), (int)card->getRank(), (int)card->getSuit()
     );
 }
 
@@ -472,8 +472,8 @@ void Board::processSwapCardStep(const events::RemotePlayerInputNetEvent& _event,
             m_isFirstPartOfSwap = true;
 
             CN_LOG_FRM("Swap card, participant: {}, slot: {}, card: {} {}, other participant: {}, slot: {}, card: {} {}", 
-                _event.m_senderPeerId, ownData.slotId, (int)ownCard->getRank(), (int)ownCard->getSuit(), 
-                m_swapData.playerId.value(), m_swapData.slotId, (int)someonesCard->getRank(), (int)someonesCard->getSuit() 
+                _event.m_senderPeerId, ownData.slotId.value(), (int)ownCard->getRank(), (int)ownCard->getSuit(), 
+                m_swapData.playerId.value(), m_swapData.slotId.value(), (int)someonesCard->getRank(), (int)someonesCard->getSuit() 
             );
         }
     }
@@ -517,7 +517,7 @@ void Board::processTakeCardStep(const events::RemotePlayerInputNetEvent& _event,
     _participant.currentStepId = StepId::FinishTurn;
 
     CN_LOG_FRM("Take card, participant: {}, slot: {}, drawn card: {} {}, discarded card: {} {}", 
-        _event.m_senderPeerId, dataStruct.slotId, (int)m_drawnCardPtr->getRank(), (int)m_drawnCardPtr->getSuit(),
+        _event.m_senderPeerId, dataStruct.slotId.value(), (int)m_drawnCardPtr->getRank(), (int)m_drawnCardPtr->getSuit(),
         (int)card->getRank(), (int)card->getSuit() 
     );
 }

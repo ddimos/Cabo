@@ -18,14 +18,15 @@ ParticipantSlotId Participant::addSlot()
 {
     if (m_nextSlotIdToAdd >= m_slots.size())
     {
-        return shared::game::ParticipantSlotIdInvalid;
+        return ParticipantSlotId{};
     }
     CN_ASSERT(m_currentNumberOfSlots <= m_slots.size());
-    
+    CN_ASSERT(ParticipantSlotId::invalid().value() != m_nextSlotIdToAdd);
+
     m_currentNumberOfSlots++;
     m_nextSlotIdToAdd++;
 
-    return m_nextSlotIdToAdd-1;
+    return ParticipantSlotId(m_nextSlotIdToAdd - 1);
 }
 
 void Participant::removeSlot(ParticipantSlotId _id)
@@ -43,14 +44,14 @@ void Participant::removeSlot(ParticipantSlotId _id)
 
 const ParticipantSlot& Participant::getSlot(ParticipantSlotId _id) const
 {
-    CN_ASSERT(m_slots.size() > _id);
-    return m_slots.at(_id);
+    CN_ASSERT(m_slots.size() > _id.value());
+    return m_slots.at(_id.value());
 }
 
 ParticipantSlot& Participant::getSlot(ParticipantSlotId _id)
 {
-    CN_ASSERT(m_slots.size() > _id);
-    return m_slots.at(_id);
+    CN_ASSERT(m_slots.size() > _id.value());
+    return m_slots.at(_id.value());
 }
 
 Card* Participant::getCard(ParticipantSlotId _id) const

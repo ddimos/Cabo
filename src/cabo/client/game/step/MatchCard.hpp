@@ -30,7 +30,7 @@ private:
     Card& m_matchedCardRef;
     Card* m_secondMatchedCardPtr;
 
-    ParticipantSlotId m_slotId = shared::game::ParticipantSlotIdInvalid;
+    ParticipantSlotId m_slotId{};
 
     Card::Rank m_rank;
     Card::Suit m_suit;

@@ -178,7 +178,7 @@ public:
     {}
 
     PlayerId m_playerId{};
-    shared::game::ParticipantSlotId m_slotId = shared::game::ParticipantSlotIdInvalid;
+    shared::game::ParticipantSlotId m_slotId{};
     bool m_wasAdded = false;
 };
 

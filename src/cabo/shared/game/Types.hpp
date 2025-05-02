@@ -3,22 +3,21 @@
 #include "shared/game/Constants.hpp"
 #include "shared/player/Types.hpp"
 
-#include <cstdint>
-#include <limits>
-#include <memory>
+#include "core/Identifier.hpp"
+
 #include <variant>
 
 namespace cn::shared::game
 {
 
-using ParticipantSlotId = uint8_t;
-constexpr ParticipantSlotId ParticipantSlotIdInvalid = std::numeric_limits<ParticipantSlotId>::max();
+struct ParticipantSlot;
+using ParticipantSlotId = core::Identifier<ParticipantSlot, uint8_t>;
 
-static_assert(std::numeric_limits<ParticipantSlotId>::max() > MaxNumberOfParticipantSlots, "Adjust the max number of player slots");
+static_assert(std::numeric_limits<ParticipantSlotId::Type>::max() > MaxNumberOfParticipantSlots, "Adjust the max number of player slots");
 
 struct ParticipantSlot
 {
-    ParticipantSlotId id = ParticipantSlotIdInvalid;
+    ParticipantSlotId id{};
     bool wasRemoved = false;
 };
 
@@ -56,7 +55,7 @@ enum class InputType
 
 struct ClickSlotInputData
 {
-    ParticipantSlotId slotId = ParticipantSlotIdInvalid;
+    ParticipantSlotId slotId{};
     PlayerId playerId{};
 };
 

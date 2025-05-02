@@ -81,7 +81,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
             unsigned short numberOfSlots = shared::game::MaxNumberOfParticipantSlots;
             std::vector<game::ParticipantSlot> slots;
             slots.reserve(numberOfSlots);
-            for (game::ParticipantSlotId slotId = 0; slotId < numberOfSlots; ++slotId)
+            for (game::ParticipantSlotId::Type slotId = 0; slotId < numberOfSlots; ++slotId)
             {
                 // TODO make a choosable button?
                 auto slotButton = std::make_shared<menu::item::Button>(
@@ -91,7 +91,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
                     game::spriteSheet::getDiscardTextureRect(game::spriteSheet::Hover::Yes),
                     [this, slotId, playerId](){
                         auto& eventDispatcherRef = getContext().get<core::event::Dispatcher>();
-                        eventDispatcherRef.send<events::LocalPlayerClickSlotEvent>(slotId, playerId);
+                        eventDispatcherRef.send<events::LocalPlayerClickSlotEvent>(game::ParticipantSlotId(slotId), playerId);
                     },
                     sf::Mouse::Button::Left
                 );
@@ -99,7 +99,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
                 
                 getContainer(core::object::Container::Type::Menu).add(slotButton);
 
-                slots.emplace_back(game::ParticipantSlot{ slotId, false, nullptr, *slotButton, {} });
+                slots.emplace_back(game::ParticipantSlot{ game::ParticipantSlotId(slotId), false, nullptr, *slotButton, {} });
             }
             
             auto participant = std::make_shared<game::Participant>(

@@ -52,7 +52,7 @@ public:
         : core::event::Event(), slotId(_slotId), slotOwnerId(_slotOwnerId)
     {}
 
-    shared::game::ParticipantSlotId slotId = shared::game::ParticipantSlotIdInvalid;
+    shared::game::ParticipantSlotId slotId{};
     PlayerId slotOwnerId{};
 };
 

@@ -139,14 +139,14 @@ void Participant::visitSlots(std::function<void(ParticipantSlot&)> _visitor)
 
 const ParticipantSlot& Participant::getSlot(ParticipantSlotId _id) const
 {
-    CN_ASSERT(m_slots.size() > _id);
-    return m_slots.at(_id);
+    CN_ASSERT(m_slots.size() > _id.value());
+    return m_slots.at(_id.value());
 }
 
 ParticipantSlot& Participant::getSlot(ParticipantSlotId _id)
 {
-    CN_ASSERT(m_slots.size() > _id);
-    return m_slots.at(_id);
+    CN_ASSERT(m_slots.size() > _id.value());
+    return m_slots.at(_id.value());
 }
 
 void Participant::onDraw(sf::RenderWindow& _window)

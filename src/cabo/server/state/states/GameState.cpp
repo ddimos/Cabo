@@ -64,9 +64,9 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
         std::vector<game::ParticipantSlot> slots;
         slots.reserve(numberOfSlots);
 
-        for (game::ParticipantSlotId slotId = 0; slotId < numberOfSlots; ++slotId)
+        for (game::ParticipantSlotId::Type slotId = 0; slotId < numberOfSlots; ++slotId)
         {
-            slots.emplace_back(game::ParticipantSlot{ slotId, false, nullptr });
+            slots.emplace_back(game::ParticipantSlot{ game::ParticipantSlotId(slotId), false, nullptr });
         }
         auto playerId = player.id;
         auto participant = std::make_shared<game::Participant>(

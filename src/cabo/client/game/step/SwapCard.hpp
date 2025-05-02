@@ -32,9 +32,9 @@ private:
     Board& m_boardRef;
     const bool m_seeCard = true;
 
-    ParticipantSlotId m_ownerSlotId = shared::game::ParticipantSlotIdInvalid;
+    ParticipantSlotId m_ownerSlotId{};
     PlayerId m_ownerId{};
-    ParticipantSlotId m_viewerSlotId = shared::game::ParticipantSlotIdInvalid;
+    ParticipantSlotId m_viewerSlotId{};
 
     Card* m_takenCardPtr = nullptr;
     Card* m_returnedCardPtr = nullptr;

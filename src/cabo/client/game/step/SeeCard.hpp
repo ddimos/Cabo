@@ -28,7 +28,7 @@ private:
     Board& m_boardRef;
     const bool m_seeOwnCard = true;
 
-    ParticipantSlotId m_slotId = shared::game::ParticipantSlotIdInvalid;
+    ParticipantSlotId m_slotId{};
     PlayerId m_slotOwnerId{};
 
     const sf::Time m_seeCardTime = sf::seconds(2.f);
