@@ -39,7 +39,7 @@ protected:
     sf::IntRect m_textureRectDefault = {};
     sf::IntRect m_textureRectHover = {};
 
-    core::event::ListenerId m_listenerId = core::event::ListenerIdInvalid;
+    core::event::ListenerId m_listenerId{};
 };
 
 } // namespace cn::client::menu::item

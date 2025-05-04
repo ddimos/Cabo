@@ -4,8 +4,8 @@
 namespace cn::core::event
 {
 
-#define CN_EVENT(_id)                                                   \
-static core::event::EventId getIdStatic() { return _id; }               \
+#define CN_EVENT(_id)                                                               \
+static core::event::EventId getIdStatic() { return core::event::EventId(_id); }     \
 core::event::EventId getId() const override { return getIdStatic(); }
 
 class Event

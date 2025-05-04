@@ -93,7 +93,7 @@ void Button::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isBein
 {
     if (_isBeingRegistered)
     {
-        if (m_listenerId == core::event::ListenerIdInvalid)
+        if (!m_listenerId.isValid())
             m_listenerId = core::event::getNewListenerId();
 
         _dispatcher.registerEvent<events::MouseButtonReleasedEvent>(m_listenerId,
@@ -109,7 +109,7 @@ void Button::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isBein
     }
     else
     {
-        if (m_listenerId == core::event::ListenerIdInvalid)
+        if (!m_listenerId.isValid())
             return;
 
         _dispatcher.unregisterEvent<events::MouseButtonReleasedEvent>(m_listenerId);

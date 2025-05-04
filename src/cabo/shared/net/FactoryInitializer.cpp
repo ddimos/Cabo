@@ -22,7 +22,7 @@ namespace cn::net
 FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
 {
     _factoryRef.add(
-        events::id::PlayerJoinAccept,
+        core::event::EventId(events::id::PlayerJoinAccept),
         [](const core::event::Event& _event, nsf::Buffer& _buffer){
             auto& event = static_cast<const events::PlayerJoinAcceptNetEvent&>(_event);
             _buffer << event.m_playerId.value();
@@ -36,7 +36,7 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
         }
     );
     _factoryRef.add(
-        events::id::PlayerUpdate,
+        core::event::EventId(events::id::PlayerUpdate),
         [](const core::event::Event& _event, nsf::Buffer& _buffer){
             auto& event = static_cast<const events::PlayerUpdateNetEvent&>(_event);
             _buffer << static_cast<uint8_t>(event.m_players.size());
@@ -64,7 +64,7 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
         }
     );
     _factoryRef.add(
-        events::id::PlayerReadyStatusUpdate,
+        core::event::EventId(events::id::PlayerReadyStatusUpdate),
         [](const core::event::Event& _event, nsf::Buffer& _buffer){
             auto& event = static_cast<const events::PlayerReadyStatusUpdateNetEvent&>(_event);
             _buffer << static_cast<uint8_t>(event.m_players.size());
@@ -93,7 +93,7 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
         }
     );
     _factoryRef.add(
-        events::id::StartGame,
+        core::event::EventId(events::id::StartGame),
         [](const core::event::Event& _event, nsf::Buffer& _buffer){
             auto& event = static_cast<const events::StartGameNetEvent&>(_event);
             _buffer << event.m_seed;
@@ -107,7 +107,7 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
         }
     );
     _factoryRef.add(
-        events::id::BoardStateUpdate,
+        core::event::EventId(events::id::BoardStateUpdate),
         [](const core::event::Event& _event, nsf::Buffer& _buffer){
             auto& event = static_cast<const events::BoardStateUpdateNetEvent&>(_event);
             _buffer << static_cast<uint8_t>(event.m_boardState); //  TODO underlying?
@@ -123,7 +123,7 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
         }
     );
     _factoryRef.add(
-        events::id::PlayerTurnUpdate,
+        core::event::EventId(events::id::PlayerTurnUpdate),
         [](const core::event::Event& _event, nsf::Buffer& _buffer){
             auto& event = static_cast<const events::PlayerTurnUpdateNetEvent&>(_event);
             _buffer << event.m_playerId.value();
@@ -139,7 +139,7 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
         }
     );
     _factoryRef.add(
-        events::id::RemotePlayerInput,
+        core::event::EventId(events::id::RemotePlayerInput),
         [](const core::event::Event& _event, nsf::Buffer& _buffer){
             auto& event = static_cast<const events::RemotePlayerInputNetEvent&>(_event);
             _buffer << event.m_playerId.value();
@@ -204,7 +204,7 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
         }
     );
     _factoryRef.add(
-        events::id::ProvideCard,
+        core::event::EventId(events::id::ProvideCard),
         [](const core::event::Event& _event, nsf::Buffer& _buffer){
             auto& event = static_cast<const events::ProvideCardNetEvent&>(_event);
             _buffer << static_cast<uint8_t>(event.m_cardId.value());
@@ -226,7 +226,7 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
         }
     );
     _factoryRef.add(
-        events::id::DiscardCard,
+        core::event::EventId(events::id::DiscardCard),
         [](const core::event::Event& _event, nsf::Buffer& _buffer){
             auto& event = static_cast<const events::DiscardCardNetEvent&>(_event);
             _buffer << static_cast<uint8_t>(event.m_rank);
@@ -246,7 +246,7 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
         }
     );
     _factoryRef.add(
-        events::id::MatchCard,
+        core::event::EventId(events::id::MatchCard),
         [](const core::event::Event& _event, nsf::Buffer& _buffer){
             auto& event = static_cast<const events::MatchCardNetEvent&>(_event);
             _buffer << static_cast<uint8_t>(event.m_rank);
@@ -268,7 +268,7 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
         }
     );
     _factoryRef.add(
-        events::id::PlayerSlotUpdate,
+        core::event::EventId(events::id::PlayerSlotUpdate),
         [](const core::event::Event& _event, nsf::Buffer& _buffer){
             auto& event = static_cast<const events::PlayerSlotUpdateNetEvent&>(_event);
             _buffer << event.m_playerId.value();

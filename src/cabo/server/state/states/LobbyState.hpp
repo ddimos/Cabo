@@ -23,7 +23,7 @@ private:
     
     void startGameIfAllPlayersReady();
 
-    core::event::ListenerId m_listenerId = core::event::ListenerIdInvalid;
+    core::event::ListenerId m_listenerId{};
     std::unordered_map<PlayerId, bool> m_players;
 
     bool m_startGame = false;

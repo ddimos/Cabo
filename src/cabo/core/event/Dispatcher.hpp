@@ -45,7 +45,7 @@ private:
 template<typename TEvent>
 void Dispatcher::registerEvent(ListenerId _listenerId, Slot<TEvent>::Callback _callback)
 {
-    CN_ASSERT(_listenerId != ListenerIdInvalid);
+    CN_ASSERT(_listenerId.isValid());
 
     EventId eventId = TEvent::getIdStatic();
 
@@ -62,7 +62,7 @@ void Dispatcher::registerEvent(ListenerId _listenerId, Slot<TEvent>::Callback _c
 template<typename TEvent>
 void Dispatcher::unregisterEvent(ListenerId _listenerId)
 {
-    CN_ASSERT(_listenerId != ListenerIdInvalid);
+    CN_ASSERT(_listenerId.isValid());
     
     EventId eventId = TEvent::getIdStatic();
     unregisterEvent(_listenerId, eventId);

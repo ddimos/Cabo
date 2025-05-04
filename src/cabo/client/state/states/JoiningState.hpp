@@ -13,7 +13,7 @@ public:
 
 private:
     void onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered) override;
-    core::event::ListenerId m_listenerId = core::event::ListenerIdInvalid;
+    core::event::ListenerId m_listenerId{};
 };
 
 } // namespace cn::client::states

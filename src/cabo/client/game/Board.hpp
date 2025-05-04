@@ -76,7 +76,7 @@ private:
     DecideActionButtons m_decideActionButtons;
     DecideSwapButtons m_decideSwapButtons;
 
-    core::event::ListenerId m_listenerId = core::event::ListenerIdInvalid;
+    core::event::ListenerId m_listenerId{};
     PlayerId m_localPlayerId{};
     BoardState m_boardState = BoardState::Start;
 

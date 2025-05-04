@@ -66,7 +66,7 @@ private:
     Card* getNextCardFromDeck();
 
     const core::Context& m_contextRef;
-    core::event::ListenerId m_listenerId = core::event::ListenerIdInvalid;
+    core::event::ListenerId m_listenerId{};
 
     Deck& m_deckRef;
     Discard& m_discardRef;

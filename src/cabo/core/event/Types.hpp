@@ -1,18 +1,36 @@
 #pragma once
-#include <cstdint>
-#include <limits>
+
+#include "core/Identifier.hpp"
+
 #include <memory>
 
 namespace cn::core::event
 {
 
-using EventId = uint16_t;
-constexpr EventId EventIdInvalid = std::numeric_limits<EventId>::max();
-
-using ListenerId = uint16_t;
-constexpr ListenerId ListenerIdInvalid = std::numeric_limits<ListenerId>::max();
-
 class Event;
+using EventId = core::Identifier<Event, uint8_t>;
+
+class Listener;
+using ListenerId = core::Identifier<Listener, uint16_t>;
+
 using EventPtr = std::unique_ptr<Event>;
 
 } // namespace cn::core::event
+
+template <>
+struct std::hash<cn::core::event::EventId>
+{
+    std::size_t operator()(const cn::core::event::EventId& _id) const
+    {
+        return std::hash<cn::core::event::EventId::Type>()(_id.value());
+    }
+};
+
+template <>
+struct std::hash<cn::core::event::ListenerId>
+{
+    std::size_t operator()(const cn::core::event::ListenerId& _id) const
+    {
+        return std::hash<cn::core::event::ListenerId::Type>()(_id.value());
+    }
+};

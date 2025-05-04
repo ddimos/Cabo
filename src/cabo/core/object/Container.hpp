@@ -13,8 +13,6 @@
 namespace cn::core::object
 {
 
-using ContainerId = unsigned;
-
 class Container final
 {
 public:

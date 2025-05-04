@@ -27,6 +27,6 @@ private:
     sf::Time m_toggleEffectTimeS = sf::seconds(1.f);
     sf::Time m_toggleEffectTimeDt = sf::Time::Zero;
 
-    core::event::ListenerId m_listenerId = core::event::ListenerIdInvalid;
+    core::event::ListenerId m_listenerId{};
 };
 } // namespace cn::client::states

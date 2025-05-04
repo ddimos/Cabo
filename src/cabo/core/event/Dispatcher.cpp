@@ -6,8 +6,11 @@ namespace cn::core::event
 
 ListenerId getNewListenerId()
 {
-    static ListenerId listenerId = 0;
-    return listenerId++;
+    static ListenerId::Type id = 0;
+    ListenerId listenerId(id);
+    id++;
+    CN_ASSERT(listenerId.isValid()); // It will assert when the counter reaches the max value
+    return listenerId;
 }
 
 void Dispatcher::processDelayed()

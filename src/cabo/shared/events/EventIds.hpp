@@ -7,7 +7,7 @@ namespace cn::events
 namespace id
 {
 
-enum : core::event::EventId
+enum : core::event::EventId::Type
 {
     // Connecction events
     PeerConnected,

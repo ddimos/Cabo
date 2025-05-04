@@ -55,8 +55,12 @@ void Manager::init()
         );
     };
     callbacks.onReceived = [this, &eventDispatcherRef, &systemClockRef](nsf::NetworkMessage&& _message){
-        core::event::EventId eventId = core::event::EventIdInvalid;
-        _message.m_data >> eventId;
+        core::event::EventId eventId{};
+        {
+            core::event::EventId::Type id = 0;
+            _message.m_data >> id;
+            eventId = core::event::EventId(id);
+        }
         auto& slot = m_factory.get(eventId);
         auto eventPtr = slot.create();
         {
@@ -67,7 +71,7 @@ void Manager::init()
             netEvent.m_receivedTime = receivedTime;
             netEvent.m_sentTimeRttBased = receivedTime - sf::Time(sf::seconds(rtt / 2.f));
         
-            CN_LOG_FRM("Received from: {}, event: {}, time: {}, rtt: {}", _message.getPeerId(), eventId, netEvent.m_receivedTime.asSeconds(), rtt);
+            CN_LOG_FRM("Received from: {}, event: {}, time: {}, rtt: {}", _message.getPeerId(), eventId.value(), netEvent.m_receivedTime.asSeconds(), rtt);
         }
         
         slot.deserialize(*eventPtr, _message.m_data);
@@ -118,12 +122,12 @@ void Manager::send(const core::event::Event& _event, nsf::MessageInfo::Type _typ
     );
     core::event::EventId eventId = _event.getId();
     auto& slot = m_factory.get(eventId);
-    message.m_data << eventId;
+    message.m_data << eventId.value();
     slot.serialize(_event, message.m_data);
     
     CN_LOG_FRM("Send {} to: {}, event: {}", 
         (_type == nsf::MessageInfo::Type::BRODCAST ? 'b' : (_type == nsf::MessageInfo::Type::UNICAST ? 'u' : 'e')),
-        _peerId, eventId
+        _peerId, eventId.value()
     );
     m_network->send(std::move(message));
 }

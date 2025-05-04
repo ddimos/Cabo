@@ -27,7 +27,7 @@ public:
 private:
     core::Context& m_contextRef;
 
-    core::event::ListenerId m_listenerId = core::event::ListenerIdInvalid;
+    core::event::ListenerId m_listenerId{};
     std::vector<Player> m_players;
     PlayerId m_localPlayerId{};
 };

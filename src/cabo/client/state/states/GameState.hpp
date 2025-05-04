@@ -17,7 +17,7 @@ private:
     core::state::Return onUpdate(sf::Time _dt) override;
 
     std::unique_ptr<game::Board> m_board;
-    core::event::ListenerId m_listenerId = core::event::ListenerIdInvalid;
+    core::event::ListenerId m_listenerId{};
 };
 
 } // namespace cn::client::states
