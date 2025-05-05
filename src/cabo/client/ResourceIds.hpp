@@ -12,6 +12,7 @@ enum class TextureIds
 {
     Background,
     BackButton,
+    CaboButton,
     Cards,
     DecideButtons,
     FinishButton,

@@ -89,5 +89,13 @@ public:
     {}
 };
 
+class LocalPlayerClickCaboButtonEvent final : public core::event::Event
+{
+public:
+    CN_EVENT(id::LocalPlayerClickCaboButton)
+
+    LocalPlayerClickCaboButtonEvent()
+    {}
+};
 
 } // namespace cn::events

@@ -79,6 +79,7 @@ void Client::init()
     m_fontHolder.load(FontIds::Main, "res/fonts/times_new_roman.ttf");
     m_textureHolder.load(TextureIds::Background, "res/textures/background.png");
     m_textureHolder.load(TextureIds::BackButton, "res/textures/back_button.png");
+    m_textureHolder.load(TextureIds::CaboButton, "res/textures/cabo_button.png");
     m_textureHolder.load(TextureIds::Cards, "res/textures/cards.png");
     m_textureHolder.load(TextureIds::DecideButtons, "res/textures/decide_buttons.png");
     m_textureHolder.load(TextureIds::FinishButton, "res/textures/finish_button.png");

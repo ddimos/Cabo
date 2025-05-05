@@ -82,6 +82,11 @@ sf::IntRect getFinishButtonTextureRect(Hover _hover)
         : sf::IntRect{ 0, FinishButtonHeight, FinishButtonWidth, FinishButtonHeight };
 }
 
+sf::IntRect getCaboButtonTextureRect(Hover _hover)
+{
+    return getFinishButtonTextureRect(_hover);
+}
+
 sf::IntRect getYesButtonTextureRect(Hover _hover)
 {
     return _hover == Hover::No 

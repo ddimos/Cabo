@@ -23,13 +23,14 @@ namespace cn::client::game
 {
 
 Board::Board(const core::Context& _context, std::vector<game::Participant*>&& _participants, Deck& _deck, 
-             menu::item::NotificationQueue& _queue, menu::item::Button& _finishButton, DecideActionButtons&& _decideActionButtons,
-             DecideSwapButtons&& _decideSwapButtons, CardPositions _cardPositions)
+             menu::item::NotificationQueue& _queue, menu::item::Button& _finishButton, menu::item::Button& _caboButton,
+             DecideActionButtons&& _decideActionButtons, DecideSwapButtons&& _decideSwapButtons, CardPositions _cardPositions)
     : m_contextRef(_context)
     , m_participants(std::move(_participants))
     , m_deckRef(_deck)
     , m_queueRef(_queue)
     , m_finishButtonRef(_finishButton)
+    , m_caboButtonRef(_caboButton)
     , m_decideActionButtons(std::move(_decideActionButtons))
     , m_decideSwapButtons(std::move(_decideSwapButtons))
     , m_cardPositions(_cardPositions)
@@ -260,6 +261,11 @@ Participant* Board::getParticipant(PlayerId _id)
     return nullptr;
 }
 
+bool Board::canSayCabo() const
+{
+    return m_boardState == BoardState::Game;
+}
+
 void Board::showDecideActionButtons()
 {
     for (auto& button : m_decideActionButtons)
@@ -282,6 +288,16 @@ void Board::hideDecideSwapButtons()
 {
     for (auto& button : m_decideSwapButtons)
         button->requestDeactivated();
+}
+
+void Board::showCaboButton()
+{
+    m_caboButtonRef.requestActivated();
+}
+
+void Board::hideCaboButton()
+{
+    m_caboButtonRef.requestDeactivated();
 }
 
 void Board::showFinishButton()
