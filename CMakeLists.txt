@@ -75,3 +75,55 @@ set_target_properties(
     PROPERTIES 
         OUTPUT_NAME "${TARGET_OUTPUT_NAME}"
 )
+
+# Taken from https://ryouze.net/posts/sfml-cmake-macos/
+if(APPLE)
+    set(MACOSX_BUNDLE_BUNDLE_NAME ${PROJECT_NAME})
+    set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.ddimos.&{PROJECT_NAME}")
+    set(MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION})
+    set(MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION})
+
+    configure_file(${CMAKE_SOURCE_DIR}/Info.plist.in ${CMAKE_BINARY_DIR}/Info.plist @ONLY)
+
+    set_target_properties(${PROJECT_NAME} PROPERTIES
+        MACOSX_BUNDLE TRUE
+        MACOSX_BUNDLE_INFO_PLIST ${CMAKE_BINARY_DIR}/Info.plist
+        INSTALL_RPATH "@executable_path/../Frameworks"
+        BUILD_WITH_INSTALL_RPATH TRUE
+    )
+
+    # Clean up the Frameworks directory before copying
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E remove_directory $<TARGET_BUNDLE_DIR:${PROJECT_NAME}>/Contents/Frameworks
+        COMMAND ${CMAKE_COMMAND} -E make_directory $<TARGET_BUNDLE_DIR:${PROJECT_NAME}>/Contents/Frameworks
+        COMMENT "Cleaning Frameworks directory"
+    )
+
+    # Copy all frameworks into the app bundle
+    # add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    #     COMMAND rsync -a ${SFML_SOURCE_DIR}/extlibs/libs-osx/Frameworks/
+    #         $<TARGET_BUNDLE_DIR:${PROJECT_NAME}>/Contents/Frameworks/
+    #     COMMENT "Copying all SFML frameworks into the app bundle"
+    # )
+
+    # Copy only the SFML freetype framework into the app bundle
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND rsync -a ${SFML_SOURCE_DIR}/extlibs/libs-osx/Frameworks/freetype.framework
+            $<TARGET_BUNDLE_DIR:${PROJECT_NAME}>/Contents/Frameworks/
+        COMMENT "Copying SFML freetype framework into the app bundle"
+    )
+
+    # Add install target for macOS app bundle
+    install(TARGETS ${PROJECT_NAME} BUNDLE DESTINATION /Applications)
+else()
+    # Add install target for regular executable
+    install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+endif()
+
+if(WIN32)
+    add_custom_command(
+        TARGET ${PROJECT_NAME}
+        COMMENT "Copy OpenAL DLL"
+        PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${SFML_SOURCE_DIR}/extlibs/bin/$<IF:$<EQUAL:${CMAKE_SIZEOF_VOID_P},8>,x64,x86>/openal32.dll $<TARGET_FILE_DIR:${PROJECT_NAME}>
+        VERBATIM)
+endif()
