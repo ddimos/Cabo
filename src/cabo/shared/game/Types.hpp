@@ -26,7 +26,8 @@ enum class BoardState
     Start,
     Peek,
     Game,
-    Cabo
+    Cabo,
+    Finish
 };
 
 enum class ActionType

@@ -17,7 +17,7 @@
 #include "core/event/Dispatcher.hpp"
 
 #include "shared/events/GameEvents.hpp"
-#include "shared/events/InputEvents.hpp"
+#include "shared/events/NetworkEvents.hpp"
 #include "shared/Types.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -330,15 +330,16 @@ void GameState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isB
 {
     if (_isBeingRegistered)
     {
-        _dispatcher.registerEvent<events::KeyReleasedEvent>(m_listenerId,
-            [this](const events::KeyReleasedEvent& _event){
-
+        _dispatcher.registerEvent<events::FinishGameNetEvent>(m_listenerId,
+            [this](const events::FinishGameNetEvent& _event){
+                pop();
+                push(id::Finish);
             }
         );
     }
     else
     {
-        _dispatcher.unregisterEvent<events::KeyReleasedEvent>(m_listenerId);
+        _dispatcher.unregisterEvent<events::FinishGameNetEvent>(m_listenerId);
     }
 
     m_board->registerEvents(_dispatcher, _isBeingRegistered);

@@ -107,6 +107,14 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
         }
     );
     _factoryRef.add(
+        core::event::EventId(events::id::FinishGame),
+        [](const core::event::Event&, nsf::Buffer&){},
+        [](core::event::Event&, nsf::Buffer&){},
+        [](){
+            return std::make_unique<events::FinishGameNetEvent>();
+        }
+    );
+    _factoryRef.add(
         core::event::EventId(events::id::BoardStateUpdate),
         [](const core::event::Event& _event, nsf::Buffer& _buffer){
             auto& event = static_cast<const events::BoardStateUpdateNetEvent&>(_event);

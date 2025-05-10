@@ -30,6 +30,8 @@ public:
     const core::Context& getContext() const { return m_contextRef; };
     Participant* getParticipant(PlayerId _id);
 
+    bool isFinished() const { return m_isFinished; }
+
     void registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered);
 
     void update(sf::Time _dt);
@@ -81,9 +83,13 @@ private:
 
     std::map<int32_t, events::RemotePlayerInputNetEvent> m_inputBuffer;
 
+    size_t m_playersLeftBeforeEnd = 0;
+
     Card* m_drawnCardPtr = nullptr;
     ClickSlotInputData m_swapData;
     bool m_isFirstPartOfSwap = true;
+
+    bool m_isFinished = false;
 };
 
 } // namespace cn::server::game

@@ -28,9 +28,6 @@ Finish::Finish(Board& _board, PlayerId _managedPlayerId)
                     if (m_boardRef.getLocalPlayerId() != getManagedPlayerId())
                         return;
 
-                    events::RemotePlayerInputNetEvent event(getManagedPlayerId(), InputType::Finish);
-                    m_boardRef.getContext().get<net::Manager>().send(event);
-
                     if (m_boardRef.canSayCabo())
                         m_boardRef.hideCaboButton();
                     m_boardRef.hideFinishButton();
@@ -45,10 +42,19 @@ Finish::Finish(Board& _board, PlayerId _managedPlayerId)
 
 void Finish::processPlayerInput(InputType _inputType, InputDataVariant _data)
 {
-    if (_inputType == InputType::Finish)
+    if (_inputType == InputType::Finish || _inputType == InputType::Cabo)
     {
         if (getCurrentStateId() != Id::WaitInput)
             return;
+        
+        m_cabo = _inputType == InputType::Cabo;
+
+        if (m_boardRef.getLocalPlayerId() == getManagedPlayerId())
+        {
+            events::RemotePlayerInputNetEvent event(getManagedPlayerId(), m_cabo ? InputType::Cabo : InputType::Finish);
+            m_boardRef.getContext().get<net::Manager>().send(event);
+        }
+
         requestFollowingState();
     }
 }

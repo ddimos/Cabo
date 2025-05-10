@@ -23,6 +23,7 @@ enum : core::event::EventId::Type
     // PlayerLeft,
     BoardStateUpdate,
     DiscardCard,
+    FinishGame,
     MatchCard,
     PlayerJoinAccept,
     PlayerReadyStatusUpdate,

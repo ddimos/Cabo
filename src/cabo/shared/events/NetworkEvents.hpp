@@ -78,6 +78,14 @@ public:
     uint32_t m_seed = 0;
 };
 
+class FinishGameNetEvent final : public BaseNetEvent
+{
+public:
+    CN_EVENT(id::FinishGame)
+    
+    FinishGameNetEvent() = default;
+};
+
 class BoardStateUpdateNetEvent final : public BaseNetEvent
 {
 public:
