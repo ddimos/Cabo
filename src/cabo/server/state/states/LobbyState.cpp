@@ -21,6 +21,12 @@ LobbyState::LobbyState(core::state::Manager& _stateManagerRef)
     uint32_t seed = static_cast<uint32_t>(std::time(nullptr));
     getContext().get<shared::Seed>().seed = seed;
 
+    auto& playerManRef = getContext().get<player::Manager>();
+    for (const auto& player : playerManRef.getPlayers())
+    {
+        m_players.emplace(player.id, false);
+    }
+
     m_listenerId = core::event::getNewListenerId();
     CN_LOG_FRM("Lobby state.., seed {}", seed);
 }
