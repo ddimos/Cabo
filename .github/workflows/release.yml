@@ -20,7 +20,7 @@ jobs:
         platform:
         - { name: Windows, os: windows-latest, c_compiler: cl,    cpp_compiler: cl,      archive_type: zip, archive_extension: zip,    target_name: Release/Cabo_Client.exe }
         - { name: Ubuntu,  os: ubuntu-latest,  c_compiler: gcc,   cpp_compiler: g++,     archive_type: tar, archive_extension: tar.gz, target_name: Cabo_Client     }
-        - { name: macOS,   os: macos-latest,   c_compiler: clang, cpp_compiler: clang++, archive_type: tar, archive_extension: tar.gz, target_name: Cabo_Client.app }
+        - { name: macOS,   os: macos-15,       c_compiler: clang, cpp_compiler: clang++, archive_type: tar, archive_extension: tar.gz, target_name: Cabo_Client.app }
         build_type: [Release]
         lib_type:
         # - { name: Shared, flags: -DBUILD_SHARED_LIBS=TRUE  }
