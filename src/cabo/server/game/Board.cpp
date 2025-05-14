@@ -11,8 +11,9 @@
 
 namespace
 {
-    // Add an offset on the server 
-    inline constexpr short unsigned TimeForPlayerTurnServerS = cn::shared::game::TimeForPlayerTurnS + 2;
+    // Add an offset on the server
+    // TODO The timeout isn't handled on clients, so I'm disabling it for now
+    inline constexpr short unsigned TimeForPlayerTurnServerS = cn::shared::game::TimeForPlayerTurnS + 999;
 } // namespace
 
 namespace cn::server::game
