@@ -11,8 +11,9 @@
 
 namespace
 {
-    // Add an offset on the server 
-    inline constexpr short unsigned TimeForPlayerTurnServerS = cn::shared::game::TimeForPlayerTurnS + 2;
+    // Add an offset on the server
+    // TODO The timeout isn't handled on clients, so I'm disabling it for now
+    inline constexpr short unsigned TimeForPlayerTurnServerS = cn::shared::game::TimeForPlayerTurnS + 999;
 } // namespace
 
 namespace cn::server::game
@@ -39,7 +40,7 @@ Board::Board(const core::Context& _context, Deck& _deck, Discard& _discard, std:
     }
 
     m_listenerId = core::event::getNewListenerId();
-    m_state = BoardState::Cabo;
+    m_state = BoardState::Finish;
     m_newStateRequested = true;
     m_timeoutDt = sf::seconds(shared::game::TimeBeforeStartS);
 }
@@ -99,6 +100,9 @@ BoardState Board::getNextState(BoardState _state) const
         newState = BoardState::Cabo;
         break;
     case BoardState::Cabo:
+        newState = BoardState::Finish;
+        break;
+    case BoardState::Finish:
         newState = BoardState::Start;
         break;
     }
@@ -129,6 +133,22 @@ void Board::enterState(BoardState _state)
     case BoardState::Game:
         break;
     case BoardState::Cabo:
+        m_playersLeftBeforeEnd = m_participants.size();
+        break;
+    case BoardState::Finish:
+        for (auto& participant : m_participants)
+            participantStartsTurn(participant);
+        for (auto& participant : m_participants)
+        {
+            participant.participantRef.visitSlots(
+                [this](ParticipantSlot& _slot) {
+                    events::ProvideCardNetEvent event(_slot.card->getRank(), _slot.card->getSuit(), _slot.card->getId());
+                    getContext().get<net::Manager>().send(event);
+                    CN_LOG_FRM("Card id: {}, {} {}", _slot.card->getId().value(), (int)_slot.card->getRank(), (int)_slot.card->getSuit());
+                }
+            );
+            participant.currentStepId = StepId::FinishTurn;
+        }
         break;
     }
 }
@@ -171,6 +191,25 @@ void Board::updateState(BoardState _state, sf::Time _dt)
         break;
     }
     case BoardState::Game:
+        if (m_participants.at(m_indexOfCurrentParticipantTurn).currentStepId == StepId::Idle)
+            m_currentParticipantFinishedTurn = true;
+
+        m_timeoutDt -= _dt;
+        if (m_timeoutDt.asSeconds() <= 0.f)
+        {
+            onParticipantTimeout(m_participants.at(m_indexOfCurrentParticipantTurn));
+            m_currentParticipantFinishedTurn = true;
+        }
+
+        if (m_currentParticipantFinishedTurn)
+        {
+            m_currentParticipantFinishedTurn = false;
+
+            m_indexOfCurrentParticipantTurn = getIndexOfNextParticipantTurn(m_indexOfCurrentParticipantTurn);
+            participantStartsTurn(m_participants.at(m_indexOfCurrentParticipantTurn));
+            m_timeoutDt = sf::seconds(TimeForPlayerTurnServerS);
+        }
+        break;
     case BoardState::Cabo:
         if (m_participants.at(m_indexOfCurrentParticipantTurn).currentStepId == StepId::Idle)
             m_currentParticipantFinishedTurn = true;
@@ -189,6 +228,35 @@ void Board::updateState(BoardState _state, sf::Time _dt)
             m_indexOfCurrentParticipantTurn = getIndexOfNextParticipantTurn(m_indexOfCurrentParticipantTurn);
             participantStartsTurn(m_participants.at(m_indexOfCurrentParticipantTurn));
             m_timeoutDt = sf::seconds(TimeForPlayerTurnServerS);
+
+            --m_playersLeftBeforeEnd;
+            if(m_playersLeftBeforeEnd == 0)
+                m_newStateRequested = true;    
+        }
+        break;
+    case BoardState::Finish:
+    // TODO copypasted code
+        bool allParticipantFinished = true;
+        for (auto& participant : m_participants)
+        {
+            if (participant.currentStepId != StepId::Idle)
+            allParticipantFinished = false;
+        }
+        
+        m_timeoutDt -= _dt;
+        if (m_timeoutDt.asSeconds() <= 0.f)
+        {
+            allParticipantFinished = true;
+            for (auto& participant : m_participants)
+            {
+                if (participant.currentStepId != StepId::Idle)
+                onParticipantTimeout(participant);
+            }
+        }
+        if (allParticipantFinished)
+        {
+            m_isFinished = true;
+            m_currentParticipantFinishedTurn = true;
         }
         break;
     }
@@ -261,6 +329,7 @@ void Board::processInputEvent(const events::RemotePlayerInputNetEvent& _event)
         } 
         break;
     case BoardState::Game:
+    case BoardState::Cabo:
         if (participant.currentStepId == StepId::DecideCard)
         {
             processDecideCardStep(_event, participant);
@@ -295,8 +364,15 @@ void Board::processInputEvent(const events::RemotePlayerInputNetEvent& _event)
             // TODO ?punish
         } 
         break;
-    case BoardState::Cabo:
-        CN_ASSERT(false);
+    case BoardState::Finish:
+        if (participant.currentStepId == StepId::FinishTurn)
+        {
+            processFinishTurnStep(_event, participant);
+        }
+        else
+        {
+            CN_LOG_FRM("Cannot process the event in the current step: participant {}, step: {}", _event.m_senderPeerId, (int)participant.currentStepId);
+        } 
         break;
     default:
         break;
@@ -358,14 +434,24 @@ void Board::processDrawCardStep(const events::RemotePlayerInputNetEvent& _event,
 
 void Board::processFinishTurnStep(const events::RemotePlayerInputNetEvent& _event, BoardParticipant& _participant)
 {
-    if (_event.m_inputType != InputType::Finish)
+    if (_event.m_inputType == InputType::Finish)
+    {
+        CN_ASSERT(_event.m_senderPeerId == _event.m_playerId.value());
+        _participant.currentStepId = StepId::Idle;
+        CN_LOG_FRM("Participant {} finishes turn.", _event.m_senderPeerId);
+    }
+    else if (_event.m_inputType == InputType::Cabo)
+    {
+        CN_ASSERT(_event.m_senderPeerId == _event.m_playerId.value());
+
+        m_newStateRequested = true;
+        _participant.currentStepId = StepId::Idle;
+        CN_LOG_FRM("Participant {} says Cabo.", _event.m_senderPeerId);
+    }
+    else
     {
         CN_ASSERT(false);
-        return;
     }
-    CN_ASSERT(_event.m_senderPeerId == _event.m_playerId.value());
-    _participant.currentStepId = StepId::Idle;
-    CN_LOG_FRM("Participant {} finishes turn.", _event.m_senderPeerId);
 }
 
 void Board::processMatchCardStep(const events::RemotePlayerInputNetEvent& _event, BoardParticipant& _participant)

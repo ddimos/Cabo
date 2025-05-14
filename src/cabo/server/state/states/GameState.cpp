@@ -95,6 +95,13 @@ core::state::Return GameState::onUpdate(sf::Time _dt)
 {
     m_board->update(_dt);
 
+    if (m_board->isFinished())
+    {
+        events::FinishGameNetEvent event;
+        getContext().get<net::Manager>().send(event);
+        pop();
+        push(id::Finish);
+    }
     return core::state::Return::Break;
 }
 

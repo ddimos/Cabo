@@ -31,7 +31,7 @@ public:
     using DecideSwapButtons = std::vector<client::menu::item::Button*>;
 
     Board(const core::Context& _context, std::vector<game::Participant*>&& _participants, Deck& _deck, 
-          menu::item::NotificationQueue& _queue, menu::item::Button& _finishButton,
+          menu::item::NotificationQueue& _queue, menu::item::Button& _finishButton, menu::item::Button& _caboButton,
           DecideActionButtons&& _decideButtons, DecideSwapButtons&& _decideSwapButtons, CardPositions _cardPositions);
 
     void registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered);
@@ -43,11 +43,15 @@ public:
 
     CardPositions getCardPositions() const { return m_cardPositions; }
 
+    bool canSayCabo() const;
+
     void showDecideActionButtons();
     void hideDecideActionButtons();
 
     void showDecideSwapButtons();
     void hideDecideSwapButtons();
+    void showCaboButton();
+    void hideCaboButton();
     void showFinishButton();
     void hideFinishButton();
 
@@ -73,6 +77,7 @@ private:
 
     menu::item::NotificationQueue& m_queueRef;
     menu::item::Button& m_finishButtonRef;
+    menu::item::Button& m_caboButtonRef;
     DecideActionButtons m_decideActionButtons;
     DecideSwapButtons m_decideSwapButtons;
 

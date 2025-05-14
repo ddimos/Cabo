@@ -20,6 +20,9 @@ inline StepId getFirstStepId(BoardState _boardState)
     case BoardState::Cabo:
         firstStep = StepId::DrawCard;
         break;
+    case BoardState::Finish:
+        firstStep = StepId::SeeAllCards;
+        break;
     }
     return firstStep;
 }

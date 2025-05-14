@@ -9,6 +9,15 @@ Manager::Manager(core::Context& _contextRef)
 {
 }
 
+Manager::~Manager()
+{
+    while (!m_stack.empty())
+    {
+        m_stack.back()->deactivate();
+        m_stack.pop_back();
+    }
+}
+
 void Manager::update(sf::Time _dt)
 {
     for (auto it = m_stack.rbegin(); it != m_stack.rend(); ++it)

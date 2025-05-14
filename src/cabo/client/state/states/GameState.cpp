@@ -17,7 +17,7 @@
 #include "core/event/Dispatcher.hpp"
 
 #include "shared/events/GameEvents.hpp"
-#include "shared/events/InputEvents.hpp"
+#include "shared/events/NetworkEvents.hpp"
 #include "shared/Types.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -163,6 +163,22 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
     finishButton->setActivationOption(core::object::Object::ActivationOption::Manually);
     getContainer(core::object::Container::Type::Menu).add(finishButton);
 
+    auto caboButton = std::make_shared<menu::item::Button>(
+        menu::Position{
+            .m_position = sf::Vector2f(180.f, 100.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
+            .m_specPositionX = menu::Position::Special::OFFSET_FROM_END, .m_specPositionY = menu::Position::Special::OFFSET_FROM_END
+        },
+        textureHolderRef.get(TextureIds::CaboButton),
+        game::spriteSheet::getCaboButtonTextureRect(),
+        game::spriteSheet::getCaboButtonTextureRect(game::spriteSheet::Hover::Yes),
+        [this, &eventDispatcherRef](){
+            eventDispatcherRef.send<events::LocalPlayerClickCaboButtonEvent>();
+        },
+        sf::Mouse::Button::Left
+    );
+    caboButton->setActivationOption(core::object::Object::ActivationOption::Manually);
+    getContainer(core::object::Container::Type::Menu).add(caboButton);
+
     game::Board::DecideActionButtons decideActionButtons;
     {
         auto matchButton = std::make_shared<menu::item::Button>(
@@ -299,7 +315,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
     getContainer(core::object::Container::Type::Menu).add(queue);
 
     m_board = std::make_unique<game::Board>(
-        getContext(), std::move(participants), *deck, *queue, *finishButton,
+        getContext(), std::move(participants), *deck, *queue, *finishButton, *caboButton,
         std::move(decideActionButtons), std::move(decideSwapButtons), 
         game::CardPositions{ 
             .discardPos = discardPos.calculateGlobalPos(),
@@ -314,15 +330,16 @@ void GameState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isB
 {
     if (_isBeingRegistered)
     {
-        _dispatcher.registerEvent<events::KeyReleasedEvent>(m_listenerId,
-            [this](const events::KeyReleasedEvent& _event){
-
+        _dispatcher.registerEvent<events::FinishGameNetEvent>(m_listenerId,
+            [this](const events::FinishGameNetEvent& _event){
+                pop();
+                push(id::Finish);
             }
         );
     }
     else
     {
-        _dispatcher.unregisterEvent<events::KeyReleasedEvent>(m_listenerId);
+        _dispatcher.unregisterEvent<events::FinishGameNetEvent>(m_listenerId);
     }
 
     m_board->registerEvents(_dispatcher, _isBeingRegistered);

@@ -12,8 +12,8 @@ public:
     FinishState(core::state::Manager& _stateManagerRef);
 
 private:
-    void onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered) override;
-    
+    core::state::Return onUpdate(sf::Time _dt) override;
+
     core::event::ListenerId m_listenerId{};
 };
 

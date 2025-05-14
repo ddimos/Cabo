@@ -20,12 +20,6 @@ DrawCard::DrawCard(Board& _board, PlayerId _managedPlayerId)
             }},
             {Id::WaitCard, {            
                 .onEnter = [this](){
-                    if (m_boardRef.getLocalPlayerId() == getManagedPlayerId())
-                    {
-                        events::RemotePlayerInputNetEvent event(getManagedPlayerId(), InputType::ClickPile, m_requestedCardFromDeck ? PileType::Deck : PileType::Discard);
-                        m_boardRef.getContext().get<net::Manager>().send(event);
-                    }           
-
                     Card* card = m_boardRef.drawCard(m_requestedCardFromDeck);
 
                     if (m_requestedCardFromDeck)
@@ -69,6 +63,12 @@ void DrawCard::processPlayerInput(InputType _inputType, InputDataVariant _data)
 
         auto dataStruct = std::get<PileType>(_data);
         m_requestedCardFromDeck = dataStruct == PileType::Deck;
+
+        if (m_boardRef.getLocalPlayerId() == getManagedPlayerId())
+        {
+            events::RemotePlayerInputNetEvent event(getManagedPlayerId(), InputType::ClickPile, m_requestedCardFromDeck ? PileType::Deck : PileType::Discard);
+            m_boardRef.getContext().get<net::Manager>().send(event);
+        }
 
         requestFollowingState();
     }

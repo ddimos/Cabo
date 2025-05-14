@@ -25,6 +25,7 @@ class Manager final    // TODO NonCopyable
 {
 public:		
     Manager(core::Context& _contextRef);
+    ~Manager();
 
     template <typename T>
     void registerState(StateId _stateId);

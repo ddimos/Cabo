@@ -23,6 +23,7 @@ enum : core::event::EventId::Type
     // PlayerLeft,
     BoardStateUpdate,
     DiscardCard,
+    FinishGame,
     MatchCard,
     PlayerJoinAccept,
     PlayerReadyStatusUpdate,
@@ -38,6 +39,7 @@ enum : core::event::EventId::Type
     PlayerPresenceChanged,
 
     // Player action events
+    LocalPlayerClickCaboButton,
     LocalPlayerClickDecideButton,
     LocalPlayerClickDecideSwapButton,
     LocalPlayerClickDeck,

@@ -6,6 +6,7 @@
 #include "client/game/step/DrawCard.hpp"
 #include "client/game/step/Finish.hpp"
 #include "client/game/step/MatchCard.hpp"
+#include "client/game/step/SeeAllCards.hpp"
 #include "client/game/step/SeeCard.hpp"
 #include "client/game/step/SwapCard.hpp"
 #include "client/game/step/TakeCard.hpp"
@@ -23,13 +24,14 @@ namespace cn::client::game
 {
 
 Board::Board(const core::Context& _context, std::vector<game::Participant*>&& _participants, Deck& _deck, 
-             menu::item::NotificationQueue& _queue, menu::item::Button& _finishButton, DecideActionButtons&& _decideActionButtons,
-             DecideSwapButtons&& _decideSwapButtons, CardPositions _cardPositions)
+             menu::item::NotificationQueue& _queue, menu::item::Button& _finishButton, menu::item::Button& _caboButton,
+             DecideActionButtons&& _decideActionButtons, DecideSwapButtons&& _decideSwapButtons, CardPositions _cardPositions)
     : m_contextRef(_context)
     , m_participants(std::move(_participants))
     , m_deckRef(_deck)
     , m_queueRef(_queue)
     , m_finishButtonRef(_finishButton)
+    , m_caboButtonRef(_caboButton)
     , m_decideActionButtons(std::move(_decideActionButtons))
     , m_decideSwapButtons(std::move(_decideSwapButtons))
     , m_cardPositions(_cardPositions)
@@ -118,7 +120,6 @@ void Board::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRe
                     it->second->processPlayerInput(InputType::SwapDecision, _event.m_swap);
             }
         );
-
         _dispatcher.registerEvent<events::LocalPlayerClickFinishButtonEvent>(m_listenerId,
             [this](const events::LocalPlayerClickFinishButtonEvent& _event)
             {
@@ -127,18 +128,26 @@ void Board::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRe
                     it->second->processPlayerInput(InputType::Finish, std::monostate());
             }
         );
+        _dispatcher.registerEvent<events::LocalPlayerClickCaboButtonEvent>(m_listenerId,
+            [this](const events::LocalPlayerClickCaboButtonEvent& _event)
+            {
+                auto it = m_steps.find(m_localPlayerId);
+                if (it != m_steps.end() && it->second)
+                    it->second->processPlayerInput(InputType::Cabo, std::monostate());
+            }
+        );
         _dispatcher.registerEvent<events::ProvideCardNetEvent>(m_listenerId,
             [&_dispatcher, this](const events::ProvideCardNetEvent& _event){
+                CN_LOG_FRM("Provided card id: {}, {} {}", _event.m_cardId.value(), (int)_event.m_rank, (int)_event.m_suit);
                 bool found = false;
                 for (auto* participant : m_participants)
                 {
                     participant->visitSlots(
                         [&_event, &found](ParticipantSlot& _slot) {
-                            if (_slot.cardPtr->getId() == _event.m_cardId)
+                            if (!found && _slot.cardPtr->getId() == _event.m_cardId)
                             {
                                 _slot.cardPtr->set(_event.m_rank, _event.m_suit);
                                 found = true;
-                                return;
                             }
                         }
                     );
@@ -155,8 +164,12 @@ void Board::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRe
                 for (auto* card : m_cardsToDiscard)
                 {
                     if (card->getId() == _event.m_cardId)
+                    {
                         card->set(_event.m_rank, _event.m_suit);
+                        return;
+                    }
                 }
+                CN_ASSERT(false);
             }
         );
         _dispatcher.registerEvent<events::PlayerSlotUpdateNetEvent>(m_listenerId,
@@ -198,6 +211,7 @@ void Board::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRe
         _dispatcher.unregisterEvent<events::LocalPlayerClickDecideButtonEvent>(m_listenerId);
         _dispatcher.unregisterEvent<events::LocalPlayerClickDecideSwapButtonEvent>(m_listenerId);
         _dispatcher.unregisterEvent<events::LocalPlayerClickFinishButtonEvent>(m_listenerId);
+        _dispatcher.unregisterEvent<events::LocalPlayerClickCaboButtonEvent>(m_listenerId);
         _dispatcher.unregisterEvent<events::ProvideCardNetEvent>(m_listenerId);
         _dispatcher.unregisterEvent<events::PlayerSlotUpdateNetEvent>(m_listenerId);
     }
@@ -260,6 +274,11 @@ Participant* Board::getParticipant(PlayerId _id)
     return nullptr;
 }
 
+bool Board::canSayCabo() const
+{
+    return m_boardState == BoardState::Game;
+}
+
 void Board::showDecideActionButtons()
 {
     for (auto& button : m_decideActionButtons)
@@ -282,6 +301,16 @@ void Board::hideDecideSwapButtons()
 {
     for (auto& button : m_decideSwapButtons)
         button->requestDeactivated();
+}
+
+void Board::showCaboButton()
+{
+    m_caboButtonRef.requestActivated();
+}
+
+void Board::hideCaboButton()
+{
+    m_caboButtonRef.requestDeactivated();
 }
 
 void Board::showFinishButton()
@@ -337,9 +366,6 @@ void Board::changeStep(PlayerId _playerId, StepId _nextStepId, std::unique_ptr<S
 {
     switch (_nextStepId)
     {
-    case StepId::Idle:
-        _step.reset();
-        break;
     case StepId::DecideCard:
         _step = std::make_unique<step::DecideCard>(*this, _playerId);
         break;
@@ -351,6 +377,9 @@ void Board::changeStep(PlayerId _playerId, StepId _nextStepId, std::unique_ptr<S
         break;
     case StepId::MatchCard:
         _step = std::make_unique<step::MatchCard>(*this, _playerId, *m_drawnCardPtr);
+        break;
+    case StepId::SeeAllCards:
+        _step = std::make_unique<step::SeeAllCards>(*this, _playerId);
         break;
     case StepId::SeeOwnCard:
         _step = std::make_unique<step::SeeCard>(*this, _playerId, true);
@@ -368,6 +397,7 @@ void Board::changeStep(PlayerId _playerId, StepId _nextStepId, std::unique_ptr<S
         _step = std::make_unique<step::TakeCard>(*this, _playerId, *m_drawnCardPtr);
         break;
     default:
+        _step.reset();
         break;
     }
     CN_LOG_FRM("Set step {}, player {}", (unsigned)_nextStepId, _playerId.value());
