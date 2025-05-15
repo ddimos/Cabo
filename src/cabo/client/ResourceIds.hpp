@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/save/Save.hpp"
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/Texture.hpp>
 
@@ -27,7 +28,14 @@ enum class FontIds
     Main,
 };
 
+enum class SaveIds
+{
+    PlayerName,
+    ServerAddress
+};
+
 using TextureHolder = core::ResourceHolder<sf::Texture, TextureIds>;
 using FontHolder = core::ResourceHolder<sf::Font, FontIds>;
+using SaveHolder = core::ResourceHolder<core::save::Save, SaveIds>;
 
 } // namespace cn::client

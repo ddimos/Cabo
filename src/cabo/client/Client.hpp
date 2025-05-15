@@ -36,6 +36,7 @@ private:
 
     TextureHolder m_textureHolder;
     FontHolder m_fontHolder;
+    SaveHolder m_saveHolder;
 
     net::Manager m_netManager;
     core::event::Manager m_eventManager;

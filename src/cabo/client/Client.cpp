@@ -88,6 +88,9 @@ void Client::init()
     m_textureHolder.load(TextureIds::Table, "res/textures/table.png");
     m_textureHolder.load(TextureIds::YesNoButtons, "res/textures/yes_no_buttons.png");
 
+    m_saveHolder.load(SaveIds::PlayerName, "res/save/player_name");
+    m_saveHolder.load(SaveIds::ServerAddress, "res/save/server_address");
+
 // TODO move states
     m_stateManager.registerState<states::TitleState>(states::id::Title);
     m_stateManager.registerState<states::MainMenuState>(states::id::MainMenu);
