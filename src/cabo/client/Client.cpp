@@ -129,6 +129,9 @@ void Client::handleEvents()
         case sf::Event::MouseMoved:
             m_eventManager.getDispatcher().send<events::MouseMovedEvent>(event.mouseMove);
             break;
+        case sf::Event::TextEntered:
+            m_eventManager.getDispatcher().send<events::TextEnteredEvent>(event.text);
+            break;
         default:
             break;
         }

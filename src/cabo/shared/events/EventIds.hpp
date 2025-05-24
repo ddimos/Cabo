@@ -17,6 +17,7 @@ enum : core::event::EventId::Type
     KeyReleased,
     MouseButtonReleased,
     MouseMoved,
+    TextEntered,
 
     // Net events
     // PlayerJoined,

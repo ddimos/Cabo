@@ -43,4 +43,16 @@ public:
     sf::Event::MouseMoveEvent mouseMove;
 };
 
+class TextEnteredEvent final : public core::event::Event
+{
+public:
+    CN_EVENT(id::TextEntered)
+
+    TextEnteredEvent(sf::Event::TextEvent _event)
+        : core::event::Event(), text(_event) 
+    {}
+
+    sf::Event::TextEvent text;
+};
+
 } // namespace cn::events
