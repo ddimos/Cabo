@@ -13,6 +13,7 @@ namespace id
         Joining,
         Lobby,
         MainMenu,
+        EnterName,
         Title
     };
 } // namespace id

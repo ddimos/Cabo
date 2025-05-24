@@ -2,6 +2,7 @@
 
 #include "client/state/StateIds.hpp"
 
+#include "client/state/states/EnterNameState.hpp"
 #include "client/state/states/FinishState.hpp"
 #include "client/state/states/GameState.hpp"
 #include "client/state/states/JoiningState.hpp"

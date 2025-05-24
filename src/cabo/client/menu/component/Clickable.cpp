@@ -17,14 +17,17 @@ void Clickable::setButton(sf::Mouse::Button _button)
 
 void Clickable::onMouseReleased(sf::Event::MouseButtonEvent _event)
 {
-    if (!contains(sf::Vector2f(_event.x, _event.y)))
-        return;
-    
     CN_ASSERT(m_button != sf::Mouse::Button::ButtonCount);
-
     if (_event.button != m_button)
         return;
+
+    if (!contains(sf::Vector2f(_event.x, _event.y)))
+    {
+        m_isActive = false;
+        return;
+    }
     
+    m_isActive = true;
     m_onClickCallback();
 }
 

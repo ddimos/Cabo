@@ -16,6 +16,7 @@ enum class TextureIds
     CaboButton,
     Cards,
     DecideButtons,
+    Field,
     FinishButton,
     MainMenuStartButton,
     MainMenuJoinButton,

@@ -23,6 +23,7 @@ Client::Client()
     m_context.insert(m_window);
     m_context.insert(m_textureHolder);
     m_context.insert(m_fontHolder);
+    m_context.insert(m_saveHolder);
     m_context.insert(m_netManager);
     m_context.insert(m_eventManager.getDispatcher());
     m_context.insert(m_playerManager);
@@ -82,6 +83,7 @@ void Client::init()
     m_textureHolder.load(TextureIds::CaboButton, "res/textures/cabo_button.png");
     m_textureHolder.load(TextureIds::Cards, "res/textures/cards.png");
     m_textureHolder.load(TextureIds::DecideButtons, "res/textures/decide_buttons.png");
+    m_textureHolder.load(TextureIds::Field, "res/textures/field.png");
     m_textureHolder.load(TextureIds::FinishButton, "res/textures/finish_button.png");
     m_textureHolder.load(TextureIds::MainMenuJoinButton, "res/textures/join_menu_join_button.png");
     m_textureHolder.load(TextureIds::MainMenuStartButton, "res/textures/create_menu_start_button.png");
@@ -93,13 +95,14 @@ void Client::init()
 
 // TODO move states
     m_stateManager.registerState<states::TitleState>(states::id::Title);
+    m_stateManager.registerState<states::EnterNameState>(states::id::EnterName);
     m_stateManager.registerState<states::MainMenuState>(states::id::MainMenu);
     m_stateManager.registerState<states::JoiningState>(states::id::Joining);
     m_stateManager.registerState<states::LobbyState>(states::id::Lobby);
     m_stateManager.registerState<states::GameState>(states::id::Game);
     m_stateManager.registerState<states::FinishState>(states::id::Finish);
 
-    m_stateManager.pushState(states::id::Title);
+    m_stateManager.pushState(states::id::EnterName);
 
     m_playerManager.registerEvents(m_eventManager.getDispatcher(), true);
 }
