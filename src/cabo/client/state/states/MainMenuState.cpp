@@ -21,7 +21,6 @@ MainMenuState::MainMenuState(core::state::Manager& _stateManagerRef)
     auto& textureHolderRef = getContext().get<TextureHolder>();
     auto& fontHolderRef = getContext().get<FontHolder>();
 
-
     auto joinButton = std::make_shared<menu::item::Button>(
         menu::Position{
             .m_position = sf::Vector2f(0.f, 0.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
@@ -40,8 +39,12 @@ MainMenuState::MainMenuState(core::state::Manager& _stateManagerRef)
 
 void MainMenuState::connect()
 {
-    // TODO 
-    getContext().get<net::Manager>().connect(nsf::NetworkAddress(sf::IpAddress("192.168.1.165"), 20475));
+    auto& save = getContext().get<SaveHolder>().get(SaveIds::ServerAddress);
+    size_t pos = save.getValue().find(':');
+    auto ip = sf::IpAddress(save.getValue().substr(0, pos));
+    unsigned port = std::stoi(save.getValue().substr(pos + 1));
+
+    getContext().get<net::Manager>().connect(nsf::NetworkAddress(ip, port));
     push(states::id::Joining);
 }
 
