@@ -1,4 +1,5 @@
 #include "client/player/Manager.hpp"
+#include "client/ResourceIds.hpp"
 
 #include "shared/events/NetworkEvents.hpp"
 #include "shared/net/Manager.hpp"
@@ -30,10 +31,12 @@ void Manager::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeing
                 m_localPlayerId = _event.m_playerId;
 
                 auto& netManRef = m_contextRef.get<net::Manager>();
-                events::PlayerUpdateNetEvent event({ Player{ .name = "Player Name"} });
+                auto& save = m_contextRef.get<SaveHolder>().get(SaveIds::PlayerName);
+
+                events::PlayerUpdateNetEvent event({ Player{ .name = save.getValue() } });
                 netManRef.send(event);
 
-                m_players.emplace_back(Player{ .name = "Player Name", .id = m_localPlayerId});
+                m_players.emplace_back(Player{ .name = save.getValue(), .id = m_localPlayerId});
             }
         );
         _dispatcher.registerEvent<events::PlayerUpdateNetEvent>(m_listenerId,

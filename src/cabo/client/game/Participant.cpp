@@ -12,8 +12,8 @@
 namespace cn::client::game
 {
 
-Participant::Participant(const core::Context& _context, PlayerId _id, bool _isLocal, std::vector<ParticipantSlot>&& _slots, unsigned short _initialNumberOfSlots)
-    : m_id(_id)
+Participant::Participant(const core::Context& _context, const Player& _player, bool _isLocal, std::vector<ParticipantSlot>&& _slots, unsigned short _initialNumberOfSlots)
+    : m_id(_player.id)
     , m_isLocal(_isLocal)
     , m_slots(std::move(_slots))
     , m_currentNumberOfSlots(_initialNumberOfSlots)
@@ -21,7 +21,7 @@ Participant::Participant(const core::Context& _context, PlayerId _id, bool _isLo
     auto& fontHolderRef = _context.get<client::FontHolder>();
 
     m_nameText.setFont(fontHolderRef.get(client::FontIds::Main));
-    m_nameText.setString("Player " + std::to_string(m_id.value())); // TODO a proper name
+    m_nameText.setString(_player.name);
     m_nameText.setFillColor(sf::Color::White);
     m_nameText.setCharacterSize(24);
     m_nameText.setOrigin(m_nameText.getGlobalBounds().getSize() / 2.f);

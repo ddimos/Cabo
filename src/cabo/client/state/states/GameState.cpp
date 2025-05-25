@@ -103,7 +103,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
             }
             
             auto participant = std::make_shared<game::Participant>(
-                getContext(), playerId, true, std::move(slots), shared::game::DefaultInitNumberOfParticipantSlots
+                getContext(), player, true, std::move(slots), shared::game::DefaultInitNumberOfParticipantSlots
             );
             participant->setSpawnPoint(spawnPoints[index]);
             getContainer(core::object::Container::Type::Game).add(participant);

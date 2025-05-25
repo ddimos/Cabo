@@ -23,7 +23,7 @@ namespace cn::client::game
 class Participant final : public core::object::Object
 {
 public:
-    Participant(const core::Context& _context, PlayerId _id, bool _isLocal, std::vector<ParticipantSlot>&& _slots, unsigned short _initialNumberOfSlots);
+    Participant(const core::Context& _context, const Player& _player, bool _isLocal, std::vector<ParticipantSlot>&& _slots, unsigned short _initialNumberOfSlots);
 
     PlayerId getId() const { return m_id; }
     bool isLocal() const { return m_isLocal; }
