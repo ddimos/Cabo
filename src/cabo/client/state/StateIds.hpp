@@ -14,6 +14,7 @@ namespace id
         Lobby,
         MainMenu,
         EnterName,
+        Test,
         Title
     };
 } // namespace id

@@ -8,4 +8,5 @@
 #include "client/state/states/JoiningState.hpp"
 #include "client/state/states/LobbyState.hpp"
 #include "client/state/states/MainMenuState.hpp"
+#include "client/state/states/TestState.hpp"
 #include "client/state/states/TitleState.hpp"

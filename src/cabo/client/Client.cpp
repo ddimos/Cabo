@@ -77,23 +77,24 @@ void Client::start()
 
 void Client::init()
 {
-    m_fontHolder.load(FontIds::Main, "res/fonts/times_new_roman.ttf");
-    m_textureHolder.load(TextureIds::Background, "res/textures/background.png");
-    m_textureHolder.load(TextureIds::BackButton, "res/textures/back_button.png");
-    m_textureHolder.load(TextureIds::CaboButton, "res/textures/cabo_button.png");
-    m_textureHolder.load(TextureIds::Cards, "res/textures/cards.png");
-    m_textureHolder.load(TextureIds::DecideButtons, "res/textures/decide_buttons.png");
-    m_textureHolder.load(TextureIds::Field, "res/textures/field.png");
-    m_textureHolder.load(TextureIds::FinishButton, "res/textures/finish_button.png");
-    m_textureHolder.load(TextureIds::MainMenuJoinButton, "res/textures/join_menu_join_button.png");
-    m_textureHolder.load(TextureIds::MainMenuStartButton, "res/textures/create_menu_start_button.png");
-    m_textureHolder.load(TextureIds::Table, "res/textures/table.png");
-    m_textureHolder.load(TextureIds::YesNoButtons, "res/textures/yes_no_buttons.png");
+    // m_fontHolder.load(FontIds::Main, "res/fonts/times_new_roman.ttf");
+    // m_textureHolder.load(TextureIds::Background, "res/textures/background.png");
+    // m_textureHolder.load(TextureIds::BackButton, "res/textures/back_button.png");
+    // m_textureHolder.load(TextureIds::CaboButton, "res/textures/cabo_button.png");
+    // m_textureHolder.load(TextureIds::Cards, "res/textures/cards.png");
+    // m_textureHolder.load(TextureIds::DecideButtons, "res/textures/decide_buttons.png");
+    // m_textureHolder.load(TextureIds::Field, "res/textures/field.png");
+    // m_textureHolder.load(TextureIds::FinishButton, "res/textures/finish_button.png");
+    // m_textureHolder.load(TextureIds::MainMenuJoinButton, "res/textures/join_menu_join_button.png");
+    // m_textureHolder.load(TextureIds::MainMenuStartButton, "res/textures/create_menu_start_button.png");
+    // m_textureHolder.load(TextureIds::Table, "res/textures/table.png");
+    // m_textureHolder.load(TextureIds::YesNoButtons, "res/textures/yes_no_buttons.png");
 
-    m_saveHolder.load(SaveIds::PlayerName, "res/save/player_name");
-    m_saveHolder.load(SaveIds::ServerAddress, "res/save/server_address");
+    // m_saveHolder.load(SaveIds::PlayerName, "res/save/player_name");
+    // m_saveHolder.load(SaveIds::ServerAddress, "res/save/server_address");
 
 // TODO move states
+    m_stateManager.registerState<states::TestState>(states::id::Test);
     m_stateManager.registerState<states::TitleState>(states::id::Title);
     m_stateManager.registerState<states::EnterNameState>(states::id::EnterName);
     m_stateManager.registerState<states::MainMenuState>(states::id::MainMenu);
@@ -102,7 +103,7 @@ void Client::init()
     m_stateManager.registerState<states::GameState>(states::id::Game);
     m_stateManager.registerState<states::FinishState>(states::id::Finish);
 
-    m_stateManager.pushState(states::id::EnterName);
+    m_stateManager.pushState(states::id::Test);
 
     m_playerManager.registerEvents(m_eventManager.getDispatcher(), true);
 }

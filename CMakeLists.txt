@@ -42,7 +42,24 @@ else ()
     )
 endif ()
 
-add_executable(Cabo ${TARGET_SRC} "./src/main.cpp")
+set(RESOURCES
+    ${CMAKE_SOURCE_DIR}/res/fonts/times_new_roman.ttf
+    ${CMAKE_SOURCE_DIR}/res/save/player_name
+    ${CMAKE_SOURCE_DIR}/res/save/server_address
+    ${CMAKE_SOURCE_DIR}/res/textures/back_button.png
+    ${CMAKE_SOURCE_DIR}/res/textures/background.png
+    ${CMAKE_SOURCE_DIR}/res/textures/cabo_button.png
+    ${CMAKE_SOURCE_DIR}/res/textures/cards.png
+    ${CMAKE_SOURCE_DIR}/res/textures/create_menu_start_button.png
+    ${CMAKE_SOURCE_DIR}/res/textures/decide_buttons.png
+    ${CMAKE_SOURCE_DIR}/res/textures/field.png
+    ${CMAKE_SOURCE_DIR}/res/textures/finish_button.png
+    ${CMAKE_SOURCE_DIR}/res/textures/join_menu_join_button.png
+    ${CMAKE_SOURCE_DIR}/res/textures/table.png
+    ${CMAKE_SOURCE_DIR}/res/textures/yes_no_buttons.png
+)
+
+add_executable(Cabo ${TARGET_SRC} "./src/main.cpp" ${RESOURCES})
 
 target_link_libraries(Cabo sfml-graphics sfml-system sfml-window sfml-network nsf)
 
@@ -91,6 +108,8 @@ if(APPLE)
         INSTALL_RPATH "@executable_path/../Frameworks"
         BUILD_WITH_INSTALL_RPATH TRUE
     )
+
+    set_source_files_properties(${RESOURCES} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
 
     # Clean up the Frameworks directory before copying
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
