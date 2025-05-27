@@ -3,27 +3,47 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/CircleShape.hpp>
 
+#include <filesystem>
+#include <fstream>
+#include <iostream>
+
 namespace cn::client::states
 {
 
 TestState::TestState(core::state::Manager& _stateManagerRef)
     : State(_stateManagerRef)
 {
+    std::cout << "Current path is " << std::filesystem::current_path() << '\n';
     {
         sf::Texture texture;
-        m_loaded1 = texture.loadFromFile("res/textures/background.png");
+        m_loaded1 = texture.loadFromFile("Contents/Resources/background.png");
     }
     {
         sf::Texture texture;
-        m_loaded2 = texture.loadFromFile("background.png");
+        m_loaded2 = texture.loadFromFile("../background.png");
     }
     {
         sf::Texture texture;
-        m_loaded3 = texture.loadFromFile("Resources/background.png");
+        m_loaded3 = texture.loadFromFile("../Resources/background.png");
     }
     {
         sf::Texture texture;
-        m_loaded4 = texture.loadFromFile("Resources/res/textures/background.png");
+        m_loaded4 = texture.loadFromFile(std::string(std::filesystem::current_path().c_str())+"/Resources/background.png");
+    }
+    {
+        sf::Texture texture;
+        m_loaded5 = texture.loadFromFile(std::string(std::filesystem::current_path().c_str())+"/Contents/Resources/background.png");
+    }
+    {
+        sf::Texture texture;
+        m_loaded6 = texture.loadFromFile(std::string(std::filesystem::current_path().c_str())+"/../Resources/background.png");
+    }
+    {
+        std::ofstream file("testtt.txt");
+        if (file.is_open())
+        {
+            file << std::filesystem::current_path();
+        }
     }
 }
 
@@ -67,6 +87,22 @@ void TestState::onDraw()
         circle.setPosition(500.f, 100.f);
         circle.setRadius(50.f);
         circle.setFillColor(sf::Color::Magenta);
+        windowRef.draw(circle);
+    }
+    if (m_loaded5)
+    {
+        sf::CircleShape circle;
+        circle.setPosition(600.f, 100.f);
+        circle.setRadius(50.f);
+        circle.setFillColor(sf::Color::Yellow);
+        windowRef.draw(circle);
+    }
+    if (m_loaded6)
+    {
+        sf::CircleShape circle;
+        circle.setPosition(700.f, 100.f);
+        circle.setRadius(50.f);
+        circle.setFillColor(sf::Color::Cyan);
         windowRef.draw(circle);
     }
 }
