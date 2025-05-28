@@ -42,24 +42,22 @@ else ()
     )
 endif ()
 
-set(RESOURCES
-    ${CMAKE_SOURCE_DIR}/res/fonts/times_new_roman.ttf
-    ${CMAKE_SOURCE_DIR}/res/save/player_name
-    ${CMAKE_SOURCE_DIR}/res/save/server_address
-    ${CMAKE_SOURCE_DIR}/res/textures/back_button.png
-    ${CMAKE_SOURCE_DIR}/res/textures/background.png
-    ${CMAKE_SOURCE_DIR}/res/textures/cabo_button.png
-    ${CMAKE_SOURCE_DIR}/res/textures/cards.png
-    ${CMAKE_SOURCE_DIR}/res/textures/create_menu_start_button.png
-    ${CMAKE_SOURCE_DIR}/res/textures/decide_buttons.png
-    ${CMAKE_SOURCE_DIR}/res/textures/field.png
-    ${CMAKE_SOURCE_DIR}/res/textures/finish_button.png
-    ${CMAKE_SOURCE_DIR}/res/textures/join_menu_join_button.png
-    ${CMAKE_SOURCE_DIR}/res/textures/table.png
-    ${CMAKE_SOURCE_DIR}/res/textures/yes_no_buttons.png
+set(GLOB_RECURSE RESOURCES_FONTS 
+    "${CMAKE_SOURCE_DIR}/res/fonts/*.ttf"
+)
+set(GLOB_RECURSE RESOURCES_SAVES 
+    "${CMAKE_SOURCE_DIR}/res/save/*"
+)
+set(GLOB_RECURSE RESOURCES_TEXTURES
+    "${CMAKE_SOURCE_DIR}/res/textures/*.png"
 )
 
-add_executable(Cabo ${TARGET_SRC} "./src/main.cpp" ${RESOURCES})
+add_executable(Cabo ${TARGET_SRC} 
+                    "./src/main.cpp"
+                    ${RESOURCES_FONTS}
+                    ${RESOURCES_SAVES}
+                    ${RESOURCES_TEXTURES}
+)
 
 target_link_libraries(Cabo sfml-graphics sfml-system sfml-window sfml-network nsf)
 
@@ -114,7 +112,9 @@ if(APPLE)
         BUILD_WITH_INSTALL_RPATH TRUE
     )
 
-    set_source_files_properties(${RESOURCES} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+    set_source_files_properties(${RESOURCES_FONTS} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources/fonts")
+    set_source_files_properties(${RESOURCES_SAVES} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources/save")
+    set_source_files_properties(${RESOURCES_TEXTURES} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources/textures")
 
     # Clean up the Frameworks directory before copying
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD

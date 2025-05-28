@@ -4,6 +4,7 @@
 
 #include "core/event/Dispatcher.hpp"
 #include "core/Log.hpp"
+#include "core/Path.hpp"
 
 #include "shared/events/InputEvents.hpp"
 
@@ -12,6 +13,20 @@
 #include "Constants.hpp"
 
 #include <SFML/Window/Event.hpp>
+
+namespace
+{
+
+std::string getResourcesPath()
+{
+#if defined(__APPLE__)
+    return std::string(cn::core::getExecutablePath().parent_path().parent_path().c_str()) + "/Resources/";
+#else
+    return "res/";
+#endif
+}
+
+} // namespace
 
 namespace cn::client
 {
@@ -77,21 +92,22 @@ void Client::start()
 
 void Client::init()
 {
-    // m_fontHolder.load(FontIds::Main, "res/fonts/times_new_roman.ttf");
-    // m_textureHolder.load(TextureIds::Background, "res/textures/background.png");
-    // m_textureHolder.load(TextureIds::BackButton, "res/textures/back_button.png");
-    // m_textureHolder.load(TextureIds::CaboButton, "res/textures/cabo_button.png");
-    // m_textureHolder.load(TextureIds::Cards, "res/textures/cards.png");
-    // m_textureHolder.load(TextureIds::DecideButtons, "res/textures/decide_buttons.png");
-    // m_textureHolder.load(TextureIds::Field, "res/textures/field.png");
-    // m_textureHolder.load(TextureIds::FinishButton, "res/textures/finish_button.png");
-    // m_textureHolder.load(TextureIds::MainMenuJoinButton, "res/textures/join_menu_join_button.png");
-    // m_textureHolder.load(TextureIds::MainMenuStartButton, "res/textures/create_menu_start_button.png");
-    // m_textureHolder.load(TextureIds::Table, "res/textures/table.png");
-    // m_textureHolder.load(TextureIds::YesNoButtons, "res/textures/yes_no_buttons.png");
+    auto resourcePath = getResourcesPath();
+    m_fontHolder.load(FontIds::Main,                        resourcePath + "fonts/times_new_roman.ttf");
+    m_textureHolder.load(TextureIds::Background,            resourcePath + "textures/background.png");
+    m_textureHolder.load(TextureIds::BackButton,            resourcePath + "textures/back_button.png");
+    m_textureHolder.load(TextureIds::CaboButton,            resourcePath + "textures/cabo_button.png");
+    m_textureHolder.load(TextureIds::Cards,                 resourcePath + "textures/cards.png");
+    m_textureHolder.load(TextureIds::DecideButtons,         resourcePath + "textures/decide_buttons.png");
+    m_textureHolder.load(TextureIds::Field,                 resourcePath + "textures/field.png");
+    m_textureHolder.load(TextureIds::FinishButton,          resourcePath + "textures/finish_button.png");
+    m_textureHolder.load(TextureIds::MainMenuJoinButton,    resourcePath + "textures/join_menu_join_button.png");
+    m_textureHolder.load(TextureIds::MainMenuStartButton,   resourcePath + "textures/create_menu_start_button.png");
+    m_textureHolder.load(TextureIds::Table,                 resourcePath + "textures/table.png");
+    m_textureHolder.load(TextureIds::YesNoButtons,          resourcePath + "textures/yes_no_buttons.png");
 
-    // m_saveHolder.load(SaveIds::PlayerName, "res/save/player_name");
-    // m_saveHolder.load(SaveIds::ServerAddress, "res/save/server_address");
+    m_saveHolder.load(SaveIds::PlayerName,                  resourcePath + "save/player_name");
+    m_saveHolder.load(SaveIds::ServerAddress,               resourcePath + "save/server_address");
 
 // TODO move states
     m_stateManager.registerState<states::TestState>(states::id::Test);
@@ -103,7 +119,7 @@ void Client::init()
     m_stateManager.registerState<states::GameState>(states::id::Game);
     m_stateManager.registerState<states::FinishState>(states::id::Finish);
 
-    m_stateManager.pushState(states::id::Test);
+    m_stateManager.pushState(states::id::EnterName);
 
     m_playerManager.registerEvents(m_eventManager.getDispatcher(), true);
 }

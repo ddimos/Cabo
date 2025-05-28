@@ -1,4 +1,5 @@
 #include "core/Path.hpp"
+#include "core/Assert.hpp"
 
 #include <string>
 
@@ -20,17 +21,26 @@ std::filesystem::path getExecutablePath()
 #if defined(_WIN32)
     DWORD len = GetModuleFileNameA(NULL, buffer, sizeof(buffer));
     if (len == 0 || len == sizeof(buffer))
-        throw std::runtime_error("Failed to get executable path on Windows");
+    {
+        CN_ASSERT_FRM(false, "Failed to get executable path on Windows");
+        return std::filesystem::path{};
+    }
 #elif defined(__APPLE__)
     uint32_t size = sizeof(buffer);
     if (_NSGetExecutablePath(buffer, &size) != 0)
-        throw std::runtime_error("Buffer too small for _NSGetExecutablePath on macOS");
+    {
+        CN_ASSERT_FRM(false, "Buffer too small for _NSGetExecutablePath on macOS");
+        return std::filesystem::path{};
+    }
 #elif defined(__linux__)
     ssize_t len = readlink("/proc/self/exe", buffer, sizeof(buffer));
     if (len == -1 || len == sizeof(buffer))
-        throw std::runtime_error("Failed to get executable path on Linux");
+    {
+        CN_ASSERT_FRM(false, "Failed to get executable path on Linux");
+        return std::filesystem::path{};
+    }
 #else
-    throw std::runtime_error("Unsupported platform");
+    static_assert(false, "Unsupported platform");
 #endif
 
     return std::filesystem::weakly_canonical(std::string(buffer));
