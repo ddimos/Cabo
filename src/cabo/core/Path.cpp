@@ -22,21 +22,21 @@ std::filesystem::path getExecutablePath()
     DWORD len = GetModuleFileNameA(NULL, buffer, sizeof(buffer));
     if (len == 0 || len == sizeof(buffer))
     {
-        CN_ASSERT_FRM(false, "Failed to get executable path on Windows");
+        CN_ASSERT_FRM(false, "Failed to get executable path on Windows, {}", len);
         return std::filesystem::path{};
     }
 #elif defined(__APPLE__)
     uint32_t size = sizeof(buffer);
     if (_NSGetExecutablePath(buffer, &size) != 0)
     {
-        CN_ASSERT_FRM(false, "Buffer too small for _NSGetExecutablePath on macOS");
+        CN_ASSERT_FRM(false, "Buffer too small for _NSGetExecutablePath on macOS, {}", size);
         return std::filesystem::path{};
     }
 #elif defined(__linux__)
     ssize_t len = readlink("/proc/self/exe", buffer, sizeof(buffer));
     if (len == -1 || len == sizeof(buffer))
     {
-        CN_ASSERT_FRM(false, "Failed to get executable path on Linux");
+        CN_ASSERT_FRM(false, "Failed to get executable path on Linux, {}", len);
         return std::filesystem::path{};
     }
 #else

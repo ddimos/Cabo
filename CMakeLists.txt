@@ -23,6 +23,8 @@ FetchContent_MakeAvailable(nsf)
 set(CMAKE_CXX_STANDARD 20)
 
 set(LAUNCH_TARGET "Client" CACHE STRING "Set the launch target. Possible values [Client, Server]")
+set(DISABLE_ASSERT false CACHE BOOL "Disable asserts.")
+set(DISABLE_LOGGING false CACHE BOOL "Disable logging.")
 
 message("Generated launch type: ${LAUNCH_TARGET}")
 
@@ -83,10 +85,16 @@ target_compile_definitions(Cabo PRIVATE
     $<$<STREQUAL:${LAUNCH_TARGET},Server>:CN_LAUNCH_TARGET=CN_LAUNCH_TARGET_SERVER>
 )
 
-target_compile_definitions(Cabo PRIVATE
-    CN_DISABLE_ASSERT=1
-    CN_DISABLE_LOGGING=1
-)
+# TODO disable asserts and logs in Release
+if (DISABLE_ASSERT)
+    target_compile_definitions(Cabo PRIVATE CN_DISABLE_ASSERT=1)
+    message("Dissable asserts")
+endif()
+
+if (DISABLE_LOGGING)
+    target_compile_definitions(Cabo PRIVATE CN_DISABLE_LOGGING=1)
+    message("Dissable logging")
+endif()
 
 message("Generated executable name: ${TARGET_OUTPUT_NAME}")
 
