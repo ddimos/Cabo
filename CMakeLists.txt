@@ -85,6 +85,11 @@ target_compile_definitions(Cabo PRIVATE
     $<$<STREQUAL:${LAUNCH_TARGET},Server>:CN_LAUNCH_TARGET=CN_LAUNCH_TARGET_SERVER>
 )
 
+target_compile_definitions(Cabo PRIVATE
+    CN_DISABLE_ASSERT=1
+    CN_DISABLE_LOGGING=1
+)
+
 message("Generated executable name: ${TARGET_OUTPUT_NAME}")
 
 set_target_properties(
