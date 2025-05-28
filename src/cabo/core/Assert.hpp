@@ -6,7 +6,7 @@
     #undef CN_ASSERT
     #undef CN_ASSERT_FRM
     #define CN_ASSERT(_cnd) (void(0))
-    #define CN_ASSERT_FRM(_cnd, _fmt) (void(0))
+    #define CN_ASSERT_FRM(_cnd, _fmt, ...) (void(0))
 
 #else
 
