@@ -1,5 +1,7 @@
 #include "client/state/states/TestState.hpp"
 
+#include "core/Path.hpp"
+
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/CircleShape.hpp>
 
@@ -13,7 +15,9 @@ namespace cn::client::states
 TestState::TestState(core::state::Manager& _stateManagerRef)
     : State(_stateManagerRef)
 {
+    auto path = core::getExecutablePath();
     std::cout << "Current path is " << std::filesystem::current_path() << '\n';
+    std::cout << "Current path is " << path.parent_path().parent_path() << '\n';
     {
         sf::Texture texture;
         m_loaded1 = texture.loadFromFile("Contents/Resources/background.png");
@@ -32,18 +36,18 @@ TestState::TestState(core::state::Manager& _stateManagerRef)
     }
     {
         sf::Texture texture;
-        m_loaded5 = texture.loadFromFile(std::string(std::filesystem::current_path().c_str())+"/Contents/Resources/background.png");
+        m_loaded5 = texture.loadFromFile(std::string(path.parent_path().parent_path().c_str())+"/Resources/background.png");
     }
     {
         sf::Texture texture;
-        m_loaded6 = texture.loadFromFile(std::string(std::filesystem::current_path().c_str())+"/../Resources/background.png");
+        m_loaded6 = texture.loadFromFile(std::string(path.parent_path().c_str())+"/../Resources/background.png");
     }
     {
-        std::ofstream file("testtt.txt");
-        if (file.is_open())
-        {
-            file << std::filesystem::current_path();
-        }
+        // std::ofstream file("testtt.txt");
+        // if (file.is_open())
+        // {
+        //     file << std::filesystem::current_path();
+        // }
     }
 }
 
