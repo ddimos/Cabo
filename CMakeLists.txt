@@ -71,7 +71,7 @@ target_include_directories(Cabo PUBLIC
 set(CMAKE_COMPILE_WARNING_AS_ERROR ON)
 
 if (LAUNCH_TARGET STREQUAL "Client")
-    set(TARGET_OUTPUT_NAME "Cabo_Client")
+    set(TARGET_OUTPUT_NAME "Cabo")
 elseif (LAUNCH_TARGET STREQUAL "Server")
     set(TARGET_OUTPUT_NAME "Cabo_Server")
 else ()
@@ -107,7 +107,7 @@ set_target_properties(
 # Taken from https://ryouze.net/posts/sfml-cmake-macos/
 if(APPLE)
     set(MACOSX_BUNDLE_BUNDLE_NAME ${PROJECT_NAME})
-    set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.ddimos.&amp;{PROJECT_NAME}")
+    set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.ddimos.${PROJECT_NAME}")
     set(MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION})
     set(MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION})
 
