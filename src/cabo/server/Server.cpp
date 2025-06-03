@@ -1,7 +1,5 @@
 #include "server/Server.hpp"
 
-#include "LaunchTarget.hpp"
-
 #include "core/event/Dispatcher.hpp"
 #include "core/Log.hpp"
 

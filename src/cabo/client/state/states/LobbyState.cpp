@@ -17,8 +17,6 @@
 #include "shared/player/Types.hpp"
 #include "shared/Types.hpp"
 
-#include "LaunchTarget.hpp"
-
 #include <SFML/Graphics/RenderWindow.hpp>
 
 namespace cn::client::states
