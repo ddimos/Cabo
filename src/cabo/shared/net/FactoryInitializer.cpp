@@ -14,6 +14,14 @@ void deserializeId(TId& _id, nsf::Buffer& _buffer)
     _id = TId(id);
 }
 
+template<typename T, typename TEnum>
+void deserializeEnum(TEnum& _value, nsf::Buffer& _buffer)
+{
+    T value = 0;
+    _buffer >> value;
+    _value = static_cast<TEnum>(value);
+}
+
 } // namespace
 
 namespace cn::net
@@ -122,9 +130,7 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
         },
         [](core::event::Event& _event, nsf::Buffer& _buffer){
             auto& event = static_cast<events::BoardStateUpdateNetEvent&>(_event);
-            uint8_t boardState = 0;
-            _buffer >> boardState;
-            event.m_boardState = static_cast<shared::game::BoardState>(boardState);
+            deserializeEnum<uint8_t>(event.m_boardState, _buffer);
         },
         [](){
             return std::make_unique<events::BoardStateUpdateNetEvent>();
@@ -174,12 +180,8 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
         },
         [](core::event::Event& _event, nsf::Buffer& _buffer){
             auto& event = static_cast<events::RemotePlayerInputNetEvent&>(_event);
-            PlayerId::Type id;
-            _buffer >> id;
-            event.m_playerId = PlayerId(id);
-            uint8_t inputType = 0;
-            _buffer >> inputType;
-            event.m_inputType = static_cast<shared::game::InputType>(inputType);
+            deserializeId(event.m_playerId, _buffer);
+            deserializeEnum<uint8_t>(event.m_inputType, _buffer);
             
             [[maybe_unused]] uint8_t data = 0;
             if (event.m_inputType == shared::game::InputType::ClickPile)
@@ -190,10 +192,8 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
             else if (event.m_inputType == shared::game::InputType::ClickSlot)
             {
                 shared::game::ClickSlotInputData dataStruct;
-                _buffer >> data;
-                dataStruct.slotId = shared::game::ParticipantSlotId(data);
-                _buffer >> data;
-                dataStruct.playerId = PlayerId(data);
+                deserializeId(dataStruct.slotId, _buffer);
+                deserializeId(dataStruct.playerId, _buffer);
                 event.m_data = dataStruct;
             }
             else if (event.m_inputType == shared::game::InputType::Action)
@@ -221,13 +221,9 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
         },
         [](core::event::Event& _event, nsf::Buffer& _buffer){
             auto& event = static_cast<events::ProvideCardNetEvent&>(_event);
-            uint8_t data;
-            _buffer >> data;
-            event.m_cardId = shared::game::CardId(data);
-            _buffer >> data;
-            event.m_rank = static_cast<shared::game::Card::Rank>(data);
-            _buffer >> data;
-            event.m_suit = static_cast<shared::game::Card::Suit>(data);
+            deserializeId(event.m_cardId, _buffer);
+            deserializeEnum<uint8_t>(event.m_rank, _buffer);
+            deserializeEnum<uint8_t>(event.m_suit, _buffer);
         },
         [](){
             return std::make_unique<events::ProvideCardNetEvent>();
@@ -242,12 +238,8 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
         },
         [](core::event::Event& _event, nsf::Buffer& _buffer){
             auto& event = static_cast<events::DiscardCardNetEvent&>(_event);
-            uint8_t rank;
-            uint8_t suit;
-            _buffer >> rank;
-            _buffer >> suit;
-            event.m_rank = static_cast<shared::game::Card::Rank>(rank);
-            event.m_suit = static_cast<shared::game::Card::Suit>(suit);
+            deserializeEnum<uint8_t>(event.m_rank, _buffer);
+            deserializeEnum<uint8_t>(event.m_suit, _buffer);
         },
         [](){
             return std::make_unique<events::DiscardCardNetEvent>();
@@ -263,12 +255,8 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
         },
         [](core::event::Event& _event, nsf::Buffer& _buffer){
             auto& event = static_cast<events::MatchCardNetEvent&>(_event);
-            uint8_t rank;
-            uint8_t suit;
-            _buffer >> rank;
-            _buffer >> suit;
-            event.m_rank = static_cast<shared::game::Card::Rank>(rank);
-            event.m_suit = static_cast<shared::game::Card::Suit>(suit);
+            deserializeEnum<uint8_t>(event.m_rank, _buffer);
+            deserializeEnum<uint8_t>(event.m_suit, _buffer);
             _buffer >> event.m_isMatched;
         },
         [](){
