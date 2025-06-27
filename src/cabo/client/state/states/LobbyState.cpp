@@ -19,13 +19,18 @@
 
 #include <SFML/Graphics/RenderWindow.hpp>
 
+namespace
+{
+constexpr cn::core::object::Container::Id MenuContainerId = 1;
+} // namespace
+
 namespace cn::client::states
 {
 
 LobbyState::LobbyState(core::state::Manager& _stateManagerRef)
     : State(_stateManagerRef)
 {
-    createContainer(core::object::Container::Type::Menu);
+    createContainer(MenuContainerId);
     
     auto& windowRef = getContext().get<sf::RenderWindow>();
     auto& textureHolderRef = getContext().get<TextureHolder>();
@@ -53,7 +58,7 @@ LobbyState::LobbyState(core::state::Manager& _stateManagerRef)
             24,
             sf::Color::White
         );
-        getContainer(core::object::Container::Type::Menu).add(playerName);
+        getContainer(MenuContainerId).add(playerName);
 
         auto status = std::make_shared<menu::item::SimpleText>(
             menu::Position{
@@ -65,7 +70,7 @@ LobbyState::LobbyState(core::state::Manager& _stateManagerRef)
             24,
             sf::Color::White
         );
-        getContainer(core::object::Container::Type::Menu).add(status);
+        getContainer(MenuContainerId).add(status);
 
         m_players.emplace_back(PlayerItem{ .m_nameTextRef = *playerName, .m_statusTextRef = *status });
     }
@@ -84,7 +89,7 @@ LobbyState::LobbyState(core::state::Manager& _stateManagerRef)
         },
         sf::Mouse::Button::Left
     );
-    getContainer(core::object::Container::Type::Menu).add(startButton);
+    getContainer(MenuContainerId).add(startButton);
 
     {
         size_t index = 0;

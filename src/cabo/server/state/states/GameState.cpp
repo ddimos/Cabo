@@ -19,13 +19,19 @@
 
 #include "core/Log.hpp"
 
+
+namespace
+{
+constexpr cn::core::object::Container::Id GameContainerId = 1;
+} // namespace
+
 namespace cn::server::states
 {
 
 GameState::GameState(core::state::Manager& _stateManagerRef)
     : State(_stateManagerRef)
 {
-    createContainer(core::object::Container::Type::Game);
+    createContainer(GameContainerId);
 
     // auto& netManagerRef = getContext().get<net::Manager>();
     auto& playerManagerRef = getContext().get<player::Manager>();
@@ -41,7 +47,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
             auto cardPair = game::Card::getCardFromIndex(i);
             auto card = std::make_shared<game::Card>(cardPair.first, cardPair.second);
             card->setId(game::CardId(static_cast<uint8_t>(i)));
-            getContainer(core::object::Container::Type::Game).add(card);
+            getContainer(GameContainerId).add(card);
             cards.push_back(card.get());
         }
     }
@@ -52,9 +58,9 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
 
     auto discard = std::make_shared<game::Discard>();
 
-    // // // getContainer(core::object::Container::Type::Game).add(table);
-    getContainer(core::object::Container::Type::Game).add(deck);
-    getContainer(core::object::Container::Type::Game).add(discard);
+    // // // getContainer(GameContainerId).add(table);
+    getContainer(GameContainerId).add(deck);
+    getContainer(GameContainerId).add(discard);
 
     std::vector<game::Participant*> participants;
     for (const auto& player : playerManagerRef.getPlayers())
@@ -72,7 +78,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
         auto participant = std::make_shared<game::Participant>(
             getContext(), playerId, std::move(slots), shared::game::DefaultInitNumberOfParticipantSlots
         );
-        getContainer(core::object::Container::Type::Game).add(participant);
+        getContainer(GameContainerId).add(participant);
         
         participants.push_back(participant.get());
     }

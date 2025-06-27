@@ -26,14 +26,20 @@
 
 #include "core/Log.hpp"
 
+namespace
+{
+constexpr cn::core::object::Container::Id GameContainerId = 1;
+constexpr cn::core::object::Container::Id MenuContainerId = 2;
+} // namespace
+
 namespace cn::client::states
 {
 
 GameState::GameState(core::state::Manager& _stateManagerRef)
     : State(_stateManagerRef)
 {
-    createContainer(core::object::Container::Type::Menu);
-    createContainer(core::object::Container::Type::Game);
+    createContainer(MenuContainerId);
+    createContainer(GameContainerId);
 
     auto& windowRef = getContext().get<sf::RenderWindow>();
     auto& textureHolderRef = getContext().get<TextureHolder>();
@@ -43,7 +49,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
     auto& playerManagerRef = getContext().get<player::Manager>();
 
     auto table = std::make_shared<game::Table>(getContext());
-    getContainer(core::object::Container::Type::Game).add(table);
+    getContainer(GameContainerId).add(table);
 
     std::vector<shared::game::Card*> cards;
     {
@@ -59,14 +65,14 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
             auto cardPair = game::Card::getCardFromIndex(i);
             auto card = std::make_shared<game::Card>(getContext(), pos.calculateGlobalPos());
             card->setId(game::CardId(static_cast<uint8_t>(i)));
-            getContainer(core::object::Container::Type::Game).add(card);
+            getContainer(GameContainerId).add(card);
             cards.push_back(card.get());
         }
     }
     auto deck = std::make_shared<game::Deck>(
         std::move(cards), getContext().get<shared::Seed>().seed
     );
-    getContainer(core::object::Container::Type::Game).add(deck);
+    getContainer(GameContainerId).add(deck);
 
 
     auto spawnPoints = table->generateSpawnPoints(playerManagerRef.getPlayers().size(), sf::Vector2f(windowRef.getSize()) / 2.f);
@@ -97,7 +103,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
                 );
                 slotButton->setActivationOption(core::object::Object::ActivationOption::Manually);
                 
-                getContainer(core::object::Container::Type::Menu).add(slotButton);
+                getContainer(MenuContainerId).add(slotButton);
 
                 slots.emplace_back(game::ParticipantSlot{ game::ParticipantSlotId(slotId), false, nullptr, *slotButton, {} });
             }
@@ -106,7 +112,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
                 getContext(), player, true, std::move(slots), shared::game::DefaultInitNumberOfParticipantSlots
             );
             participant->setSpawnPoint(spawnPoints[index]);
-            getContainer(core::object::Container::Type::Game).add(participant);
+            getContainer(GameContainerId).add(participant);
             
             participants.push_back(participant.get());
 
@@ -129,7 +135,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
         },
         sf::Mouse::Button::Left
     );
-    getContainer(core::object::Container::Type::Menu).add(deckButton);
+    getContainer(MenuContainerId).add(deckButton);
 
     menu::Position discardPos = menu::Position{
         .m_position = sf::Vector2f(-75.f, 0.f), .m_parentSize = sf::Vector2f(windowRef.getSize()),
@@ -145,7 +151,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
         },
         sf::Mouse::Button::Left
     );
-    getContainer(core::object::Container::Type::Menu).add(discardButton);
+    getContainer(MenuContainerId).add(discardButton);
 
     auto finishButton = std::make_shared<menu::item::Button>(
         menu::Position{
@@ -161,7 +167,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
         sf::Mouse::Button::Left
     );
     finishButton->setActivationOption(core::object::Object::ActivationOption::Manually);
-    getContainer(core::object::Container::Type::Menu).add(finishButton);
+    getContainer(MenuContainerId).add(finishButton);
 
     auto caboButton = std::make_shared<menu::item::Button>(
         menu::Position{
@@ -177,7 +183,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
         sf::Mouse::Button::Left
     );
     caboButton->setActivationOption(core::object::Object::ActivationOption::Manually);
-    getContainer(core::object::Container::Type::Menu).add(caboButton);
+    getContainer(MenuContainerId).add(caboButton);
 
     game::Board::DecideActionButtons decideActionButtons;
     {
@@ -195,7 +201,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
             sf::Mouse::Button::Left
         );
         matchButton->setActivationOption(core::object::Object::ActivationOption::Manually);
-        getContainer(core::object::Container::Type::Menu).add(matchButton);
+        getContainer(MenuContainerId).add(matchButton);
         decideActionButtons.push_back(matchButton.get());
 
         auto takeButton = std::make_shared<menu::item::Button>(
@@ -212,7 +218,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
             sf::Mouse::Button::Left
         );
         takeButton->setActivationOption(core::object::Object::ActivationOption::Manually);
-        getContainer(core::object::Container::Type::Menu).add(takeButton);
+        getContainer(MenuContainerId).add(takeButton);
         decideActionButtons.push_back(takeButton.get());
 
         auto actionButton = std::make_shared<menu::item::Button>(
@@ -229,7 +235,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
             sf::Mouse::Button::Left
         );
         actionButton->setActivationOption(core::object::Object::ActivationOption::Manually);
-        getContainer(core::object::Container::Type::Menu).add(actionButton);
+        getContainer(MenuContainerId).add(actionButton);
         decideActionButtons.push_back(actionButton.get());
 
         auto discardDecideButton = std::make_shared<menu::item::Button>(
@@ -246,7 +252,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
             sf::Mouse::Button::Left
         );
         discardDecideButton->setActivationOption(core::object::Object::ActivationOption::Manually);
-        getContainer(core::object::Container::Type::Menu).add(discardDecideButton);
+        getContainer(MenuContainerId).add(discardDecideButton);
         decideActionButtons.push_back(discardDecideButton.get());
     }
     game::Board::DecideSwapButtons decideSwapButtons;
@@ -265,7 +271,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
             sf::Mouse::Button::Left
         );
         yesButton->setActivationOption(core::object::Object::ActivationOption::Manually);
-        getContainer(core::object::Container::Type::Menu).add(yesButton);
+        getContainer(MenuContainerId).add(yesButton);
         decideSwapButtons.push_back(yesButton.get());
 
         auto noButton = std::make_shared<menu::item::Button>(
@@ -282,7 +288,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
             sf::Mouse::Button::Left
         );
         noButton->setActivationOption(core::object::Object::ActivationOption::Manually);
-        getContainer(core::object::Container::Type::Menu).add(noButton);
+        getContainer(MenuContainerId).add(noButton);
         decideSwapButtons.push_back(noButton.get());
     }
 
@@ -299,7 +305,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
                 sf::Color::White
             );
             text->setActivationOption(core::object::Object::ActivationOption::Manually);
-            getContainer(core::object::Container::Type::Menu).add(text);
+            getContainer(MenuContainerId).add(text);
             texts.push_back(text.get());
         }
     }
@@ -312,7 +318,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
         50.f,
         texts
     );
-    getContainer(core::object::Container::Type::Menu).add(queue);
+    getContainer(MenuContainerId).add(queue);
 
     m_board = std::make_unique<game::Board>(
         getContext(), std::move(participants), *deck, *queue, *finishButton, *caboButton,

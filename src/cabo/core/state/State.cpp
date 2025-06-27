@@ -77,16 +77,22 @@ Context& State::getContext()
     return m_stateManagerRef.getContext();
 }
 
-void State::createContainer(object::Container::Type _type)
+void State::createContainer(object::Container::Id _id)
 {
-    CN_ASSERT(!m_containers.contains(_type));
-    m_containers.emplace(_type, object::Container{});
+    CN_ASSERT(!m_containers.contains(_id));
+    m_containers.emplace(_id, object::Container{});
 }
 
-object::Container& State::getContainer(object::Container::Type _type)
+void State::createSortedContainer(object::Container::Id _id, object::Container::SortCallback _sortCallback)
 {
-    CN_ASSERT(m_containers.contains(_type));
-    return m_containers.at(_type);
+    CN_ASSERT(!m_containers.contains(_id));
+    m_containers.emplace(_id, object::Container{ _sortCallback });
+}
+
+object::Container& State::getContainer(object::Container::Id _id)
+{
+    CN_ASSERT(m_containers.contains(_id));
+    return m_containers.at(_id);
 }
 
 } // namespace cn::core::state

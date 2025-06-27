@@ -9,13 +9,18 @@
 
 #include <SFML/Graphics/RenderWindow.hpp>
 
+namespace
+{
+constexpr cn::core::object::Container::Id MenuContainerId = 1;
+} // namespace
+
 namespace cn::client::states
 {
 
 TitleState::TitleState(core::state::Manager& _stateManagerRef)
     : State(_stateManagerRef)
 {
-    createContainer(core::object::Container::Type::Menu);
+    createContainer(MenuContainerId);
 
     auto& windowRef = getContext().get<sf::RenderWindow>();
     auto& fontHolderRef = getContext().get<FontHolder>();
@@ -30,7 +35,7 @@ TitleState::TitleState(core::state::Manager& _stateManagerRef)
         24,
         sf::Color::White
     );
-    getContainer(core::object::Container::Type::Menu).add(m_text);
+    getContainer(MenuContainerId).add(m_text);
 
     m_listenerId = core::event::getNewListenerId();
 }

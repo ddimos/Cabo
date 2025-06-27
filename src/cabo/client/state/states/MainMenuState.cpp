@@ -9,13 +9,18 @@
 
 #include <SFML/Graphics/RenderWindow.hpp>
 
+namespace
+{
+constexpr cn::core::object::Container::Id MenuContainerId = 1;
+} // namespace
+
 namespace cn::client::states
 {
 
 MainMenuState::MainMenuState(core::state::Manager& _stateManagerRef)
     : State(_stateManagerRef)
 {
-    createContainer(core::object::Container::Type::Menu);
+    createContainer(MenuContainerId);
     
     auto& windowRef = getContext().get<sf::RenderWindow>();
     auto& textureHolderRef = getContext().get<TextureHolder>();
@@ -34,7 +39,7 @@ MainMenuState::MainMenuState(core::state::Manager& _stateManagerRef)
         },
         sf::Mouse::Button::Left
     );
-    getContainer(core::object::Container::Type::Menu).add(joinButton);
+    getContainer(MenuContainerId).add(joinButton);
 }
 
 void MainMenuState::connect()

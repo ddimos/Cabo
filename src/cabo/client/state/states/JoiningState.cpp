@@ -10,13 +10,18 @@
 
 #include <SFML/Graphics/RenderWindow.hpp>
 
+namespace
+{
+constexpr cn::core::object::Container::Id MenuContainerId = 1;
+} // namespace
+
 namespace cn::client::states
 {
 
 JoiningState::JoiningState(core::state::Manager& _stateManagerRef)
     : State(_stateManagerRef)
 {
-    createContainer(core::object::Container::Type::Menu);
+    createContainer(MenuContainerId);
     
     auto& windowRef = getContext().get<sf::RenderWindow>();
     auto& textureHolderRef = getContext().get<TextureHolder>();
@@ -33,7 +38,7 @@ JoiningState::JoiningState(core::state::Manager& _stateManagerRef)
         24,
         sf::Color::White
     );
-    getContainer(core::object::Container::Type::Menu).add(connectingText);
+    getContainer(MenuContainerId).add(connectingText);
 
     auto backButton = std::make_shared<menu::item::Button>(
         menu::Position{
@@ -48,7 +53,7 @@ JoiningState::JoiningState(core::state::Manager& _stateManagerRef)
         },
         sf::Mouse::Button::Left
     );
-    getContainer(core::object::Container::Type::Menu).add(backButton);
+    getContainer(MenuContainerId).add(backButton);
 
     m_listenerId = core::event::getNewListenerId();
 }

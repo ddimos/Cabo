@@ -7,6 +7,7 @@
 #include <SFML/System/Time.hpp>
 #include <SFML/Window/Event.hpp>
 
+#include <functional>
 #include <memory>
 #include <vector>
 
@@ -16,11 +17,11 @@ namespace cn::core::object
 class Container final
 {
 public:
-    enum class Type
-    {
-        Game,
-        Menu
-    };
+    using Id = unsigned;
+    using SortCallback = std::function<bool(const Object&, const Object&)>;
+
+    Container();
+    Container(SortCallback _sortCallback);
 
     void update(sf::Time _dt);
     void draw(sf::RenderWindow& _windowRef);
@@ -32,7 +33,11 @@ public:
 
     void processChanges(core::Context& _context);
 
+    bool isSorted() const { return m_isSorted; }
+
 private:
+    const bool m_isSorted = false;
+    SortCallback m_sortCallback{};
     std::vector<std::shared_ptr<Object>> m_objects;
     std::vector<std::shared_ptr<Object>> m_newObjects;
 };

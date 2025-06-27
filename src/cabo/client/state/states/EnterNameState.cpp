@@ -8,13 +8,18 @@
 
 #include <SFML/Graphics/RenderWindow.hpp>
 
+namespace
+{
+constexpr cn::core::object::Container::Id MenuContainerId = 1;
+} // namespace
+
 namespace cn::client::states
 {
 
 EnterNameState::EnterNameState(core::state::Manager& _stateManagerRef)
     : State(_stateManagerRef)
 {
-    createContainer(core::object::Container::Type::Menu);
+    createContainer(MenuContainerId);
     
     auto& windowRef = getContext().get<sf::RenderWindow>();
     auto& textureHolderRef = getContext().get<TextureHolder>();
@@ -44,7 +49,7 @@ EnterNameState::EnterNameState(core::state::Manager& _stateManagerRef)
     );
     m_buttonPtr = nextButton.get();
     nextButton->setActivationOption(core::object::Object::ActivationOption::Manually);
-    getContainer(core::object::Container::Type::Menu).add(nextButton);
+    getContainer(MenuContainerId).add(nextButton);
 
     auto text = std::make_shared<menu::item::SimpleText>(
         menu::Position{
@@ -56,7 +61,7 @@ EnterNameState::EnterNameState(core::state::Manager& _stateManagerRef)
         24,
         sf::Color::White
     );
-    getContainer(core::object::Container::Type::Menu).add(text);
+    getContainer(MenuContainerId).add(text);
 
     auto inputText = std::make_shared<menu::item::SimpleText>(
         menu::Position{},
@@ -79,8 +84,8 @@ EnterNameState::EnterNameState(core::state::Manager& _stateManagerRef)
         32
     );
     m_inputPtr = input.get();
-    getContainer(core::object::Container::Type::Menu).add(input);
-    getContainer(core::object::Container::Type::Menu).add(inputText);
+    getContainer(MenuContainerId).add(input);
+    getContainer(MenuContainerId).add(inputText);
 }
 
 core::state::Return EnterNameState::onUpdate(sf::Time _dt)

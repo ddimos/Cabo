@@ -1,10 +1,31 @@
 #include "core/object/Container.hpp"
 
+#include <algorithm>
+
 namespace cn::core::object
 {
 
+Container::Container()
+    : m_isSorted(false)
+{
+}
+
+Container::Container(SortCallback _sortCallback)
+    : m_isSorted(true)
+    , m_sortCallback(_sortCallback)
+{
+}
+
 void Container::update(sf::Time _dt)
-{    
+{
+    if (m_isSorted)
+    {
+        std::sort(m_objects.begin(), m_objects.end(), 
+            [this](const std::shared_ptr<Object>& _left, const std::shared_ptr<Object>& _right){
+                return m_sortCallback(*_left, *_right);
+            }
+        );
+    }
     for (auto& object : m_objects)
         object->update(_dt);
 }

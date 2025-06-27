@@ -44,12 +44,13 @@ protected:
     void clear();
 
     Context& getContext();
-    void createContainer(object::Container::Type _type);
-    object::Container& getContainer(object::Container::Type _type);
+    void createContainer(object::Container::Id _id);
+    void createSortedContainer(object::Container::Id _id, object::Container::SortCallback _sortCallback);
+    object::Container& getContainer(object::Container::Id _id);
 
 private:
     Manager& m_stateManagerRef;
-    std::map<object::Container::Type, object::Container> m_containers;
+    std::map<object::Container::Id, object::Container> m_containers;
 };
     
 } // namespace cn::core::state
