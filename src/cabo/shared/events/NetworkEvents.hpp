@@ -131,6 +131,24 @@ public:
     shared::game::InputDataVariant m_data = std::monostate();
 };
 
+class RemotePlayerInputNetEvent2 final : public BaseNetEvent
+{
+public:
+    CN_EVENT(id::RemotePlayerInput2)
+
+    RemotePlayerInputNetEvent2() = default;
+    RemotePlayerInputNetEvent2(PlayerId _playerId, shared::game::PlayerInputType _inputType)
+        : m_playerId(_playerId), m_inputType(_inputType)
+    {}
+    RemotePlayerInputNetEvent2(PlayerId _playerId, shared::game::PlayerInputType _inputType, shared::game::PlayerInputDataVariant _data)
+        : m_playerId(_playerId), m_inputType(_inputType), m_data(_data)
+    {}
+
+    PlayerId m_playerId{};
+    shared::game::PlayerInputType m_inputType = shared::game::PlayerInputType::PressMouse;
+    shared::game::PlayerInputDataVariant m_data = std::monostate();
+};
+
 class ProvideCardNetEvent final : public BaseNetEvent
 {
 public:

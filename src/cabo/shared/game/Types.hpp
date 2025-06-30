@@ -7,6 +7,8 @@
 
 #include <variant>
 
+#include <SFML/System/Vector2.hpp>
+
 namespace cn::shared::game
 {
 
@@ -44,6 +46,7 @@ enum class PileType
     Discard
 };
 
+// TODO remove
 enum class InputType
 {
     Action,
@@ -61,5 +64,13 @@ struct ClickSlotInputData
 };
 
 using InputDataVariant = std::variant<ActionType, ClickSlotInputData, PileType, bool, std::monostate>;
+
+enum class PlayerInputType
+{
+    PressMouse,
+    ReleaseMouse
+};
+
+using PlayerInputDataVariant = std::variant<sf::Vector2f, std::monostate>;
 
 } // namespace cn::shared::game

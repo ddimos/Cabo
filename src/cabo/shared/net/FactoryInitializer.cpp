@@ -3,6 +3,8 @@
 
 #include "shared/events/NetworkEvents.hpp"
 
+#include "core/Assert.hpp"
+
 namespace
 {
 
@@ -209,6 +211,47 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
         },
         [](){
             return std::make_unique<events::RemotePlayerInputNetEvent>();
+        }
+    );
+    _factoryRef.add(
+        core::event::EventId(events::id::RemotePlayerInput2),
+        [](const core::event::Event& _event, nsf::Buffer& _buffer){
+            auto& event = static_cast<const events::RemotePlayerInputNetEvent2&>(_event);
+            _buffer << event.m_playerId.value();
+            _buffer << static_cast<uint8_t>(event.m_inputType);
+
+            if (event.m_inputType == shared::game::PlayerInputType::PressMouse
+                || event.m_inputType == shared::game::PlayerInputType::ReleaseMouse)
+            {
+                const auto& data = std::get<sf::Vector2f>(event.m_data);
+                _buffer << data.x;
+                _buffer << data.y;
+            }
+            else
+            {
+                CN_ASSERT(false);
+            }
+        },
+        [](core::event::Event& _event, nsf::Buffer& _buffer){
+            auto& event = static_cast<events::RemotePlayerInputNetEvent2&>(_event);
+            deserializeId(event.m_playerId, _buffer);
+            deserializeEnum<uint8_t>(event.m_inputType, _buffer);
+            
+            if (event.m_inputType == shared::game::PlayerInputType::PressMouse 
+                || event.m_inputType == shared::game::PlayerInputType::ReleaseMouse)
+            {
+                sf::Vector2f data;
+                _buffer >> data.x;
+                _buffer >> data.y;
+                event.m_data = data;
+            }
+            else
+            {
+                CN_ASSERT(false);
+            }
+        },
+        [](){
+            return std::make_unique<events::RemotePlayerInputNetEvent2>();
         }
     );
     _factoryRef.add(

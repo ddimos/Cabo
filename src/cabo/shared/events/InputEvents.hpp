@@ -19,6 +19,18 @@ public:
     sf::Event::KeyEvent key;
 };
 
+class MouseButtonPressedEvent final : public core::event::Event
+{
+public:
+    CN_EVENT(id::MouseButtonPressed)
+
+    MouseButtonPressedEvent(sf::Event::MouseButtonEvent _event)
+        : core::event::Event(), mouseButton(_event) 
+    {}
+
+    sf::Event::MouseButtonEvent mouseButton;
+};
+
 class MouseButtonReleasedEvent final : public core::event::Event
 {
 public:

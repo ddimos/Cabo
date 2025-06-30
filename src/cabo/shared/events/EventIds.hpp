@@ -15,6 +15,7 @@ enum : core::event::EventId::Type
 
     // Input events
     KeyReleased,
+    MouseButtonPressed,
     MouseButtonReleased,
     MouseMoved,
     TextEntered,
@@ -33,6 +34,7 @@ enum : core::event::EventId::Type
     PlayerUpdate,
     ProvideCard,
     RemotePlayerInput,
+    RemotePlayerInput2,
     ShowCardInSlot,
     StartGame,
 

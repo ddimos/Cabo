@@ -30,7 +30,8 @@ namespace cn::client
 {
 
 Client::Client()
-    : m_window(sf::VideoMode::getFullscreenModes().front(), "CABOn", sf::Style::Fullscreen)
+    : m_window(sf::VideoMode(1600, 960), "CABOn", sf::Style::Close)
+    //m_window(sf::VideoMode::getFullscreenModes().front(), "CABOn", sf::Style::Fullscreen)
     , m_netManager(m_context, false), m_stateManager(m_context), m_playerManager(m_context)
 {
     m_context.insert(m_window);
@@ -140,6 +141,9 @@ void Client::handleEvents()
         case sf::Event::KeyReleased:
             // m_eventManager.getDispatcher().send(std::make_unique<events::KeyReleasedEvent>(event.key));
             m_eventManager.getDispatcher().send<events::KeyReleasedEvent>(event.key);
+            break;
+        case sf::Event::MouseButtonPressed:
+            m_eventManager.getDispatcher().send<events::MouseButtonPressedEvent>(event.mouseButton);
             break;
         case sf::Event::MouseButtonReleased:
             m_eventManager.getDispatcher().send<events::MouseButtonReleasedEvent>(event.mouseButton);
