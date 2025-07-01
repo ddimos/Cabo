@@ -3,6 +3,8 @@
 #include "shared/game/Constants.hpp"
 #include "shared/player/Types.hpp"
 
+#include "shared/board/BoardObject.hpp"
+
 #include "core/Identifier.hpp"
 
 #include <variant>
@@ -68,9 +70,32 @@ using InputDataVariant = std::variant<ActionType, ClickSlotInputData, PileType, 
 enum class PlayerInputType
 {
     PressMouse,
-    ReleaseMouse
+    ReleaseMouse,
+    MoveMouse
 };
 
 using PlayerInputDataVariant = std::variant<sf::Vector2f, std::monostate>;
+
+enum class ServerCommandType
+{
+    PlayerInteractsWithCard,
+    PlayerMoves
+};
+
+struct PlayerInteractsWithCardData
+{
+    PlayerId playerId{};
+    board::BoardObjectId cardId{};
+    sf::Vector2f pos{};
+    bool grabs = false;
+};
+
+struct PlayerMovesData
+{
+    PlayerId playerId{};
+    sf::Vector2f pos{};
+};
+
+using ServerCommandDataVariant = std::variant<PlayerInteractsWithCardData, PlayerMovesData, std::monostate>;
 
 } // namespace cn::shared::game

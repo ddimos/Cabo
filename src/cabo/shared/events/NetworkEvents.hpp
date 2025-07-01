@@ -137,16 +137,33 @@ public:
     CN_EVENT(id::RemotePlayerInput2)
 
     RemotePlayerInputNetEvent2() = default;
-    RemotePlayerInputNetEvent2(PlayerId _playerId, shared::game::PlayerInputType _inputType)
-        : m_playerId(_playerId), m_inputType(_inputType)
+    RemotePlayerInputNetEvent2(PlayerId _playerId, shared::game::PlayerInputType _type)
+        : m_playerId(_playerId), m_type(_type)
     {}
-    RemotePlayerInputNetEvent2(PlayerId _playerId, shared::game::PlayerInputType _inputType, shared::game::PlayerInputDataVariant _data)
-        : m_playerId(_playerId), m_inputType(_inputType), m_data(_data)
+    RemotePlayerInputNetEvent2(PlayerId _playerId, shared::game::PlayerInputType _type, shared::game::PlayerInputDataVariant _data)
+        : m_playerId(_playerId), m_type(_type), m_data(_data)
     {}
 
-    PlayerId m_playerId{};
-    shared::game::PlayerInputType m_inputType = shared::game::PlayerInputType::PressMouse;
+    PlayerId m_playerId{};// TODO remove this, it is sent from a local player to server
+    shared::game::PlayerInputType m_type = shared::game::PlayerInputType::PressMouse;
     shared::game::PlayerInputDataVariant m_data = std::monostate();
+};
+
+class ServerCommandNetEvent final : public BaseNetEvent
+{
+public:
+    CN_EVENT(id::ServerCommand)
+
+    ServerCommandNetEvent() = default;
+    ServerCommandNetEvent(shared::game::ServerCommandType _type)
+        : m_type(_type)
+    {}
+    ServerCommandNetEvent(shared::game::ServerCommandType _type, shared::game::ServerCommandDataVariant _data)
+        : m_type(_type), m_data(_data)
+    {}
+
+    shared::game::ServerCommandType m_type = shared::game::ServerCommandType::PlayerInteractsWithCard;
+    shared::game::ServerCommandDataVariant m_data = std::monostate();
 };
 
 class ProvideCardNetEvent final : public BaseNetEvent

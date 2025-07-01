@@ -11,8 +11,8 @@
 namespace cn::client::game
 {
 
-InputController::InputController(core::Context& _context)
-    : m_contextRef(_context)
+InputController::InputController(core::Context& _context, MoveCallback _moveCallback)
+    : m_contextRef(_context), m_moveCallback(_moveCallback)
 {
     m_listenerId = core::event::getNewListenerId();
 }
@@ -45,9 +45,12 @@ void InputController::registerEvents(core::event::Dispatcher& _dispatcher, bool 
             }
         );
         _dispatcher.registerEvent<events::MouseMovedEvent>(m_listenerId,
-            [this](const events::MouseMovedEvent& _event){
+            [this, &netManRef, &playerManRef, &windowRef](const events::MouseMovedEvent& _event){
                 // TODO to send an update every 100 ms
-
+                sf::Vector2f pos = windowRef.mapPixelToCoords(sf::Vector2i(_event.mouseMove.x, _event.mouseMove.y));
+                m_moveCallback(pos);
+                events::RemotePlayerInputNetEvent2 event(playerManRef.getLocalPlayerId(), shared::game::PlayerInputType::MoveMouse, pos);
+                netManRef.send(event, false);
             }
         );
     }

@@ -35,6 +35,7 @@ enum : core::event::EventId::Type
     ProvideCard,
     RemotePlayerInput,
     RemotePlayerInput2,
+    ServerCommand,
     ShowCardInSlot,
     StartGame,
 

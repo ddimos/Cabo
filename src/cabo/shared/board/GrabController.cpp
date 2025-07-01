@@ -45,6 +45,7 @@ BoardObject* GrabController::tryToReleaseObject(PlayerId _playerId, sf::Vector2f
     {
         // Don't check the position, release anyway
         it->second->onReleased();
+        object = it->second;
         m_grabbedObjects.erase(it);
     }
     return object;

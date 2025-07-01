@@ -1,20 +1,17 @@
 #pragma once
 
 #include "core/object/Object.hpp"
-#include "shared/game/Card.hpp"
+#include "shared/board/Card.hpp"
 
 namespace cn::server::game
 {
 
-using shared::game::CardId;
-
-// Make the card class a game object for a better lifetime management
-class Card final: public core::object::Object, public shared::game::Card 
+class Card final : public core::object::Object
 {
 public:
-    Card(Rank _rank, Suit _suit)
-        : shared::game::Card(_rank, _suit)
-    { }
+    Card(shared::board::Card& _boardCard) : m_boardCardRef(_boardCard) {}
+
+    shared::board::Card& m_boardCardRef;
 };
 
 } // namespace cn::server::game
