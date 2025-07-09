@@ -1,5 +1,6 @@
 #include "shared/board/Board.hpp"
 
+#include "core/math/Math.hpp"
 #include "core/Assert.hpp"
 #include "core/Log.hpp"
 
@@ -19,19 +20,19 @@ Card& Board::spawnCard()
 
 Deck& Board::spawnDeck()
 {
-    m_deck = std::make_unique<shared::board::Deck>(m_seed, sf::Vector2f(400.f, 400.f));
+    m_deck = std::make_unique<shared::board::Deck>(generateNextOjectId(), m_seed, sf::Vector2f(400.f, 400.f));
     return *m_deck;
 }
 
 Discard& Board::spawnDiscard()
 {
-    m_discard = std::make_unique<shared::board::Discard>();
+    m_discard = std::make_unique<shared::board::Discard>(generateNextOjectId());
     return *m_discard;
 }
 
 Participant& Board::spawnParticipant(PlayerId _playerId)
 {
-    auto [it, inserted] = m_participants.try_emplace(_playerId, std::make_unique<shared::board::Participant>(_playerId));
+    auto [it, inserted] = m_participants.try_emplace(_playerId, std::make_unique<shared::board::Participant>(generateNextOjectId(), _playerId));
     CN_ASSERT(inserted);
     return *(it->second);
 }
@@ -39,16 +40,24 @@ Participant& Board::spawnParticipant(PlayerId _playerId)
 void Board::start()
 {
     m_deck->shuffle();
+    auto points = core::math::generatePointOnEllipse(780, 460, m_participants.size(), {780.f, 460.f});
+    unsigned i = 0;
+    for (const auto& [id, part] : m_participants)
+    {
+        part->setPosition(points.at(i).first);
+        part->setRotation(points.at(i).second);
+        ++i;
+    }
 }
 
-void Board::participantGrabs(PlayerId _playerId, BoardObjectId _id, sf::Vector2f _position)
+void Board::participantGrabs(PlayerId _playerId, ObjectId _id, sf::Vector2f _position)
 {
     CN_LOG_FRM("Grabs {} {}", _playerId.value(), _id.value());
     m_participants.at(_playerId)->setObject(getCard(_id));
     m_participants.at(_playerId)->setMousePosition(_position);
 }
 
-void Board::participantReleases(PlayerId _playerId, BoardObjectId _id, sf::Vector2f _position)
+void Board::participantReleases(PlayerId _playerId, ObjectId _id, sf::Vector2f _position)
 {
     CN_LOG_FRM("Releases {} {}", _playerId.value(), _id.value());
     m_participants.at(_playerId)->setMousePosition(_position);
@@ -61,14 +70,14 @@ void Board::participantMoves(PlayerId _playerId, sf::Vector2f _position)
     m_participants.at(_playerId)->setMousePosition(_position);
 }
 
-BoardObjectId Board::generateNextOjectId()
+ObjectId Board::generateNextOjectId()
 {
-    BoardObjectId newId(m_objectIdGenerator++);
+    ObjectId newId(m_objectIdGenerator++);
     CN_ASSERT(newId.isValid());
     return newId;
 }
 
-BoardObject* Board::getCard(BoardObjectId _id)
+Object* Board::getCard(ObjectId _id)
 {
     for (auto& card : m_cards)
     {

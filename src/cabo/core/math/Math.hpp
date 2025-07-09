@@ -3,6 +3,8 @@
 #include <SFML/System/Vector2.hpp>
 #include <cmath>
 #include <numbers>
+#include <utility>
+#include <vector>
 
 namespace cn::core::math
 {
@@ -53,5 +55,7 @@ inline sf::Vector2f normalizeVector(sf::Vector2f _v)
     }
     return vOut;
 }
+
+std::vector<std::pair<sf::Vector2f, float>> generatePointOnEllipse(float _r1, float _r2, unsigned _numberOfPoints, sf::Vector2f _positionOffset);
 
 } // namespace cn::core::math

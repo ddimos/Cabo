@@ -1,5 +1,6 @@
 #pragma once
 
+#include "shared/board/Object.hpp"
 #include <vector>
 
 namespace cn::shared::board
@@ -7,10 +8,10 @@ namespace cn::shared::board
 
 class Card;
 
-class Discard final
+class Discard : public Object
 {
 public:
-    Discard()=default;
+    Discard(ObjectId _id) : Object(_id) {}
 
     void discard(Card* _card);
     Card* getLast();

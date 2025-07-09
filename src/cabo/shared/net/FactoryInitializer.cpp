@@ -218,10 +218,11 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
         [](const core::event::Event& _event, nsf::Buffer& _buffer){
             auto& event = static_cast<const events::RemotePlayerInputNetEvent2&>(_event);
             _buffer << event.m_playerId.value();
-            _buffer << static_cast<uint8_t>(event.m_inputType);
+            _buffer << static_cast<uint8_t>(event.m_type);
 
-            if (event.m_inputType == shared::game::PlayerInputType::PressMouse
-                || event.m_inputType == shared::game::PlayerInputType::ReleaseMouse)
+            if (event.m_type == shared::game::PlayerInputType::PressMouse
+                || event.m_type == shared::game::PlayerInputType::ReleaseMouse
+                || event.m_type == shared::game::PlayerInputType::MoveMouse)
             {
                 const auto& data = std::get<sf::Vector2f>(event.m_data);
                 _buffer << data.x;
@@ -235,10 +236,11 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
         [](core::event::Event& _event, nsf::Buffer& _buffer){
             auto& event = static_cast<events::RemotePlayerInputNetEvent2&>(_event);
             deserializeId(event.m_playerId, _buffer);
-            deserializeEnum<uint8_t>(event.m_inputType, _buffer);
+            deserializeEnum<uint8_t>(event.m_type, _buffer);
             
-            if (event.m_inputType == shared::game::PlayerInputType::PressMouse 
-                || event.m_inputType == shared::game::PlayerInputType::ReleaseMouse)
+            if (event.m_type == shared::game::PlayerInputType::PressMouse 
+                || event.m_type == shared::game::PlayerInputType::ReleaseMouse
+                || event.m_type == shared::game::PlayerInputType::MoveMouse)
             {
                 sf::Vector2f data;
                 _buffer >> data.x;
@@ -252,6 +254,62 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
         },
         [](){
             return std::make_unique<events::RemotePlayerInputNetEvent2>();
+        }
+    );
+    _factoryRef.add(
+        core::event::EventId(events::id::ServerCommand),
+        [](const core::event::Event& _event, nsf::Buffer& _buffer){
+            auto& event = static_cast<const events::ServerCommandNetEvent&>(_event);
+            _buffer << static_cast<uint8_t>(event.m_type);
+            if (event.m_type == shared::game::ServerCommandType::PlayerInteractsWithCard)
+            {
+                const auto& data = std::get<shared::game::PlayerInteractsWithCardData>(event.m_data);
+                _buffer << data.playerId.value();
+                _buffer << data.cardId.value();
+                _buffer << data.pos.x;
+                _buffer << data.pos.y;
+                _buffer << data.grabs;
+            }
+            else if (event.m_type == shared::game::ServerCommandType::PlayerMoves)
+            {
+                const auto& data = std::get<shared::game::PlayerMovesData>(event.m_data);
+                _buffer << data.playerId.value();
+                _buffer << data.pos.x;
+                _buffer << data.pos.y;
+            }
+            else
+            {
+                CN_ASSERT(false);
+            }
+        },
+        [](core::event::Event& _event, nsf::Buffer& _buffer){
+            auto& event = static_cast<events::ServerCommandNetEvent&>(_event);
+            deserializeEnum<uint8_t>(event.m_type, _buffer);
+            if (event.m_type == shared::game::ServerCommandType::PlayerInteractsWithCard)
+            {
+                shared::game::PlayerInteractsWithCardData data;
+                deserializeId(data.playerId, _buffer);
+                deserializeId(data.cardId, _buffer);
+                _buffer >> data.pos.x;
+                _buffer >> data.pos.y;
+                _buffer >> data.grabs;
+                event.m_data = data;
+            }
+            else if (event.m_type == shared::game::ServerCommandType::PlayerMoves)
+            {
+                shared::game::PlayerMovesData data;
+                deserializeId(data.playerId, _buffer);
+                _buffer >> data.pos.x;
+                _buffer >> data.pos.y;
+                event.m_data = data;
+            }
+            else
+            {
+                CN_ASSERT(false);
+            }
+        },
+        [](){
+            return std::make_unique<events::ServerCommandNetEvent>();
         }
     );
     _factoryRef.add(

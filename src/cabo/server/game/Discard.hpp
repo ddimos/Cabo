@@ -1,17 +1,10 @@
 #pragma once
 
-#include "core/object/Object.hpp"
-#include "shared/board/Discard.hpp"
+#include "shared/game/Discard.hpp"
 
 namespace cn::server::game
 {
 
-class Discard final : public core::object::Object
-{
-public:
-    Discard(shared::board::Discard& _boardDiscard) : m_boardDiscardRef(_boardDiscard) {}
-    
-    shared::board::Discard& m_boardDiscardRef;
-};
+using shared::game::Discard;
 
 } // namespace cn::server::game

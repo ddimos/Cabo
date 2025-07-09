@@ -15,6 +15,8 @@ using ListenerId = core::Identifier<Listener, uint16_t>;
 
 using EventPtr = std::unique_ptr<Event>;
 
+class Dispatcher;
+
 } // namespace cn::core::event
 
 template <>

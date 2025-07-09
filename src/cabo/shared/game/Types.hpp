@@ -3,7 +3,7 @@
 #include "shared/game/Constants.hpp"
 #include "shared/player/Types.hpp"
 
-#include "shared/board/BoardObject.hpp"
+#include "shared/board/Object.hpp"
 
 #include "core/Identifier.hpp"
 
@@ -85,7 +85,7 @@ enum class ServerCommandType
 struct PlayerInteractsWithCardData
 {
     PlayerId playerId{};
-    board::BoardObjectId cardId{};
+    board::ObjectId cardId{};
     sf::Vector2f pos{};
     bool grabs = false;
 };

@@ -1,20 +1,17 @@
 #pragma once
 
-#include "core/object/Object.hpp"
-#include "shared/board/Participant.hpp"
+#include "shared/game/Participant.hpp"
 
 namespace cn::client::game
 {
 
-class Participant final : public core::object::Object
+class Participant final : public shared::game::Participant
 {
 public:
-    Participant(shared::board::Participant& _boardParticipant) : m_boardParticipantRef(_boardParticipant) {}
-    
-    shared::board::Participant& getBoardParticipant() { return m_boardParticipantRef; }
+    Participant(shared::board::Participant& _boardParticipant)
+        : shared::game::Participant(_boardParticipant) {}
 
 private:
-    shared::board::Participant& m_boardParticipantRef;
 };
 
 } // namespace cn::client::game

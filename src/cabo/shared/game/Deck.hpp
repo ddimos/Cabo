@@ -1,31 +1,21 @@
 #pragma once
 
-#include "core/object/Object.hpp"
-#include "core/Random.hpp"
-
-#include "server/game/Card.hpp"
-
-#include <functional>
-#include <vector>
+#include "shared/board/Deck.hpp"
+#include "shared/game/Object.hpp"
 
 namespace cn::shared::game
 {
 
-class Deck final : public core::object::Object
+class Deck : public shared::game::Object
 {
 public:
-    Deck(std::vector<Card*>&& _cards, unsigned _seed);
+    Deck(shared::board::Deck& _boardDeck) : m_boardDeckRef(_boardDeck) {}
 
-    void shuffle();
-    void shuffleFromDiscard();
+    shared::board::Object& getBoardObject() const { return m_boardDeckRef; }
+    shared::board::Deck& getBoardDeck() const { return m_boardDeckRef; }
 
-    Card* getNextCard();
-
-    void visit(std::function<void(const Card&)>) const;
-
-private:
-    std::vector<Card*> m_cards;
-    core::Random m_randomizer;
+protected:
+    shared::board::Deck& m_boardDeckRef;
 };
 
-} // namespace cn::game
+} // namespace cn::shared::game

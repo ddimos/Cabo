@@ -4,14 +4,14 @@
 namespace cn::shared::board
 {
 
-void GrabController::addObject(BoardObject& _object)
+void GrabController::addObject(Object& _object)
 {
     m_objects.push_back(&_object);
 }
 
-BoardObject* GrabController::tryToGrabObject(PlayerId _playerId, sf::Vector2f _position)
+Object* GrabController::tryToGrabObject(PlayerId _playerId, sf::Vector2f _position)
 {
-    BoardObject* topObject = nullptr;
+    Object* topObject = nullptr;
     for (auto& object : m_objects)
     {
         if (!object->contains(_position))
@@ -37,9 +37,9 @@ BoardObject* GrabController::tryToGrabObject(PlayerId _playerId, sf::Vector2f _p
     return topObject;
 }
 
-BoardObject* GrabController::tryToReleaseObject(PlayerId _playerId, sf::Vector2f)
+Object* GrabController::tryToReleaseObject(PlayerId _playerId, sf::Vector2f)
 {
-    BoardObject* object = nullptr;
+    Object* object = nullptr;
     auto it = m_grabbedObjects.find(_playerId);
     if (it != m_grabbedObjects.end())
     {

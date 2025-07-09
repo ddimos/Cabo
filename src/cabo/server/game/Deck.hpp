@@ -1,17 +1,11 @@
 #pragma once
 
-#include "core/object/Object.hpp"
-#include "shared/board/Deck.hpp"
+#include "shared/game/Deck.hpp"
 
 namespace cn::server::game
 {
 
-class Deck final : public core::object::Object
-{
-public:
-    Deck(shared::board::Deck& _boardDeck) : m_boardDeckRef(_boardDeck) {}
+using shared::game::Deck;
 
-    shared::board::Deck& m_boardDeckRef;
-};
 
 } // namespace cn::server::game

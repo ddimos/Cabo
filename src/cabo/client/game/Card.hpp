@@ -3,14 +3,14 @@
 #include "core/object/Object.hpp"
 #include "core/Context.hpp"
 
-#include "shared/board/Card.hpp"
+#include "shared/game/Card.hpp"
 
 #include <SFML/Graphics/Sprite.hpp>
 
 namespace cn::client::game
 {
 
-class Card final : public core::object::Object
+class Card final : public shared::game::Card
 {
 public:
     Card(const core::Context& _context, shared::board::Card& _boardCard);
@@ -18,10 +18,7 @@ public:
     void onUpdate(sf::Time _dt) override;
     void onDraw(sf::RenderWindow& _window) override;
 
-    shared::board::Card& getBoardCard() const { return m_boardCardRef; };
-
 private:
-    shared::board::Card& m_boardCardRef;
     sf::Sprite m_sprite;
 };
 

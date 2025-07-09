@@ -1,5 +1,6 @@
 #pragma once
 
+#include "shared/board/Object.hpp"
 #include "core/Random.hpp"
 
 #include <functional>
@@ -12,10 +13,10 @@ namespace cn::shared::board
 
 class Card;
 
-class Deck final
+class Deck : public Object
 {
 public:
-    Deck(unsigned _seed, sf::Vector2f _position);
+    Deck(ObjectId _id, unsigned _seed, sf::Vector2f _position);
 
     void setCards(std::vector<Card*>&& _cards);
     void shuffle();

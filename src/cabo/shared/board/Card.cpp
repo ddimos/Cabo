@@ -3,8 +3,8 @@
 namespace cn::shared::board
 {
 
-Card::Card(BoardObjectId _id)
-    : BoardObject(_id)
+Card::Card(ObjectId _id)
+    : Object(_id)
 {
 }
 

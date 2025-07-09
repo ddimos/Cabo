@@ -7,7 +7,7 @@ namespace cn::client::game
 {
 
 Card::Card(const core::Context& _context, shared::board::Card& _boardCard) 
-    : m_boardCardRef(_boardCard)
+    : shared::game::Card(_boardCard)
 {
     m_sprite.setTexture(_context.get<TextureHolder>().get(TextureIds::Cards));
     m_sprite.setTextureRect(game::spriteSheet::getCardBackTextureRect());

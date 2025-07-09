@@ -9,8 +9,8 @@
 namespace cn::shared::board
 {
 
-Deck::Deck(unsigned _seed, sf::Vector2f _position)
-    : m_position(_position)
+Deck::Deck(ObjectId _id, unsigned _seed, sf::Vector2f _position)
+    : Object(_id), m_position(_position)
 {
     m_randomizer.init(_seed);
 }

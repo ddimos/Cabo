@@ -1,5 +1,6 @@
 #pragma once
 
+#include "shared/board/Object.hpp"
 #include "shared/player/Types.hpp"
 
 #include <SFML/System/Vector2.hpp>
@@ -7,20 +8,20 @@
 namespace cn::shared::board
 {
 
-class BoardObject;
+class Object;
 
-class Participant final
+class Participant : public Object
 {
 public:
-    Participant(PlayerId _playerId);
+    Participant(ObjectId _id, PlayerId _playerId);
 
     void setMousePosition(sf::Vector2f _position);
-    void setObject(BoardObject* _object);
+    void setObject(Object* _object);
 
 private:
     PlayerId m_playerId{};
     sf::Vector2f m_mousePosition{};
-    BoardObject* m_object = nullptr;
+    Object* m_object = nullptr;
 };
 
 } // namespace cn::shared::board
