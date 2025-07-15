@@ -19,14 +19,30 @@ bool Object::contains(sf::Vector2f _pos) const
     return localBounds.contains(positionInLocalCoord);
 }
 
-void Object::onGrabbed()
+InteractableObject::InteractableObject(ObjectId _id)
+    : Object(_id)
+{
+
+}
+
+void InteractableObject::grab()
 {
     m_isGrabbed = true;
 }
 
-void Object::onReleased()
+void InteractableObject::release()
 {
     m_isGrabbed = false;
+}
+
+void InteractableObject::turnUp()
+{
+    m_isFaceUp = true;
+}
+
+void InteractableObject::turnDown()
+{
+    m_isFaceUp = false;
 }
 
 } // namespace cn::shared::board

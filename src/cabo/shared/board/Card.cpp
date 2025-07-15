@@ -4,7 +4,7 @@ namespace cn::shared::board
 {
 
 Card::Card(ObjectId _id)
-    : Object(_id)
+    : InteractableObject(_id)
 {
 }
 

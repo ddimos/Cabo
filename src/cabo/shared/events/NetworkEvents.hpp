@@ -145,7 +145,7 @@ public:
     {}
 
     PlayerId m_playerId{};// TODO remove this, it is sent from a local player to server
-    shared::game::PlayerInputType m_type = shared::game::PlayerInputType::PressMouse;
+    shared::game::PlayerInputType m_type = shared::game::PlayerInputType::Grab;
     shared::game::PlayerInputDataVariant m_data = std::monostate();
 };
 

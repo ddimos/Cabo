@@ -220,9 +220,10 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
             _buffer << event.m_playerId.value();
             _buffer << static_cast<uint8_t>(event.m_type);
 
-            if (event.m_type == shared::game::PlayerInputType::PressMouse
-                || event.m_type == shared::game::PlayerInputType::ReleaseMouse
-                || event.m_type == shared::game::PlayerInputType::MoveMouse)
+            if (event.m_type == shared::game::PlayerInputType::Grab
+                || event.m_type == shared::game::PlayerInputType::Release
+                || event.m_type == shared::game::PlayerInputType::Flip
+                || event.m_type == shared::game::PlayerInputType::Move)
             {
                 const auto& data = std::get<sf::Vector2f>(event.m_data);
                 _buffer << data.x;
@@ -238,9 +239,10 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
             deserializeId(event.m_playerId, _buffer);
             deserializeEnum<uint8_t>(event.m_type, _buffer);
             
-            if (event.m_type == shared::game::PlayerInputType::PressMouse 
-                || event.m_type == shared::game::PlayerInputType::ReleaseMouse
-                || event.m_type == shared::game::PlayerInputType::MoveMouse)
+            if (event.m_type == shared::game::PlayerInputType::Grab 
+                || event.m_type == shared::game::PlayerInputType::Release
+                || event.m_type == shared::game::PlayerInputType::Flip
+                || event.m_type == shared::game::PlayerInputType::Move)
             {
                 sf::Vector2f data;
                 _buffer >> data.x;
@@ -268,7 +270,7 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
                 _buffer << data.cardId.value();
                 _buffer << data.pos.x;
                 _buffer << data.pos.y;
-                _buffer << data.grabs;
+                _buffer << static_cast<uint8_t>(data.type);
             }
             else if (event.m_type == shared::game::ServerCommandType::PlayerMoves)
             {
@@ -292,7 +294,7 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
                 deserializeId(data.cardId, _buffer);
                 _buffer >> data.pos.x;
                 _buffer >> data.pos.y;
-                _buffer >> data.grabs;
+                deserializeEnum<uint8_t>(data.type, _buffer);
                 event.m_data = data;
             }
             else if (event.m_type == shared::game::ServerCommandType::PlayerMoves)

@@ -16,6 +16,14 @@ Card::Card(const core::Context& _context, shared::board::Card& _boardCard)
 
 void Card::onUpdate(sf::Time _dt)
 {
+    if (getBoardCard().isFaceUp())
+    {
+        m_sprite.setTextureRect(game::spriteSheet::getBlurredCardTextureRect());
+    }
+    else
+    {
+        m_sprite.setTextureRect(game::spriteSheet::getCardBackTextureRect());
+    }
     m_sprite.setPosition(m_boardCardRef.getPosition());
 }
     

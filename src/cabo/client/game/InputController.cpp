@@ -29,7 +29,7 @@ void InputController::registerEvents(core::event::Dispatcher& _dispatcher, bool 
                 if (_event.mouseButton.button != sf::Mouse::Button::Left)
                     return;
                 events::RemotePlayerInputNetEvent2 event(
-                    playerManRef.getLocalPlayerId(), shared::game::PlayerInputType::PressMouse,
+                    playerManRef.getLocalPlayerId(), shared::game::PlayerInputType::Grab,
                     windowRef.mapPixelToCoords(sf::Vector2i(_event.mouseButton.x, _event.mouseButton.y)));
                 netManRef.send(event);
             }
@@ -39,8 +39,19 @@ void InputController::registerEvents(core::event::Dispatcher& _dispatcher, bool 
                 if (_event.mouseButton.button != sf::Mouse::Button::Left)
                     return;
                 events::RemotePlayerInputNetEvent2 event(
-                    playerManRef.getLocalPlayerId(), shared::game::PlayerInputType::ReleaseMouse, 
+                    playerManRef.getLocalPlayerId(), shared::game::PlayerInputType::Release, 
                     windowRef.mapPixelToCoords(sf::Vector2i(_event.mouseButton.x, _event.mouseButton.y)));
+                netManRef.send(event);
+            }
+        );
+        _dispatcher.registerEvent<events::KeyReleasedEvent>(m_listenerId,
+            [&netManRef, &playerManRef, &windowRef](const events::KeyReleasedEvent& _event){
+                if (_event.key.code != sf::Keyboard::Space)
+                    return;
+                auto mousePos = sf::Mouse::getPosition(windowRef);
+                events::RemotePlayerInputNetEvent2 event(
+                    playerManRef.getLocalPlayerId(), shared::game::PlayerInputType::Flip,
+                    windowRef.mapPixelToCoords(sf::Vector2i(mousePos.x, mousePos.y)));
                 netManRef.send(event);
             }
         );
@@ -49,7 +60,7 @@ void InputController::registerEvents(core::event::Dispatcher& _dispatcher, bool 
                 // TODO to send an update every 100 ms
                 sf::Vector2f pos = windowRef.mapPixelToCoords(sf::Vector2i(_event.mouseMove.x, _event.mouseMove.y));
                 m_moveCallback(pos);
-                events::RemotePlayerInputNetEvent2 event(playerManRef.getLocalPlayerId(), shared::game::PlayerInputType::MoveMouse, pos);
+                events::RemotePlayerInputNetEvent2 event(playerManRef.getLocalPlayerId(), shared::game::PlayerInputType::Move, pos);
                 netManRef.send(event, false);
             }
         );
@@ -58,6 +69,7 @@ void InputController::registerEvents(core::event::Dispatcher& _dispatcher, bool 
     {
         _dispatcher.unregisterEvent<events::MouseButtonPressedEvent>(m_listenerId);
         _dispatcher.unregisterEvent<events::MouseButtonReleasedEvent>(m_listenerId);
+        _dispatcher.unregisterEvent<events::KeyReleasedEvent>(m_listenerId);
         _dispatcher.unregisterEvent<events::MouseMovedEvent>(m_listenerId);
     }
 }

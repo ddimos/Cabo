@@ -53,15 +53,32 @@ void Board::start()
 void Board::participantGrabs(PlayerId _playerId, ObjectId _id, sf::Vector2f _position)
 {
     CN_LOG_FRM("Grabs {} {}", _playerId.value(), _id.value());
-    m_participants.at(_playerId)->setObject(getCard(_id));
+    auto* card = getCard(_id);
+    card->grab();
+    m_participants.at(_playerId)->setObject(card);
     m_participants.at(_playerId)->setMousePosition(_position);
 }
 
 void Board::participantReleases(PlayerId _playerId, ObjectId _id, sf::Vector2f _position)
 {
     CN_LOG_FRM("Releases {} {}", _playerId.value(), _id.value());
+    auto* card = getCard(_id);
+    card->release();
     m_participants.at(_playerId)->setMousePosition(_position);
     m_participants.at(_playerId)->setObject(nullptr);
+}
+
+void Board::participantTurnsUp(PlayerId _playerId, ObjectId _id, sf::Vector2f _position)
+{
+    CN_LOG_FRM("TurnsUp {} {}", _playerId.value(), _id.value());
+    
+    getCard(_id)->turnUp();
+}
+
+void Board::participantTurnsDown(PlayerId _playerId, ObjectId _id, sf::Vector2f _position)
+{
+    CN_LOG_FRM("TurnsDown {} {}", _playerId.value(), _id.value());
+    getCard(_id)->turnDown();
 }
 
 void Board::participantMoves(PlayerId _playerId, sf::Vector2f _position)
@@ -77,7 +94,7 @@ ObjectId Board::generateNextOjectId()
     return newId;
 }
 
-Object* Board::getCard(ObjectId _id)
+Card* Board::getCard(ObjectId _id)
 {
     for (auto& card : m_cards)
     {

@@ -6,10 +6,10 @@
 namespace cn::shared::board
 {
 
-class Card : public Object
+class Card : public InteractableObject
 {
 public:
-    using Value = core::Identifier<Object, uint8_t>;
+    using Value = core::Identifier<Card, uint8_t>;
 
     Card(ObjectId _id);
 

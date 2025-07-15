@@ -69,9 +69,10 @@ using InputDataVariant = std::variant<ActionType, ClickSlotInputData, PileType, 
 
 enum class PlayerInputType
 {
-    PressMouse,
-    ReleaseMouse,
-    MoveMouse
+    Flip,
+    Grab,
+    Move,
+    Release
 };
 
 using PlayerInputDataVariant = std::variant<sf::Vector2f, std::monostate>;
@@ -84,10 +85,17 @@ enum class ServerCommandType
 
 struct PlayerInteractsWithCardData
 {
+    enum class Type
+    {
+        Grabs,
+        Releases,
+        TurnsDown,
+        TurnsUp
+    };
     PlayerId playerId{};
     board::ObjectId cardId{};
     sf::Vector2f pos{};
-    bool grabs = false;
+    Type type = Type::Grabs;
 };
 
 struct PlayerMovesData

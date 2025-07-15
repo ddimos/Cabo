@@ -32,19 +32,32 @@ public:
     unsigned getZIndex() const { return m_zIndex; }
     void setZIndex(unsigned _zIndex) { m_zIndex = _zIndex; }
 
-    bool isGrabbed() const { return m_isGrabbed; }
-
     bool contains(sf::Vector2f _pos) const;
-
-    void onGrabbed();
-    void onReleased();
 
 private:
     ObjectId m_id{};
     sf::FloatRect m_bounds{};
     float m_rotation{0};
     unsigned m_zIndex = 0;
+};
+
+class InteractableObject : public Object
+{
+public:
+    InteractableObject(ObjectId _id);
+
+    bool isGrabbed() const { return m_isGrabbed; }
+    bool isFaceUp() const { return m_isFaceUp; }
+
+    void grab();
+    void release();
+
+    void turnUp();
+    void turnDown();
+
+private:
     bool m_isGrabbed = false;
+    bool m_isFaceUp = false;
 };
 
 } // namespace cn::shared::board
