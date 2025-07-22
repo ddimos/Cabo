@@ -22,7 +22,6 @@ bool Object::contains(sf::Vector2f _pos) const
 InteractableObject::InteractableObject(ObjectId _id)
     : Object(_id)
 {
-
 }
 
 void InteractableObject::grab()

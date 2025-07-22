@@ -18,4 +18,32 @@ protected:
     shared::board::Card& m_boardCardRef;
 };
 
+enum class Rank
+{
+    Ace,
+    _2,
+    _3,
+    _4,
+    _5,
+    _6,
+    _7,
+    _8,
+    _9,
+    _10,
+    Jack,
+    Queen,
+    King
+};
+
+enum class Suit
+{
+    Clubs,      // (♣)
+    Hearts,     // (♥)
+    Spades,     // (♠)
+    Diamonds    // (♦)
+}; 
+
+board::Card::Value getValueFromCard(Rank, Suit);
+std::pair<Rank, Suit> getCardFromValue(board::Card::Value _value);
+
 } // namespace cn::shared::game

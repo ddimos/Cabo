@@ -3,6 +3,7 @@
 #include "shared/game/Constants.hpp"
 #include "shared/player/Types.hpp"
 
+#include "shared/board/Card.hpp"
 #include "shared/board/Object.hpp"
 
 #include "core/Identifier.hpp"
@@ -80,7 +81,8 @@ using PlayerInputDataVariant = std::variant<sf::Vector2f, std::monostate>;
 enum class ServerCommandType
 {
     PlayerInteractsWithCard,
-    PlayerMoves
+    PlayerMoves,
+    ProvideCardValue
 };
 
 struct PlayerInteractsWithCardData
@@ -104,6 +106,12 @@ struct PlayerMovesData
     sf::Vector2f pos{};
 };
 
-using ServerCommandDataVariant = std::variant<PlayerInteractsWithCardData, PlayerMovesData, std::monostate>;
+struct ProvideCardValueData
+{
+    board::ObjectId cardId{};
+    board::Card::Value value{};
+};
+
+using ServerCommandDataVariant = std::variant<PlayerInteractsWithCardData, PlayerMovesData, ProvideCardValueData, std::monostate>;
 
 } // namespace cn::shared::game

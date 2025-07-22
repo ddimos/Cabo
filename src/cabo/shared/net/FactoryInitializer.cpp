@@ -279,6 +279,12 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
                 _buffer << data.pos.x;
                 _buffer << data.pos.y;
             }
+            else if (event.m_type == shared::game::ServerCommandType::ProvideCardValue)
+            {
+                const auto& data = std::get<shared::game::ProvideCardValueData>(event.m_data);
+                _buffer << data.cardId.value();
+                _buffer << data.value.value();
+            }
             else
             {
                 CN_ASSERT(false);
@@ -303,6 +309,13 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
                 deserializeId(data.playerId, _buffer);
                 _buffer >> data.pos.x;
                 _buffer >> data.pos.y;
+                event.m_data = data;
+            }
+            else if (event.m_type == shared::game::ServerCommandType::ProvideCardValue)
+            {
+                shared::game::ProvideCardValueData data;
+                deserializeId(data.cardId, _buffer);
+                deserializeId(data.value, _buffer);
                 event.m_data = data;
             }
             else

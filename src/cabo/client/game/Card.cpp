@@ -18,7 +18,15 @@ void Card::onUpdate(sf::Time _dt)
 {
     if (getBoardCard().isFaceUp())
     {
-        m_sprite.setTextureRect(game::spriteSheet::getBlurredCardTextureRect());
+        if (getBoardCard().getValue().isValid())
+        {
+            auto card = shared::game::getCardFromValue(getBoardCard().getValue());
+            m_sprite.setTextureRect(game::spriteSheet::getCardTextureRect(card.first, card.second));
+        }
+        else
+        {
+            m_sprite.setTextureRect(game::spriteSheet::getBlurredCardTextureRect());
+        }
     }
     else
     {
@@ -26,7 +34,7 @@ void Card::onUpdate(sf::Time _dt)
     }
     m_sprite.setPosition(m_boardCardRef.getPosition());
 }
-    
+
 void Card::onDraw(sf::RenderWindow& _window)
 {
     _window.draw(m_sprite);

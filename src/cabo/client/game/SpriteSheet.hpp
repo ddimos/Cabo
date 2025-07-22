@@ -13,7 +13,7 @@ enum class Hover
     No
 };
 
-sf::IntRect getCardTextureRect(shared::game::Card::Rank _rank, shared::game::Card::Suit _suit);
+sf::IntRect getCardTextureRect(shared::game::Rank _rank, shared::game::Suit _suit);
 sf::IntRect getBlurredCardTextureRect();
 sf::IntRect getCardBackTextureRect(Hover _hover = Hover::No);
 sf::IntRect getDiscardTextureRect(Hover _hover = Hover::No);

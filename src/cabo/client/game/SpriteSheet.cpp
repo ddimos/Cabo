@@ -20,7 +20,7 @@ inline constexpr short unsigned YesNoButtonHeight = 20;
 namespace cn::client::game::spriteSheet
 {
 
-sf::IntRect getCardTextureRect(shared::game::Card::Rank _rank, shared::game::Card::Suit _suit)
+sf::IntRect getCardTextureRect(shared::game::Rank _rank, shared::game::Suit _suit)
 {
     int rankNum = static_cast<int>(_rank) + 1;
     int suitNum = static_cast<int>(_suit);

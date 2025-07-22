@@ -35,9 +35,9 @@ public:
     void participantTurnsDown(PlayerId _playerId, ObjectId _id, sf::Vector2f _position);
     void participantMoves(PlayerId _playerId, sf::Vector2f _position);
 
+    Card* getCard(ObjectId _id);
 private:
     ObjectId generateNextOjectId();
-    Card* getCard(ObjectId _id);
 
     const unsigned m_seed = 0;
     std::vector<std::unique_ptr<Card>> m_cards;

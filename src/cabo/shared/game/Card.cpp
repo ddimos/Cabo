@@ -2,10 +2,7 @@
 #include "core/Assert.hpp"
 #include <cmath>
 
-namespace cn::shared::game
-{
-
-std::pair<Card::Rank, Card::Suit> Card::getCardFromIndex(unsigned _index)
+namespace
 {
 /*
             Clubs       Hearts      Spades     Diamonds
@@ -23,59 +20,31 @@ std::pair<Card::Rank, Card::Suit> Card::getCardFromIndex(unsigned _index)
     Queen,   11           24          37          50
     King,    12           25          38          51
 */
-    constexpr unsigned NumOfRanks = 13;
-    constexpr unsigned NumOfSuits = 4;
-    static_assert(NumOfRanks - 1 == static_cast<unsigned>(Rank::King));
-    static_assert(NumOfSuits - 1 == static_cast<unsigned>(Suit::Diamonds));
 
-    CN_ASSERT(NumOfRanks * NumOfSuits > _index);
+constexpr unsigned NumOfRanks = 13;
+constexpr unsigned NumOfSuits = 4;
+static_assert(NumOfRanks - 1 == static_cast<unsigned>(cn::shared::game::Rank::King));
+static_assert(NumOfSuits - 1 == static_cast<unsigned>(cn::shared::game::Suit::Diamonds));
 
-    unsigned rank = _index % NumOfRanks;
-    unsigned suit = static_cast<unsigned>(std::floor(_index / NumOfRanks));
+} // namespace
+
+namespace cn::shared::game
+{
+
+board::Card::Value getValueFromCard(Rank _rank, Suit _suit)
+{
+    return board::Card::Value(static_cast<uint8_t>(_rank) + NumOfRanks * static_cast<uint8_t>(_suit));
+}
+
+std::pair<Rank, Suit> getCardFromValue(board::Card::Value _value)
+{
+    CN_ASSERT(NumOfRanks * NumOfSuits > _value.value());
+
+    unsigned rank = _value.value() % NumOfRanks;
+    unsigned suit = static_cast<unsigned>(std::floor(_value.value() / NumOfRanks));
     CN_ASSERT(NumOfSuits > suit);
 
     return std::make_pair(static_cast<Rank>(rank), static_cast<Suit>(suit));
-}
-
-bool Card::hasAbility(const Card& _card)
-{
-    return getAbility(_card) != Ability::None;
-}
-
-Card::Ability Card::getAbility(const Card& _card)
-{
-    if (_card.m_rank == Rank::_7 || _card.m_rank == Rank::_8)
-        return Ability::Peek;
-    if (_card.m_rank == Rank::_9 || _card.m_rank == Rank::_10)
-        return Ability::Spy;
-    if (_card.m_rank == Rank::Jack)
-        return Ability::SwapBlindly;
-    if (_card.m_rank == Rank::Queen)
-        return Ability::SwapOpenly;
-    return Ability::None;
-}
-
-Card::Card(Rank _rank, Suit _suit)
-    : m_rank(_rank), m_suit(_suit), m_isCardValueValid(true)
-{
-}
-
-bool Card::hasAbility() const
-{
-    return Card::hasAbility(*this);
-}
-
-Card::Ability Card::getAbility() const
-{
-    return Card::getAbility(*this);
-}
-
-void Card::set(Rank _rank, Suit _suit)
-{
-    m_rank = _rank;
-    m_suit = _suit;
-
-    m_isCardValueValid = true;
 }
 
 } // namespace cn::shared::game
