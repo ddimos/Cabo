@@ -36,6 +36,7 @@ public:
     void participantMoves(PlayerId _playerId, sf::Vector2f _position);
 
     Card* getCard(ObjectId _id);
+
 private:
     ObjectId generateNextOjectId();
 

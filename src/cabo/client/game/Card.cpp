@@ -16,7 +16,7 @@ Card::Card(const core::Context& _context, shared::board::Card& _boardCard)
 
 void Card::onUpdate(sf::Time _dt)
 {
-    if (getBoardCard().isFaceUp())
+    if (getBoardCard().getFlippableComponent().isFaceUp())
     {
         if (getBoardCard().getValue().isValid())
         {

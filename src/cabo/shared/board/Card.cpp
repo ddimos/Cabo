@@ -4,7 +4,9 @@ namespace cn::shared::board
 {
 
 Card::Card(ObjectId _id)
-    : InteractableObject(_id)
+    : Object(_id)
+    , m_flippableComponent(*this)
+    , m_grabbableComponent(*this)
 {
 }
 

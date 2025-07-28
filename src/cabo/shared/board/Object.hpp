@@ -41,23 +41,4 @@ private:
     unsigned m_zIndex = 0;
 };
 
-class InteractableObject : public Object
-{
-public:
-    InteractableObject(ObjectId _id);
-
-    bool isGrabbed() const { return m_isGrabbed; }
-    bool isFaceUp() const { return m_isFaceUp; }
-
-    void grab();
-    void release();
-
-    void turnUp();
-    void turnDown();
-
-private:
-    bool m_isGrabbed = false;
-    bool m_isFaceUp = false;
-};
-
 } // namespace cn::shared::board
