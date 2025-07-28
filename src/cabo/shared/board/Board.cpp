@@ -37,6 +37,14 @@ Participant& Board::spawnParticipant(PlayerId _playerId)
     return *(it->second);
 }
 
+Anchor& Board::spawnAnchor()
+{
+    constexpr int radius = 100;
+    m_anchors.emplace_back(std::make_unique<shared::board::Anchor>(generateNextOjectId(), radius));
+    m_anchors.back()->setPosition(sf::Vector2f(500.f, 500.f));
+    return *(m_anchors.back());
+}
+
 void Board::start()
 {
     m_deck->shuffle();
