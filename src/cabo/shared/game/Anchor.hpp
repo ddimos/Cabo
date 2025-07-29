@@ -6,16 +6,14 @@
 namespace cn::shared::game
 {
 
-class Anchor : public shared::game::Object
+class Anchor : public Object
 {
 public:
-    Anchor(shared::board::Anchor& _boardAnchor) : m_boardAnchorRef(_boardAnchor) {}
+    Anchor(board::Anchor& _boardAnchor)
+        : Object(_boardAnchor)
+    {}
 
-    shared::board::Object& getBoardObject() const { return m_boardAnchorRef; }
-    shared::board::Anchor& getBoardAnchor() const { return m_boardAnchorRef; }
-
-protected:
-    shared::board::Anchor& m_boardAnchorRef;
+    board::Anchor& getBoardAnchor() const { return static_cast<board::Anchor&>(getBoardObject()); }
 };
 
 } // namespace cn::shared::game

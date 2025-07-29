@@ -9,9 +9,14 @@ namespace cn::shared::game
 class Object : public core::object::Object
 {
 public:
-    Object() = default;
+    Object(board::Object& _boardObject)
+        : m_boardObjectRef(_boardObject)
+    {}
 
-    virtual board::Object& getBoardObject() const = 0;
+    board::Object& getBoardObject() const { return m_boardObjectRef; }
+
+private:
+    board::Object& m_boardObjectRef;
 };
 
 } // namespace cn::shared::game

@@ -6,16 +6,14 @@
 namespace cn::shared::game
 {
 
-class Discard : public shared::game::Object
+class Discard : public Object
 {
 public:
-    Discard(shared::board::Discard& _boardDiscard) : m_boardDiscardRef(_boardDiscard) {}
+    Discard(board::Discard& _boardDiscard)
+        : Object(_boardDiscard)
+    {}
 
-    shared::board::Object& getBoardObject() const { return m_boardDiscardRef; }
-    shared::board::Discard& getBoardDiscard() const { return m_boardDiscardRef; }
-
-protected:
-    shared::board::Discard& m_boardDiscardRef;
+    board::Discard& getBoardDiscard() const { return static_cast<board::Discard&>(getBoardObject()); }
 };
 
 } // namespace cn::shared::game

@@ -6,16 +6,13 @@
 namespace cn::shared::game
 {
 
-class Participant : public shared::game::Object
+class Participant : public Object
 {
 public:
-    Participant(shared::board::Participant& _boardParticipant) : m_boardParticipantRef(_boardParticipant) {}
+    Participant(board::Participant& _boardParticipant)
+        : Object(_boardParticipant) {}
 
-    shared::board::Object& getBoardObject() const { return m_boardParticipantRef; }
-    shared::board::Participant& getBoardParticipant() const { return m_boardParticipantRef; }
-
-protected:
-    shared::board::Participant& m_boardParticipantRef;
+    board::Participant& getBoardParticipant() const { return static_cast<board::Participant&>(getBoardObject()); }
 };
 
 } // namespace cn::shared::game

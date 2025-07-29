@@ -6,16 +6,14 @@
 namespace cn::shared::game
 {
 
-class Card : public shared::game::Object
+class Card : public Object
 {
 public:
-    Card(shared::board::Card& _boardCard) : m_boardCardRef(_boardCard) {}
+    Card(board::Card& _boardCard)
+        : Object(_boardCard)
+    {}
 
-    shared::board::Object& getBoardObject() const { return m_boardCardRef; }
-    shared::board::Card& getBoardCard() const { return m_boardCardRef; }
-
-protected:
-    shared::board::Card& m_boardCardRef;
+    board::Card& getBoardCard() const { return static_cast<board::Card&>(getBoardObject()); }
 };
 
 enum class Rank
