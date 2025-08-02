@@ -3,8 +3,8 @@
 namespace cn::client::game
 {
 
-PrivateZone::PrivateZone(shared::board::Object& _boardPrivateZone)
-    : shared::game::Object(_boardPrivateZone)
+PrivateZone::PrivateZone(shared::board::PrivateZone& _boardPrivateZone)
+    : shared::game::PrivateZone(_boardPrivateZone)
 {
     m_shape.setFillColor(sf::Color::Transparent);
     m_shape.setOutlineColor(sf::Color::Red);

@@ -37,10 +37,10 @@ Participant& Board::spawnParticipant(PlayerId _playerId)
     return *(it->second);
 }
 
-Object& Board::spawnPrivateZone()
+PrivateZone& Board::spawnPrivateZone(PlayerId _playerId)
 {
-    m_privateZones.emplace_back(std::make_unique<shared::board::Object>(generateNextOjectId()));
-    m_privateZones.back()->setSize(sf::Vector2f(200.f, 100.f));
+    m_privateZones.emplace_back(std::make_unique<shared::board::PrivateZone>(generateNextOjectId(), _playerId));
+    m_privateZones.back()->setSize(sf::Vector2f(400.f, 200.f));
     return *(m_privateZones.back());
 }
 

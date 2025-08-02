@@ -1,5 +1,6 @@
 #pragma once
 #include "shared/board/component/Component.hpp"
+#include "shared/board/PrivateZone.hpp"
 
 namespace cn::shared::board::controller
 {
@@ -15,15 +16,18 @@ public:
     PrivateZoneViewable(Object& _parent);
 
     bool isHidden() const;
-    bool isHiddenInZone(Object& _privateZone) const;
+    bool isHiddenInZone(PrivateZone& _privateZone) const;
+    bool isHiddenInZoneOfPlayer(PlayerId _playerId) const;
+
+    PrivateZone* getPrivateZone() const { return m_privateZone; }
 
 private:
     friend class controller::PrivateZoneViewable;
 
-    void show(Object& _privateZone);
-    void hide(Object& _privateZone);
+    void show(PrivateZone& _privateZone);
+    void hide(PrivateZone& _privateZone);
 
-    Object* m_privateZone = nullptr;
+    PrivateZone* m_privateZone = nullptr;
 };
 
 } // namespace cn::shared::board::component

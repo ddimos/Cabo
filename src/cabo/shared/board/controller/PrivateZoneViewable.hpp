@@ -2,7 +2,7 @@
 
 #include "shared/board/controller/Controller.hpp"
 #include "shared/board/component/PrivateZoneViewable.hpp"
-#include "shared/board/Object.hpp"
+#include "shared/board/PrivateZone.hpp"
 
 #include <functional>
 #include <vector>
@@ -16,12 +16,12 @@ public:
     using OnZoneChanged = std::function<void(component::PrivateZoneViewable&)>;
     PrivateZoneViewable(OnZoneChanged _onZoneChanged);
 
-    void addPrivateZone(Object& _zone);
+    void addPrivateZone(PrivateZone& _zone);
     void update();
 
 private:
     OnZoneChanged m_onZoneChanged{};
-    std::vector<Object*> m_privateZones;
+    std::vector<PrivateZone*> m_privateZones;
 };
 
 } // namespace cn::shared::board::controller

@@ -15,19 +15,24 @@ bool PrivateZoneViewable::isHidden() const
     return m_privateZone != nullptr;
 }
 
-bool PrivateZoneViewable::isHiddenInZone(Object& _privateZone) const
+bool PrivateZoneViewable::isHiddenInZone(PrivateZone& _privateZone) const
 {
     return m_privateZone && m_privateZone->getId() == _privateZone.getId();
 }
 
-void PrivateZoneViewable::show(Object& _privateZone)
+bool PrivateZoneViewable::isHiddenInZoneOfPlayer(PlayerId _playerId) const
+{
+    return m_privateZone && m_privateZone->getOwnerId() == _playerId;
+}
+
+void PrivateZoneViewable::show(PrivateZone& _privateZone)
 {
     CN_ASSERT(m_privateZone != nullptr);
     CN_ASSERT(m_privateZone->getId() == _privateZone.getId());
     m_privateZone = nullptr;
 }
 
-void PrivateZoneViewable::hide(Object& _privateZone)
+void PrivateZoneViewable::hide(PrivateZone& _privateZone)
 {
     CN_ASSERT(m_privateZone == nullptr);
     m_privateZone = &_privateZone;

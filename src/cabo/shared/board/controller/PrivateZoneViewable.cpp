@@ -8,7 +8,7 @@ PrivateZoneViewable::PrivateZoneViewable(OnZoneChanged _onZoneChanged)
 {
 }
 
-void PrivateZoneViewable::addPrivateZone(Object& _zone)
+void PrivateZoneViewable::addPrivateZone(PrivateZone& _zone)
 {
     m_privateZones.push_back(&_zone);
 }
