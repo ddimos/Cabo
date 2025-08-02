@@ -32,7 +32,7 @@ void Card::onUpdate(sf::Time _dt)
     {
         m_sprite.setTextureRect(game::spriteSheet::getCardBackTextureRect());
     }
-    m_sprite.setPosition(m_boardCardRef.getPosition());
+    m_sprite.setPosition(getBoardCard().getPosition());
 }
 
 void Card::onDraw(sf::RenderWindow& _window)

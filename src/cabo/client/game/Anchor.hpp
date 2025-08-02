@@ -1,6 +1,5 @@
 #pragma once
 
-#include "core/object/Object.hpp"
 #include "core/Context.hpp"
 
 #include "shared/game/Anchor.hpp"

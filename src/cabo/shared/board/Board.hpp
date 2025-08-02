@@ -27,6 +27,7 @@ public:
     Deck& spawnDeck();
     Discard& spawnDiscard();
     Participant& spawnParticipant(PlayerId _playerId);
+    Object& spawnPrivateZone();
     Anchor& spawnAnchor();
 
     void start();
@@ -47,6 +48,7 @@ private:
     std::unique_ptr<Deck> m_deck;
     std::unique_ptr<Discard> m_discard;
     std::unordered_map<PlayerId, std::unique_ptr<Participant>> m_participants;
+    std::vector<std::unique_ptr<Object>> m_privateZones;
     std::vector<std::unique_ptr<Anchor>> m_anchors;
     ObjectId::Type m_objectIdGenerator = 0;
 };

@@ -37,11 +37,17 @@ Participant& Board::spawnParticipant(PlayerId _playerId)
     return *(it->second);
 }
 
+Object& Board::spawnPrivateZone()
+{
+    m_privateZones.emplace_back(std::make_unique<shared::board::Object>(generateNextOjectId()));
+    m_privateZones.back()->setSize(sf::Vector2f(200.f, 100.f));
+    return *(m_privateZones.back());
+}
+
 Anchor& Board::spawnAnchor()
 {
     constexpr int radius = 100;
     m_anchors.emplace_back(std::make_unique<shared::board::Anchor>(generateNextOjectId(), radius));
-    m_anchors.back()->setPosition(sf::Vector2f(500.f, 500.f));
     return *(m_anchors.back());
 }
 
@@ -54,6 +60,8 @@ void Board::start()
     {
         part->setPosition(points.at(i).first);
         part->setRotation(points.at(i).second);
+        m_privateZones.at(i)->setPosition(points.at(i).first);
+        // m_privateZones.at(i)->setRotation(points.at(i).second); TODO
         ++i;
     }
 }

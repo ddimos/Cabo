@@ -1,0 +1,43 @@
+#include "shared/board/controller/PrivateZoneViewable.hpp"
+
+namespace cn::shared::board::controller
+{
+
+PrivateZoneViewable::PrivateZoneViewable(OnZoneChanged _onZoneChanged)
+    : m_onZoneChanged(_onZoneChanged)
+{
+}
+
+void PrivateZoneViewable::addPrivateZone(Object& _zone)
+{
+    m_privateZones.push_back(&_zone);
+}
+
+void PrivateZoneViewable::update()
+{
+    // TODO to optimize this
+    for (auto* component : m_components)
+    {
+        for (auto* zone : m_privateZones)
+        {
+            if (zone->contains(component->getParent().getPosition()))
+            {
+                if (!component->isHidden())
+                {
+                    component->hide(*zone);
+                    m_onZoneChanged(*component);
+                }
+            }
+            else
+            {
+                if (component->isHiddenInZone(*zone))
+                {
+                    component->show(*zone);
+                    m_onZoneChanged(*component);
+                }
+            }
+        }
+    }
+}
+
+} // namespace cn::shared::board::controller
