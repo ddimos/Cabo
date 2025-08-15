@@ -4,6 +4,7 @@
 #include "core/Context.hpp"
 
 #include <SFML/System/Vector2.hpp>
+#include <SFML/System/Time.hpp>
 #include <functional>
 
 namespace cn::client::game
@@ -20,6 +21,7 @@ public:
 private:
     core::Context& m_contextRef;
     core::event::ListenerId m_listenerId{};
+    sf::Time m_lastUpdateTime{};
     MoveCallback m_moveCallback{};
 };
 

@@ -4,6 +4,7 @@
 #include "shared/net/Manager.hpp"
 #include "shared/events/InputEvents.hpp"
 #include "shared/events/NetworkEvents.hpp"
+#include "shared/game/Constants.hpp"
 
 #include <SFML/Window/Event.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -22,6 +23,7 @@ void InputController::registerEvents(core::event::Dispatcher& _dispatcher, bool 
     auto& netManRef = m_contextRef.get<net::Manager>();
     auto& playerManRef = m_contextRef.get<player::Manager>();
     auto& windowRef = m_contextRef.get<sf::RenderWindow>();
+    auto& clockRef = m_contextRef.get<sf::Clock>();
     if (_isBeingRegistered)
     {
         _dispatcher.registerEvent<events::MouseButtonPressedEvent>(m_listenerId,
@@ -56,10 +58,15 @@ void InputController::registerEvents(core::event::Dispatcher& _dispatcher, bool 
             }
         );
         _dispatcher.registerEvent<events::MouseMovedEvent>(m_listenerId,
-            [this, &netManRef, &playerManRef, &windowRef](const events::MouseMovedEvent& _event){
-                // TODO to send an update every 100 ms
+            [this, &netManRef, &playerManRef, &windowRef, &clockRef](const events::MouseMovedEvent& _event){
                 sf::Vector2f pos = windowRef.mapPixelToCoords(sf::Vector2i(_event.mouseMove.x, _event.mouseMove.y));
                 m_moveCallback(pos);
+
+                auto currentTime = clockRef.getElapsedTime();
+                if (currentTime - m_lastUpdateTime < shared::game::MoveUpdateDuration)
+                    return;
+                m_lastUpdateTime = currentTime;
+
                 events::RemotePlayerInputNetEvent2 event(playerManRef.getLocalPlayerId(), shared::game::PlayerInputType::Move, pos);
                 netManRef.send(event, false);
             }
