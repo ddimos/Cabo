@@ -1,6 +1,6 @@
 #pragma once
 
-#include "shared/game/Participant.hpp"
+#include "shared/game/object/Participant.hpp"
 #include "core/Context.hpp"
 #include "core/Interpolator.hpp"
 
@@ -9,16 +9,16 @@
 namespace cn::client::game
 {
 
-class Participant final : public shared::game::Participant
+class Participant final : public shared::game::object::Participant
 {
 public:
-    Participant(const core::Context& _context, shared::board::Participant& _boardParticipant, bool _isLocal);
+    Participant(const core::Context& _context, shared::game::object::Id _id, PlayerId _playerId, bool _isLocal);
 
     bool isLocal() const { return m_isLocal; }
-    void addPosition(sf::Vector2f _pos);
-
+    
 private:
     void onUpdate(sf::Time _dt) override;
+    void setMousePosition(sf::Vector2f _pos) override;
 
     bool m_isLocal = false;
 

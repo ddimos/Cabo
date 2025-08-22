@@ -1,10 +1,10 @@
 #pragma once
 
-#include "shared/game/Participant.hpp"
+#include "shared/game/object/Participant.hpp"
 
 namespace cn::server::game
 {
 
-using shared::game::Participant;
+using shared::game::object::Participant;
 
 } // namespace cn::server::game

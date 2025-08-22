@@ -1,10 +1,10 @@
 #pragma once
 
-#include "shared/game/Anchor.hpp"
+#include "shared/game/object/Anchor.hpp"
 
 namespace cn::server::game
 {
 
-using shared::game::Anchor;
+using shared::game::object::Anchor;
 
 } // namespace cn::server::game

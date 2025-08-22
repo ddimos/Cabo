@@ -1,13 +1,14 @@
 #include "client/game/Card.hpp"
 #include "client/game/SpriteSheet.hpp"
-
 #include "client/ResourceIds.hpp"
+
+#include "shared/game/CardValue.hpp"
 
 namespace cn::client::game
 {
 
-Card::Card(const core::Context& _context, shared::board::Card& _boardCard) 
-    : shared::game::Card(_boardCard)
+Card::Card(const core::Context& _context, shared::game::object::Id _id) 
+    : shared::game::object::Card(_id)
     , m_interpolatedFlip(_context.get<sf::Clock>(), sf::seconds(1.f), core::Easing::linear)
 {
     m_sprite.setTexture(_context.get<TextureHolder>().get(TextureIds::Cards));
@@ -18,7 +19,7 @@ Card::Card(const core::Context& _context, shared::board::Card& _boardCard)
 void Card::startFlipping()
 {
     m_startFlipping = true;
-    m_isNextFaceUp = !getBoardCard().getFlippableComponent().isFaceUp();
+    m_isNextFaceUp = !getFlippableComponent().isFaceUp();
     m_interpolatedFlip.start(1.f);
 }
 
@@ -67,11 +68,11 @@ void Card::onUpdate(sf::Time _dt)
     //     }
     //     m_sprite.setScale(m_interpolatedFlip.get() ,m_sprite.getScale().y);
     // }
-    if (getBoardCard().getFlippableComponent().isFaceUp())
+    if (getFlippableComponent().isFaceUp())
     {
-        if (getBoardCard().getValue().isValid())
+        if (getValue().isValid())
         {
-            auto card = shared::game::getCardFromValue(getBoardCard().getValue());
+            auto card = shared::game::getCardFromValue(getValue());
             m_sprite.setTextureRect(game::spriteSheet::getCardTextureRect(card.first, card.second));
         }
         else
@@ -83,7 +84,7 @@ void Card::onUpdate(sf::Time _dt)
     {
         m_sprite.setTextureRect(game::spriteSheet::getCardBackTextureRect());
     }
-    m_sprite.setPosition(getBoardCard().getPosition());
+    m_sprite.setPosition(getPosition());
 }
 
 void Card::onDraw(sf::RenderWindow& _window)

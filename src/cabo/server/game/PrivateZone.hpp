@@ -1,10 +1,10 @@
 #pragma once
 
-#include "shared/game/PrivateZone.hpp"
+#include "shared/game/object/PrivateZone.hpp"
 
 namespace cn::server::game
 {
 
-using shared::game::PrivateZone;
+using shared::game::object::PrivateZone;
 
 } // namespace cn::server::game

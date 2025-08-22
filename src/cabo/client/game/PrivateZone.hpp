@@ -1,16 +1,16 @@
 #pragma once
 
-#include "shared/game/PrivateZone.hpp"
+#include "shared/game/object/PrivateZone.hpp"
 
 #include <SFML/Graphics/RectangleShape.hpp>
 
 namespace cn::client::game
 {
 
-class PrivateZone final : public shared::game::PrivateZone
+class PrivateZone final : public shared::game::object::PrivateZone
 {
 public:
-    PrivateZone(shared::board::PrivateZone& _boardPrivateZone);
+    PrivateZone(shared::game::object::Id _id, PlayerId _ownerId);
 
 private:
     void onUpdate(sf::Time _dt) override;

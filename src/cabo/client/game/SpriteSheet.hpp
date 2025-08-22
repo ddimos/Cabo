@@ -1,6 +1,6 @@
 #pragma once
 
-#include "shared/game/Card.hpp"
+#include "shared/game/Types.hpp"
 
 #include <SFML/Graphics/Rect.hpp>
 

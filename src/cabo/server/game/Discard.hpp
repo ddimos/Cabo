@@ -1,10 +1,10 @@
 #pragma once
 
-#include "shared/game/Discard.hpp"
+#include "shared/game/object/Discard.hpp"
 
 namespace cn::server::game
 {
 
-using shared::game::Discard;
+using shared::game::object::Discard;
 
 } // namespace cn::server::game

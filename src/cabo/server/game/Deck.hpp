@@ -1,11 +1,10 @@
 #pragma once
 
-#include "shared/game/Deck.hpp"
+#include "shared/game/object/Deck.hpp"
 
 namespace cn::server::game
 {
 
-using shared::game::Deck;
-
+using shared::game::object::Deck;
 
 } // namespace cn::server::game

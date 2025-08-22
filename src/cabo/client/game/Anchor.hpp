@@ -1,18 +1,17 @@
 #pragma once
 
 #include "core/Context.hpp"
-
-#include "shared/game/Anchor.hpp"
+#include "shared/game/object/Anchor.hpp"
 
 #include <SFML/Graphics/CircleShape.hpp>
 
 namespace cn::client::game
 {
 
-class Anchor final : public shared::game::Anchor
+class Anchor final : public shared::game::object::Anchor
 {
 public:
-    Anchor(const core::Context& _context, shared::board::Anchor& _boardAnchor);
+    Anchor(const core::Context& _context, shared::game::object::Id _id, int _radius);
 
 private:
     void onUpdate(sf::Time _dt) override;

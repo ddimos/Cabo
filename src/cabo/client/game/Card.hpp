@@ -4,17 +4,17 @@
 #include "core/Context.hpp"
 #include "core/Interpolator.hpp"
 
-#include "shared/game/Card.hpp"
+#include "shared/game/object/Card.hpp"
 
 #include <SFML/Graphics/Sprite.hpp>
 
 namespace cn::client::game
 {
 
-class Card final : public shared::game::Card
+class Card final : public shared::game::object::Card
 {
 public:
-    Card(const core::Context& _context, shared::board::Card& _boardCard);
+    Card(const core::Context& _context, shared::game::object::Id _id);
 
     void startFlipping();
 

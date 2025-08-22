@@ -1,15 +1,15 @@
 #pragma once
 
-#include "shared/game/Deck.hpp"
+#include "shared/game/object/Deck.hpp"
 
 namespace cn::client::game
 {
 
-class Deck final : public shared::game::Deck
+class Deck final : public shared::game::object::Deck
 {
 public:
-    Deck(shared::board::Deck& _boardDeck)
-        : shared::game::Deck(_boardDeck) {}
+    Deck(shared::game::object::Id _id, unsigned _seed)
+        : shared::game::object::Deck(_id, _seed) {}
 private:
 };
 

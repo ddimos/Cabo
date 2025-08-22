@@ -3,8 +3,8 @@
 #include "shared/game/Constants.hpp"
 #include "shared/player/Types.hpp"
 
-#include "shared/board/Card.hpp"
-#include "shared/board/Object.hpp"
+#include "shared/game/object/Card.hpp"
+#include "shared/game/object/Object.hpp"
 
 #include "core/Identifier.hpp"
 
@@ -14,6 +14,31 @@
 
 namespace cn::shared::game
 {
+
+enum class Rank
+{
+    Ace,
+    _2,
+    _3,
+    _4,
+    _5,
+    _6,
+    _7,
+    _8,
+    _9,
+    _10,
+    Jack,
+    Queen,
+    King
+};
+
+enum class Suit
+{
+    Clubs,      // (♣)
+    Hearts,     // (♥)
+    Spades,     // (♠)
+    Diamonds    // (♦)
+}; 
 
 struct ParticipantSlot;
 using ParticipantSlotId = core::Identifier<ParticipantSlot, uint8_t>;
@@ -95,7 +120,7 @@ struct PlayerInteractsWithCardData
         TurnsUp
     };
     PlayerId playerId{};
-    board::ObjectId cardId{};
+    object::Id cardId{};
     sf::Vector2f pos{};
     Type type = Type::Grabs;
 };
@@ -108,8 +133,8 @@ struct PlayerMovesData
 
 struct ProvideCardValueData
 {
-    board::ObjectId cardId{};
-    board::Card::Value value{};
+    object::Id cardId{};
+    object::Card::Value value{};
 };
 
 using ServerCommandDataVariant = std::variant<PlayerInteractsWithCardData, PlayerMovesData, ProvideCardValueData, std::monostate>;

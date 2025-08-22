@@ -1,15 +1,15 @@
 #pragma once
 
-#include "shared/game/Discard.hpp"
+#include "shared/game/object/Discard.hpp"
 
 namespace cn::client::game
 {
 
-class Discard final : public shared::game::Discard
+class Discard final : public shared::game::object::Discard
 {
 public:
-    Discard(shared::board::Discard& _boardDiscard)
-        : shared::game::Discard(_boardDiscard) {}
+    Discard(shared::game::object::Id& _id)
+        : shared::game::object::Discard(_id) {}
 
 private:
 };

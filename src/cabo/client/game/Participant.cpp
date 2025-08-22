@@ -4,16 +4,19 @@
 namespace cn::client::game
 {
 
-Participant::Participant(const core::Context& _context, shared::board::Participant& _boardParticipant, bool _isLocal)
-    : shared::game::Participant(_boardParticipant)
+Participant::Participant(const core::Context& _context, shared::game::object::Id _id, PlayerId _playerId, bool _isLocal)
+    : shared::game::object::Participant(_id, _playerId)
     , m_isLocal(_isLocal)
     , m_interpolatorPos(_context.get<sf::Clock>(), shared::game::MoveUpdateDuration, core::Easing::linear)
 {
 }
 
-void Participant::addPosition(sf::Vector2f _pos)
+void Participant::setMousePosition(sf::Vector2f _pos)
 {
-    m_interpolatorPos.start(_pos);
+    if (m_isLocal)
+        shared::game::object::Participant::setMousePosition(_pos);
+    else
+        m_interpolatorPos.start(_pos);
 }
 
 void Participant::onUpdate(sf::Time) 
@@ -22,7 +25,7 @@ void Participant::onUpdate(sf::Time)
         return;
 
     auto pos = sf::Vector2f(m_interpolatorPos.get());
-    getBoardParticipant().setMousePosition(pos);
+    shared::game::object::Participant::setMousePosition(pos);
 }
 
 } // namespace cn::client::game
