@@ -33,7 +33,10 @@ public:
     void setDuration(sf::Time _duration);
 
     void start(T _value);
+    void start(T _start, T _end);
     T get() const;
+
+    bool isFinished() const;
 
 private:
     sf::Clock& m_clockRef;
@@ -67,7 +70,14 @@ void Interpolator<T>::start(T _value)
     m_start = get();
     m_end = _value;
     m_startTime = m_clockRef.getElapsedTime();
-    CN_LOG("start \n");
+}
+
+template <typename T>
+void Interpolator<T>::start(T _start, T _end)
+{
+    m_start = _start;
+    m_end = _end;
+    m_startTime = m_clockRef.getElapsedTime();
 }
 
 template <typename T>
@@ -82,6 +92,13 @@ T Interpolator<T>::get() const
     T delta = m_end - m_start;
     T value = m_start + delta * m_easingFunc(ratio);
     return value;
+}
+
+template <typename T>
+bool Interpolator<T>::isFinished() const
+{
+   sf::Time time = m_clockRef.getElapsedTime() - m_startTime;
+   return time > m_duration;
 }
 
 } // namespace cn::core
