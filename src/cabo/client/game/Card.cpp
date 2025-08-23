@@ -9,8 +9,8 @@ namespace cn::client::game
 
 Card::Card(const core::Context& _context, shared::game::object::Id _id) 
     : shared::game::object::Card(_id)
-    , m_interpolatedPos(_context.get<sf::Clock>(), sf::seconds(0.3f), core::Easing::linear)
-    , m_interpolatedFlip(_context.get<sf::Clock>(), sf::seconds(1.f), core::Easing::linear)
+    , m_interpolatedPos(sf::seconds(0.3f), core::Easing::linear)
+    , m_interpolatedFlip(sf::seconds(1.f), core::Easing::linear)
 {
     m_sprite.setTexture(_context.get<TextureHolder>().get(TextureIds::Cards));
     m_sprite.setTextureRect(game::spriteSheet::getCardBackTextureRect());
@@ -90,7 +90,7 @@ void Card::onUpdate(sf::Time _dt)
     {
         m_sprite.setTextureRect(game::spriteSheet::getCardBackTextureRect());
     }
-    if (!m_interpolatedPos.isFinished())
+    if (m_interpolatedPos.doesInterpolate())
     {
         auto pos = m_interpolatedPos.get();
         m_sprite.setPosition(pos);

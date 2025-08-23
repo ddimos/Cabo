@@ -7,7 +7,7 @@ namespace cn::client::game
 Participant::Participant(const core::Context& _context, shared::game::object::Id _id, PlayerId _playerId, bool _isLocal)
     : shared::game::object::Participant(_id, _playerId)
     , m_isLocal(_isLocal)
-    , m_interpolatorPos(_context.get<sf::Clock>(), shared::game::MoveUpdateDuration, core::Easing::linear)
+    , m_interpolatorPos(shared::game::MoveUpdateDuration, core::Easing::linear)
 {
 }
 

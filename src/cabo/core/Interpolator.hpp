@@ -28,31 +28,37 @@ class Interpolator
 public:
     using EasingFunc = std::function<float(float)>;
 
-    Interpolator(sf::Clock& _clockRef, sf::Time _duration, EasingFunc _func);
+    Interpolator(sf::Time _duration, EasingFunc _func);
 
     void setDuration(sf::Time _duration);
 
     void start(T _value);
     void start(T _start, T _end);
-    T get() const;
+    T get();
 
-    bool isFinished() const;
+    bool doesInterpolate() const;
 
 private:
-    sf::Clock& m_clockRef;
+    enum class State
+    {
+        None,
+        Interpolates,
+        Finished
+    };
+
+    sf::Clock m_clock;
     EasingFunc m_easingFunc{};
-    sf::Time m_duration{sf::seconds(1.f)};
+    sf::Time m_duration{};
 
     T m_start{};
     T m_end{};
 
-    sf::Time m_startTime{};
+    State m_state = State::None;
 };
 
 template <typename T>
-Interpolator<T>::Interpolator(sf::Clock& _clockRef, sf::Time _duration, EasingFunc _func)
-    : m_clockRef(_clockRef)
-    , m_easingFunc(_func)
+Interpolator<T>::Interpolator(sf::Time _duration, EasingFunc _func)
+    : m_easingFunc(_func)
 {
     setDuration(_duration);
 }
@@ -69,7 +75,8 @@ void Interpolator<T>::start(T _value)
 {
     m_start = get();
     m_end = _value;
-    m_startTime = m_clockRef.getElapsedTime();
+    m_clock.restart();
+    m_state = State::Interpolates;
 }
 
 template <typename T>
@@ -77,15 +84,19 @@ void Interpolator<T>::start(T _start, T _end)
 {
     m_start = _start;
     m_end = _end;
-    m_startTime = m_clockRef.getElapsedTime();
+    m_clock.restart();
+    m_state = State::Interpolates;
 }
 
 template <typename T>
-T Interpolator<T>::get() const
+T Interpolator<T>::get()
 {
-    sf::Time time = m_clockRef.getElapsedTime() - m_startTime;
+    sf::Time time = m_clock.getElapsedTime();
     if (time > m_duration)
+    {
+        m_state = State::Finished;
         return m_end;
+    }
     
     float ratio = time / m_duration;
     CN_LOG_FRM("ratio: {}, {}", ratio , m_easingFunc(ratio));
@@ -95,10 +106,9 @@ T Interpolator<T>::get() const
 }
 
 template <typename T>
-bool Interpolator<T>::isFinished() const
+bool Interpolator<T>::doesInterpolate() const
 {
-   sf::Time time = m_clockRef.getElapsedTime() - m_startTime;
-   return time > m_duration;
+   return m_state == State::Interpolates;
 }
 
 } // namespace cn::core
