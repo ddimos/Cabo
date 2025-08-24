@@ -12,8 +12,8 @@
 namespace cn::client::game
 {
 
-InputController::InputController(core::Context& _context, MoveCallback _moveCallback)
-    : m_contextRef(_context), m_moveCallback(_moveCallback)
+InputController::InputController(core::Context& _context, Callback _moveCallback, Callback _releaseCallback)
+    : m_contextRef(_context), m_moveCallback(_moveCallback), m_releaseCallback(_releaseCallback)
 {
     m_listenerId = core::event::getNewListenerId();
 }
@@ -37,12 +37,12 @@ void InputController::registerEvents(core::event::Dispatcher& _dispatcher, bool 
             }
         );
         _dispatcher.registerEvent<events::MouseButtonReleasedEvent>(m_listenerId,
-            [&netManRef, &playerManRef, &windowRef](const events::MouseButtonReleasedEvent& _event){
+            [this, &netManRef, &playerManRef, &windowRef](const events::MouseButtonReleasedEvent& _event){
                 if (_event.mouseButton.button != sf::Mouse::Button::Left)
                     return;
-                events::RemotePlayerInputNetEvent2 event(
-                    playerManRef.getLocalPlayerId(), shared::game::PlayerInputType::Release, 
-                    windowRef.mapPixelToCoords(sf::Vector2i(_event.mouseButton.x, _event.mouseButton.y)));
+                sf::Vector2f pos = windowRef.mapPixelToCoords(sf::Vector2i(_event.mouseButton.x, _event.mouseButton.y));
+                m_releaseCallback(pos);
+                events::RemotePlayerInputNetEvent2 event(playerManRef.getLocalPlayerId(), shared::game::PlayerInputType::Release, pos);
                 netManRef.send(event);
             }
         );

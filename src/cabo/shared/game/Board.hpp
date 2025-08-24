@@ -40,6 +40,7 @@ public:
     void participantMoves(PlayerId _playerId, sf::Vector2f _position);
 
     object::Card* getCard(object::Id _id);
+    object::Participant* getParticipant(PlayerId _playerId);
 
 private:
     object::Id generateNextOjectId();

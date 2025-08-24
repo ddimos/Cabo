@@ -77,6 +77,12 @@ object::Card* Board::getCard(object::Id _id)
     return nullptr;
 }
 
+object::Participant* Board::getParticipant(PlayerId _playerId)
+{
+    CN_ASSERT_FRM(m_participants.contains(_playerId), "No participant with id: {}", _playerId.value());
+    return m_participants.at(_playerId);
+}
+
 void Board::participantGrabs(PlayerId _playerId, object::Id _id, sf::Vector2f _position)
 {
     CN_LOG_FRM("Grabs {} {}", _playerId.value(), _id.value());
@@ -89,7 +95,6 @@ void Board::participantReleases(PlayerId _playerId, object::Id _id, sf::Vector2f
 {
     CN_LOG_FRM("Releases {} {}", _playerId.value(), _id.value());
     auto* card = getCard(_id);
-    m_participants.at(_playerId)->setMousePosition(_position);
     m_participants.at(_playerId)->setObject(nullptr);
 }
 

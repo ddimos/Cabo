@@ -13,8 +13,8 @@ namespace cn::client::game
 class InputController final
 {
 public:
-    using MoveCallback = std::function<void(sf::Vector2f)>;
-    InputController(core::Context& _context, MoveCallback _moveCallback);
+    using Callback = std::function<void(sf::Vector2f)>;
+    InputController(core::Context& _context, Callback _moveCallback, Callback _releaseCallback);
 
     void registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered);
 
@@ -22,7 +22,8 @@ private:
     core::Context& m_contextRef;
     core::event::ListenerId m_listenerId{};
     sf::Time m_lastUpdateTime{};
-    MoveCallback m_moveCallback{};
+    Callback m_moveCallback{};
+    Callback m_releaseCallback{};
 };
 
 } // namespace cn::client::game
