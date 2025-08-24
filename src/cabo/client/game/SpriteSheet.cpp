@@ -6,14 +6,8 @@ namespace
 inline constexpr short unsigned CardWidth = 70;
 inline constexpr short unsigned CardHeight = 100;
 
-inline constexpr short unsigned DecideButtonWidth = 66;
-inline constexpr short unsigned DecideButtonHeight = 20;
-
 inline constexpr short unsigned FinishButtonWidth = 66;
 inline constexpr short unsigned FinishButtonHeight = 20;
-
-inline constexpr short unsigned YesNoButtonWidth = 40;
-inline constexpr short unsigned YesNoButtonHeight = 20;
 
 } // namespace
 
@@ -47,34 +41,6 @@ sf::IntRect getDiscardTextureRect(Hover _hover)
         : sf::IntRect{ 0, 3 * CardHeight, CardWidth, CardHeight };
 }
 
-sf::IntRect getMatchButtonTextureRect(Hover _hover)
-{
-    return _hover == Hover::No 
-        ? sf::IntRect{ 0,                  0, DecideButtonWidth, DecideButtonHeight }
-        : sf::IntRect{ 0, DecideButtonHeight, DecideButtonWidth, DecideButtonHeight };
-}
-
-sf::IntRect getTakeButtonTextureRect(Hover _hover)
-{
-    return _hover == Hover::No 
-        ? sf::IntRect{ DecideButtonWidth,                  0, DecideButtonWidth, DecideButtonHeight }
-        : sf::IntRect{ DecideButtonWidth, DecideButtonHeight, DecideButtonWidth, DecideButtonHeight };
-}
-
-sf::IntRect getActionButtonTextureRect(Hover _hover)
-{
-    return _hover == Hover::No 
-        ? sf::IntRect{ 2 * DecideButtonWidth,                  0, DecideButtonWidth, DecideButtonHeight }
-        : sf::IntRect{ 2 * DecideButtonWidth, DecideButtonHeight, DecideButtonWidth, DecideButtonHeight };
-}
-
-sf::IntRect getDiscardButtonTextureRect(Hover _hover)
-{
-    return _hover == Hover::No 
-        ? sf::IntRect{ 3 * DecideButtonWidth,                  0, DecideButtonWidth, DecideButtonHeight }
-        : sf::IntRect{ 3 * DecideButtonWidth, DecideButtonHeight, DecideButtonWidth, DecideButtonHeight };
-}
-
 sf::IntRect getFinishButtonTextureRect(Hover _hover)
 {
     return _hover == Hover::No 
@@ -85,20 +51,6 @@ sf::IntRect getFinishButtonTextureRect(Hover _hover)
 sf::IntRect getCaboButtonTextureRect(Hover _hover)
 {
     return getFinishButtonTextureRect(_hover);
-}
-
-sf::IntRect getYesButtonTextureRect(Hover _hover)
-{
-    return _hover == Hover::No 
-        ? sf::IntRect{ 0,                 0, YesNoButtonWidth, YesNoButtonHeight }
-        : sf::IntRect{ 0, YesNoButtonHeight, YesNoButtonWidth, YesNoButtonHeight };
-}
-
-sf::IntRect getNoButtonTextureRect(Hover _hover)
-{
-    return _hover == Hover::No 
-        ? sf::IntRect{ YesNoButtonWidth,                 0, YesNoButtonWidth, YesNoButtonHeight }
-        : sf::IntRect{ YesNoButtonWidth, YesNoButtonHeight, YesNoButtonWidth, YesNoButtonHeight };
 }
 
 } // namespace cn::client::game::spriteSheet

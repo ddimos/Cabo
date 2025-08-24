@@ -14,7 +14,7 @@ namespace cn::server::game
 class InputController final
 {
 public:
-    using ProcessInputCallback = std::function<void(const events::RemotePlayerInputNetEvent2&)>;
+    using ProcessInputCallback = std::function<void(const events::RemotePlayerInputNetEvent&)>;
     InputController(core::Context& _context, ProcessInputCallback _processInput);
 
     void registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered);
@@ -25,7 +25,7 @@ private:
     ProcessInputCallback m_processInput{};
     core::event::ListenerId m_listenerId{};
 
-    std::map<int32_t, events::RemotePlayerInputNetEvent2> m_inputBuffer;
+    std::map<int32_t, events::RemotePlayerInputNetEvent> m_inputBuffer;
 };
 
 } // namespace cn::server::game

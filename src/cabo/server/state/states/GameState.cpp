@@ -1,14 +1,13 @@
 #include "server/state/states/GameState.hpp"
 #include "server/state/StateIds.hpp"
 
-#include "server/game/Board.hpp"
+#include "server/player/Manager.hpp"
+
 #include "server/game/Card.hpp"
 #include "server/game/Deck.hpp"
 #include "server/game/Discard.hpp"
 #include "server/game/Participant.hpp"
-#include "server/game/Types.hpp"
-
-#include "server/player/Manager.hpp"
+#include "server/game/PrivateZone.hpp"
 
 #include "core/event/Dispatcher.hpp"
 
@@ -16,9 +15,9 @@
 #include "shared/events/GameEvents.hpp"
 #include "shared/net/Manager.hpp"
 #include "shared/Types.hpp"
+#include "shared/game/object/Object.hpp"
 
 #include "core/Log.hpp"
-
 
 namespace
 {
@@ -31,83 +30,193 @@ namespace cn::server::states
 GameState::GameState(core::state::Manager& _stateManagerRef)
     : State(_stateManagerRef)
 {
-    createContainer(GameContainerId);
+    createSortedContainer(GameContainerId, 
+        [](const core::object::Object& _left, const core::object::Object& _right){
+            const auto& left = static_cast<const shared::game::object::Object&>(_left);
+            const auto& right = static_cast<const shared::game::object::Object&>(_right);
+            return left.getZIndex() < right.getZIndex();
+        }
+    );
 
-    // auto& netManagerRef = getContext().get<net::Manager>();
+    auto& netManagerRef = getContext().get<net::Manager>();
     auto& playerManagerRef = getContext().get<player::Manager>();
     unsigned seed = getContext().get<shared::Seed>().seed;
 
-
-    std::vector<shared::game::Card*> cards;
-    {
-        unsigned short deckSize = shared::game::StandartDeckSize;
-        cards.reserve(deckSize);
-        for (unsigned short i = 0; i < deckSize; ++i)
-        {
-            auto cardPair = game::Card::getCardFromIndex(i);
-            auto card = std::make_shared<game::Card>(cardPair.first, cardPair.second);
-            card->setId(game::CardId(static_cast<uint8_t>(i)));
-            getContainer(GameContainerId).add(card);
-            cards.push_back(card.get());
+    m_flipController = std::make_unique<shared::game::controller::Flippable>();
+    m_grabController = std::make_unique<shared::game::controller::Grabbable>();
+    m_privateZoneViewableController = std::make_unique<shared::game::controller::PrivateZoneViewable>(
+        [&](shared::game::component::PrivateZoneViewable& _component){
+            // CN_LOG("PRIVATE ZONE");
+            if (!_component.isHidden())
+            {
+                auto& card = static_cast<shared::game::object::Card&>(_component.getParent());
+                events::ServerCommandNetEvent event(
+                    shared::game::ServerCommandType::ProvideCardValue,
+                    shared::game::ProvideCardValueData{
+                        .cardId = card.getId(),
+                        .value = card.getValue()
+                    }
+                );
+                netManagerRef.send(event);
+            }
         }
-    }
-
-    auto deck = std::make_shared<game::Deck>(
-        std::move(cards), seed
     );
 
-    auto discard = std::make_shared<game::Discard>();
+    m_inputController = std::make_unique<game::InputController>(getContext(), 
+        [this, &netManagerRef](const events::RemotePlayerInputNetEvent& _event){
+            if (_event.m_type == shared::game::PlayerInputType::Grab)
+            {
+                const auto& data = std::get<sf::Vector2f>(_event.m_data);
+                auto* component = m_grabController->findObjectToGrab(_event.m_playerId, data);
+                if (!component)
+                    return;
 
-    // // // getContainer(GameContainerId).add(table);
-    getContainer(GameContainerId).add(deck);
-    getContainer(GameContainerId).add(discard);
+                m_grabController->grabObject(_event.m_playerId, *component);
+                auto& object = component->getParent();
+                m_board->participantGrabs(_event.m_playerId, object.getId(), data);
 
-    std::vector<game::Participant*> participants;
-    for (const auto& player : playerManagerRef.getPlayers())
-    {
-        unsigned short numberOfSlots = shared::game::MaxNumberOfParticipantSlots;
-        
-        std::vector<game::ParticipantSlot> slots;
-        slots.reserve(numberOfSlots);
+                events::ServerCommandNetEvent event(
+                    shared::game::ServerCommandType::PlayerInteractsWithCard,
+                    shared::game::PlayerInteractsWithCardData{ .playerId = _event.m_playerId, .cardId = object.getId(), .pos = data, .type = shared::game::PlayerInteractsWithCardData::Type::Grabs }
+                );
+                netManagerRef.send(event);
+            }
+            else if (_event.m_type == shared::game::PlayerInputType::Release)
+            {
+                const auto& data = std::get<sf::Vector2f>(_event.m_data);
+                auto* component = m_grabController->findObjectToRelease(_event.m_playerId, data);
+                if (!component)
+                    return;
 
-        for (game::ParticipantSlotId::Type slotId = 0; slotId < numberOfSlots; ++slotId)
-        {
-            slots.emplace_back(game::ParticipantSlot{ game::ParticipantSlotId(slotId), false, nullptr });
+                m_grabController->releaseObject(_event.m_playerId, *component);
+                auto& object = component->getParent();
+                m_board->participantReleases(_event.m_playerId, object.getId(), data);
+
+                events::ServerCommandNetEvent event(
+                    shared::game::ServerCommandType::PlayerInteractsWithCard,
+                    shared::game::PlayerInteractsWithCardData{ .playerId = _event.m_playerId, .cardId = object.getId(), .pos = data, .type = shared::game::PlayerInteractsWithCardData::Type::Releases }
+                );
+                netManagerRef.send(event);
+            }
+            else if (_event.m_type == shared::game::PlayerInputType::Flip)
+            {
+                const auto& data = std::get<sf::Vector2f>(_event.m_data);
+                CN_LOG_FRM("Flip {} {}", data.x, data.y);
+                auto* component = m_flipController->findObjectToFlip(data);
+                if (!component)
+                    return;
+                
+                m_flipController->flipObject(*component);
+                auto& card = static_cast<shared::game::object::Card&>(component->getParent());               
+
+                {
+                    events::ServerCommandNetEvent event(
+                        shared::game::ServerCommandType::PlayerInteractsWithCard,
+                        shared::game::PlayerInteractsWithCardData{ 
+                            .playerId = _event.m_playerId,
+                            .cardId = card.getId(),
+                            .pos = data,
+                            .type = component->isFaceUp()
+                                ? shared::game::PlayerInteractsWithCardData::Type::TurnsUp
+                                : shared::game::PlayerInteractsWithCardData::Type::TurnsDown
+                        }
+                    );
+                    netManagerRef.send(event);
+                }
+                {
+                    events::ServerCommandNetEvent event(
+                        shared::game::ServerCommandType::ProvideCardValue,
+                        shared::game::ProvideCardValueData{
+                            .cardId = card.getId(),
+                            .value = card.getValue()
+                        }
+                    );
+                    if (card.getPrivateZoneViewableComponent().isHiddenInZoneOfPlayer(_event.m_playerId))
+                    {
+                        netManagerRef.send(event, nsf::PeerID(_event.m_playerId.value()));
+                    }
+                    else if (card.getPrivateZoneViewableComponent().isHidden())
+                    {
+                        netManagerRef.send(event, nsf::PeerID(card.getPrivateZoneViewableComponent().getPrivateZone()->getOwnerId().value()));
+                    }
+                    else
+                    {
+                        netManagerRef.send(event);
+                    }
+                }
+            }
+            else if (_event.m_type == shared::game::PlayerInputType::Move)
+            {
+                const auto& data = std::get<sf::Vector2f>(_event.m_data);
+                m_board->participantMoves(_event.m_playerId, data);
+
+                events::ServerCommandNetEvent event(
+                    shared::game::ServerCommandType::PlayerMoves,
+                    shared::game::PlayerMovesData{ .playerId = _event.m_playerId, .pos = data }
+                );
+                netManagerRef.send(event, nsf::MessageInfo::Type::EXCLUDE_BRODCAST, false, nsf::PeerID{ _event.m_playerId.value() });
+            }
         }
-        auto playerId = player.id;
-        auto participant = std::make_shared<game::Participant>(
-            getContext(), playerId, std::move(slots), shared::game::DefaultInitNumberOfParticipantSlots
-        );
-        getContainer(GameContainerId).add(participant);
-        
-        participants.push_back(participant.get());
-    }
-    // TODO to randomize for the first play, then the player who won  
-    PlayerId firstParticipantTurn = playerManagerRef.getPlayers().front().id;
-    
-    m_board = std::make_unique<game::Board>(getContext(), *deck, *discard, std::move(participants), firstParticipantTurn);
+    );
+
+    m_board = std::make_unique<shared::game::Board>(playerManagerRef.getPlayers(),
+        [this](shared::game::object::Id _id){
+            auto card = std::make_shared<game::Card>(_id);
+            getContainer(GameContainerId).add(card);
+            m_flipController->add(card->getFlippableComponent());
+            m_grabController->add(card->getGrabbableComponent());
+            m_privateZoneViewableController->add(card->getPrivateZoneViewableComponent());
+            return card.get();
+        },
+        [this](shared::game::object::Id _id){
+            auto deck = std::make_shared<game::Deck>(_id, getContext().get<shared::Seed>().seed);
+            getContainer(GameContainerId).add(deck);
+            return deck.get();
+        },
+        [this](shared::game::object::Id _id){
+            auto discard = std::make_shared<game::Discard>(_id);
+            getContainer(GameContainerId).add(discard);
+            return discard.get();
+        },
+        [this](shared::game::object::Id _id, PlayerId _playerId){
+            auto participant = std::make_shared<game::Participant>(_id, _playerId);
+            getContainer(GameContainerId).add(participant);
+            return participant.get();
+        },
+        [this](shared::game::object::Id _id, PlayerId _playerId){
+            auto zone = std::make_shared<game::PrivateZone>(_id, _playerId);
+            getContainer(GameContainerId).add(zone);
+            m_privateZoneViewableController->addPrivateZone(*zone);
+            return zone.get();
+        }
+    );
 
     m_listenerId = core::event::getNewListenerId();
+
+    m_board->start();
 
     CN_LOG("Game state..");
 }
 
 void GameState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered)
 {
-    m_board->registerEvents(_dispatcher, _isBeingRegistered);
+    m_inputController->registerEvents(_dispatcher, _isBeingRegistered);
+    // m_board->registerEvents(_dispatcher, _isBeingRegistered);
 }
 
 core::state::Return GameState::onUpdate(sf::Time _dt)
 {
-    m_board->update(_dt);
+    m_inputController->update();
+    m_privateZoneViewableController->update();
+    // m_board->update(_dt);
 
-    if (m_board->isFinished())
-    {
-        events::FinishGameNetEvent event;
-        getContext().get<net::Manager>().send(event);
-        pop();
-        push(id::Finish);
-    }
+    // if (m_board->isFinished())
+    // {
+    //     events::FinishGameNetEvent event;
+    //     getContext().get<net::Manager>().send(event);
+    //     pop();
+    //     push(id::Finish);
+    // }
     return core::state::Return::Break;
 }
 

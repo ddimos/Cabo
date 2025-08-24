@@ -30,7 +30,7 @@ void InputController::registerEvents(core::event::Dispatcher& _dispatcher, bool 
             [&netManRef, &playerManRef, &windowRef](const events::MouseButtonPressedEvent& _event){
                 if (_event.mouseButton.button != sf::Mouse::Button::Left)
                     return;
-                events::RemotePlayerInputNetEvent2 event(
+                events::RemotePlayerInputNetEvent event(
                     playerManRef.getLocalPlayerId(), shared::game::PlayerInputType::Grab,
                     windowRef.mapPixelToCoords(sf::Vector2i(_event.mouseButton.x, _event.mouseButton.y)));
                 netManRef.send(event);
@@ -42,7 +42,7 @@ void InputController::registerEvents(core::event::Dispatcher& _dispatcher, bool 
                     return;
                 sf::Vector2f pos = windowRef.mapPixelToCoords(sf::Vector2i(_event.mouseButton.x, _event.mouseButton.y));
                 m_releaseCallback(pos);
-                events::RemotePlayerInputNetEvent2 event(playerManRef.getLocalPlayerId(), shared::game::PlayerInputType::Release, pos);
+                events::RemotePlayerInputNetEvent event(playerManRef.getLocalPlayerId(), shared::game::PlayerInputType::Release, pos);
                 netManRef.send(event);
             }
         );
@@ -51,7 +51,7 @@ void InputController::registerEvents(core::event::Dispatcher& _dispatcher, bool 
                 if (_event.key.code != sf::Keyboard::Space)
                     return;
                 auto mousePos = sf::Mouse::getPosition(windowRef);
-                events::RemotePlayerInputNetEvent2 event(
+                events::RemotePlayerInputNetEvent event(
                     playerManRef.getLocalPlayerId(), shared::game::PlayerInputType::Flip,
                     windowRef.mapPixelToCoords(sf::Vector2i(mousePos.x, mousePos.y)));
                 netManRef.send(event);
@@ -67,7 +67,7 @@ void InputController::registerEvents(core::event::Dispatcher& _dispatcher, bool 
                     return;
                 m_lastUpdateTime = currentTime;
 
-                events::RemotePlayerInputNetEvent2 event(playerManRef.getLocalPlayerId(), shared::game::PlayerInputType::Move, pos);
+                events::RemotePlayerInputNetEvent event(playerManRef.getLocalPlayerId(), shared::game::PlayerInputType::Move, pos);
                 netManRef.send(event, false);
             }
         );

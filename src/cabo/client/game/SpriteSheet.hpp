@@ -18,15 +18,7 @@ sf::IntRect getBlurredCardTextureRect();
 sf::IntRect getCardBackTextureRect(Hover _hover = Hover::No);
 sf::IntRect getDiscardTextureRect(Hover _hover = Hover::No);
 
-sf::IntRect getMatchButtonTextureRect(Hover _hover = Hover::No);
-sf::IntRect getTakeButtonTextureRect(Hover _hover = Hover::No);
-sf::IntRect getActionButtonTextureRect(Hover _hover = Hover::No);
-sf::IntRect getDiscardButtonTextureRect(Hover _hover = Hover::No);
-
 sf::IntRect getFinishButtonTextureRect(Hover _hover = Hover::No);
 sf::IntRect getCaboButtonTextureRect(Hover _hover = Hover::No);
-
-sf::IntRect getYesButtonTextureRect(Hover _hover = Hover::No);
-sf::IntRect getNoButtonTextureRect(Hover _hover = Hover::No);
 
 } // namespace cn::client::game::spriteSheet

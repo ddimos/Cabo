@@ -22,16 +22,16 @@ void InputController::registerEvents(core::event::Dispatcher& _dispatcher, bool 
     auto& netManRef = m_contextRef.get<net::Manager>();
     if (_isBeingRegistered)
     {
-        _dispatcher.registerEvent<events::RemotePlayerInputNetEvent2>(m_listenerId,
-            [this](const events::RemotePlayerInputNetEvent2& _event){
-                CN_LOG_FRM("Input {} from {} received", (unsigned)_event.m_type, _event.m_playerId.value());
+        _dispatcher.registerEvent<events::RemotePlayerInputNetEvent>(m_listenerId,
+            [this](const events::RemotePlayerInputNetEvent& _event){
+    //            CN_LOG_FRM("Input {} from {} received", (unsigned)_event.m_type, _event.m_playerId.value());
                 m_inputBuffer.emplace(_event.m_sentTimeRttBased.asMilliseconds(), _event);
             }
         );
     }
     else
     {
-        _dispatcher.unregisterEvent<events::RemotePlayerInputNetEvent2>(m_listenerId);
+        _dispatcher.unregisterEvent<events::RemotePlayerInputNetEvent>(m_listenerId);
     }
 }
 
