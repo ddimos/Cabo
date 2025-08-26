@@ -2,6 +2,7 @@
 
 #include "core/event/Types.hpp"
 #include "core/state/State.hpp"
+#include "core/Random.hpp"
 
 #include "shared/game/Board.hpp"
 #include "shared/game/controller/Attachable.hpp"
@@ -28,6 +29,8 @@ private:
     std::unique_ptr<shared::game::controller::Grabbable> m_grabController;
     std::unique_ptr<shared::game::controller::PrivateZoneViewable> m_privateZoneViewableController;
     std::unique_ptr<shared::game::Board> m_board;
+
+    core::Random m_cardValueGenerator;
 
     core::event::ListenerId m_listenerId{};
 };

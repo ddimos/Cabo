@@ -19,6 +19,8 @@
 
 #include "core/Log.hpp"
 
+#include <ctime>
+
 namespace
 {
 constexpr cn::core::object::Container::Id GameContainerId = 1;
@@ -193,7 +195,15 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
 
     m_listenerId = core::event::getNewListenerId();
 
-    m_board->start();
+    uint32_t cardValueSeed = static_cast<uint32_t>(std::time(nullptr));
+    m_cardValueGenerator.init(cardValueSeed);
+
+    auto cardValuesRaw = m_cardValueGenerator.generateSequenceNoRepeats(shared::game::StandartDeckSize);
+    std::vector<game::Card::Value> cardValues;
+    cardValues.reserve(cardValuesRaw.size());
+    for (auto value : cardValuesRaw)
+        cardValues.push_back(game::Card::Value(static_cast<uint8_t>(value)));
+    m_board->start(cardValues);
 
     CN_LOG("Game state..");
 }

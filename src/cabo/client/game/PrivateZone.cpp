@@ -17,7 +17,10 @@ PrivateZone::PrivateZone(shared::game::object::Id _id, PlayerId _ownerId)
 
 void PrivateZone::onUpdate(sf::Time _dt)
 {
+    // TODO to do it only once
     m_shape.setPosition(getPosition());
+    m_shape.setSize(getSize());
+    m_shape.setOrigin(m_shape.getSize() / 2.f);
 }
 
 void PrivateZone::onDraw(sf::RenderWindow& _window)

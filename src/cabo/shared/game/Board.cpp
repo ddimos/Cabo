@@ -44,9 +44,14 @@ Board::Board(const std::vector<Player>& _players,
     }
 }
 
-void Board::start()
+void Board::start(const std::vector<object::Card::Value>& _cardValues)
 {
     m_deck->shuffle();
+
+    CN_ASSERT(_cardValues.empty() || _cardValues.size() == m_cards.size());
+    for (size_t i = 0; i < _cardValues.size(); ++i)
+        m_cards.at(i)->setValue(_cardValues.at(i));
+
     auto points = core::math::generatePointOnEllipse(780, 460, m_participants.size(), {780.f, 460.f});
     unsigned i = 0;
     for (const auto& [id, part] : m_participants)

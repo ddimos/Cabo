@@ -31,7 +31,7 @@ public:
         std::function<object::PrivateZone*(object::Id, PlayerId)> _createPrivateZoneFunc
     );
 
-    void start();
+    void start(const std::vector<object::Card::Value>& _cardValues);
 
     void participantGrabs(PlayerId _playerId, object::Id _id, sf::Vector2f _position);
     void participantReleases(PlayerId _playerId, object::Id _id, sf::Vector2f _position);

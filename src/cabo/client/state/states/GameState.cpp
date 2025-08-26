@@ -101,7 +101,9 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
 
     m_listenerId = core::event::getNewListenerId();
 
-    m_board->start();
+    // We don't know the values on the client yet
+    std::vector<game::Card::Value> cardValues;
+    m_board->start(cardValues);
 }
 
 void GameState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered)
