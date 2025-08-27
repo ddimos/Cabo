@@ -17,7 +17,7 @@ public:
     Card(const core::Context& _context, shared::game::object::Id _id);
 
     void startTransit(sf::Vector2f _pos);
-    void startFlipping();
+    void startFlipping(bool _wantsToBeUp);
 
 private:
     void onUpdate(sf::Time _dt) override;
@@ -26,8 +26,7 @@ private:
     sf::Sprite m_sprite;
     core::Interpolator<sf::Vector2f> m_interpolatedPos;
     core::Interpolator<float> m_interpolatedFlip;
-    bool m_startFlipping = false;
-    bool m_isNextFaceUp = false;
+    bool m_wantsToBeUp = false;
 };
 
 } // namespace cn::client::game

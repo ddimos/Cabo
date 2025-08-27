@@ -12,8 +12,8 @@
 namespace cn::client::game
 {
 
-InputController::InputController(core::Context& _context, Callback _moveCallback, Callback _releaseCallback)
-    : m_contextRef(_context), m_moveCallback(_moveCallback), m_releaseCallback(_releaseCallback)
+InputController::InputController(core::Context& _context, Callback _moveCallback, Callback _releaseCallback, Callback _flipCallback)
+    : m_contextRef(_context), m_moveCallback(_moveCallback), m_releaseCallback(_releaseCallback), m_flipCallback(_flipCallback)
 {
     m_listenerId = core::event::getNewListenerId();
 }
@@ -47,13 +47,14 @@ void InputController::registerEvents(core::event::Dispatcher& _dispatcher, bool 
             }
         );
         _dispatcher.registerEvent<events::KeyReleasedEvent>(m_listenerId,
-            [&netManRef, &playerManRef, &windowRef](const events::KeyReleasedEvent& _event){
+            [this, &netManRef, &playerManRef, &windowRef](const events::KeyReleasedEvent& _event){
                 if (_event.key.code != sf::Keyboard::Space)
                     return;
-                auto mousePos = sf::Mouse::getPosition(windowRef);
+                auto mousePos = windowRef.mapPixelToCoords(sf::Mouse::getPosition(windowRef));
+                m_flipCallback(mousePos);
                 events::RemotePlayerInputNetEvent event(
                     playerManRef.getLocalPlayerId(), shared::game::PlayerInputType::Flip,
-                    windowRef.mapPixelToCoords(sf::Vector2i(mousePos.x, mousePos.y)));
+                    mousePos);
                 netManRef.send(event);
             }
         );

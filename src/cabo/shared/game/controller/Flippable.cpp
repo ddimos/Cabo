@@ -16,4 +16,16 @@ void Flippable::flipObject(component::Flippable& _component)
         _component.turnUp();
 }
 
+void Flippable::turnUp(component::Flippable& _component)
+{
+    if (!_component.isFaceUp())
+        _component.turnUp();
+}
+
+void Flippable::turnDown(component::Flippable& _component)
+{
+    if (_component.isFaceUp())
+        _component.turnDown();
+}
+
 } // namespace cn::shared::game::controller

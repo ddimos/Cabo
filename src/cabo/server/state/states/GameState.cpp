@@ -69,6 +69,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
             if (_event.m_type == shared::game::PlayerInputType::Grab)
             {
                 const auto& data = std::get<sf::Vector2f>(_event.m_data);
+                m_board->participantMoves(_event.m_playerId, data);
                 auto* component = m_grabController->findObjectToGrab(_event.m_playerId, data);
                 if (!component)
                     return;
@@ -86,6 +87,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
             else if (_event.m_type == shared::game::PlayerInputType::Release)
             {
                 const auto& data = std::get<sf::Vector2f>(_event.m_data);
+                m_board->participantMoves(_event.m_playerId, data);
                 auto* component = m_grabController->findObjectToRelease(_event.m_playerId, data);
                 if (!component)
                     return;
@@ -103,13 +105,18 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
             else if (_event.m_type == shared::game::PlayerInputType::Flip)
             {
                 const auto& data = std::get<sf::Vector2f>(_event.m_data);
-                CN_LOG_FRM("Flip {} {}", data.x, data.y);
+                m_board->participantMoves(_event.m_playerId, data);
+
                 auto* component = m_flipController->findObjectToFlip(data);
                 if (!component)
                     return;
                 
                 m_flipController->flipObject(*component);
                 auto& card = static_cast<shared::game::object::Card&>(component->getParent());               
+                if (component->isFaceUp())
+                    m_board->participantTurnsUp(_event.m_playerId, card.getId(), data);
+                else
+                    m_board->participantTurnsDown(_event.m_playerId, card.getId(), data);
 
                 {
                     events::ServerCommandNetEvent event(
@@ -133,6 +140,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
                             .value = card.getValue()
                         }
                     );
+                    CN_LOG_FRM("Card {} value {}", card.getId().value(), card.getValue().value());
                     if (card.getPrivateZoneViewableComponent().isHiddenInZoneOfPlayer(_event.m_playerId))
                     {
                         netManagerRef.send(event, nsf::PeerID(_event.m_playerId.value()));

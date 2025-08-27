@@ -99,7 +99,6 @@ T Interpolator<T>::get()
     }
     
     float ratio = time / m_duration;
-    CN_LOG_FRM("ratio: {}, {}", ratio , m_easingFunc(ratio));
     T delta = m_end - m_start;
     T value = m_start + delta * m_easingFunc(ratio);
     return value;

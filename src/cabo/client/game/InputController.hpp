@@ -14,7 +14,7 @@ class InputController final
 {
 public:
     using Callback = std::function<void(sf::Vector2f)>;
-    InputController(core::Context& _context, Callback _moveCallback, Callback _releaseCallback);
+    InputController(core::Context& _context, Callback _moveCallback, Callback _releaseCallback, Callback _flipCallback);
 
     void registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered);
 
@@ -24,6 +24,7 @@ private:
     sf::Time m_lastUpdateTime{};
     Callback m_moveCallback{};
     Callback m_releaseCallback{};
+    Callback m_flipCallback{};
 };
 
 } // namespace cn::client::game
