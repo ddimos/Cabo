@@ -28,7 +28,7 @@ LobbyState::LobbyState(core::state::Manager& _stateManagerRef)
     }
 
     m_listenerId = core::event::getNewListenerId();
-    CN_LOG_FRM("Lobby state.., seed {}", seed);
+    CN_LOG_I_FRM("Lobby state.., seed {}", seed);
 }
 
 void LobbyState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered)
@@ -58,7 +58,7 @@ void LobbyState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _is
                 CN_ASSERT(_event.m_players.size() == 1);
                 CN_ASSERT(_event.m_players.begin()->second); // TODO to implement m_ready == false;
                 
-                CN_LOG_FRM("Player is ready.. {}", _event.m_senderPeerId);
+                CN_LOG_I_FRM("Player is ready.. {}", _event.m_senderPeerId);
 
                 auto it = m_players.find(_event.m_players.begin()->first);
                 it->second = true;
@@ -86,7 +86,7 @@ core::state::Return LobbyState::onUpdate(sf::Time _dt)
 
         if (m_timeToWaitDt.asSeconds() <= 0.f)
         {
-            CN_LOG("Start game..");
+            CN_LOG_I("Start game..");
 
             events::StartGameNetEvent event(getContext().get<shared::Seed>().seed);
             getContext().get<net::Manager>().send(event);
@@ -113,7 +113,7 @@ void LobbyState::startGameIfAllPlayersReady()
 
     if (allPlayersReady)
     {
-        CN_LOG("All players ready..");
+        CN_LOG_I("All players ready..");
         m_startGame = true;
         m_timeToWaitDt = m_timeToWait;
     }

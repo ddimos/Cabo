@@ -140,7 +140,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
                             .value = card.getValue()
                         }
                     );
-                    CN_LOG_FRM("Card {} value {}", card.getId().value(), card.getValue().value());
+                    CN_LOG_I_FRM("Card {} value {}", card.getId().value(), card.getValue().value());
                     if (card.getPrivateZoneViewableComponent().isHiddenInZoneOfPlayer(_event.m_playerId))
                     {
                         netManagerRef.send(event, nsf::PeerID(_event.m_playerId.value()));
@@ -213,7 +213,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
         cardValues.push_back(game::Card::Value(static_cast<uint8_t>(value)));
     m_board->start(cardValues);
 
-    CN_LOG("Game state..");
+    CN_LOG_I("Game state..");
 }
 
 void GameState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered)

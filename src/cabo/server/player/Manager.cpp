@@ -29,7 +29,7 @@ void Manager::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeing
         _dispatcher.registerEvent<events::PeerConnectedEvent>(m_listenerId,
             [this](const events::PeerConnectedEvent& _event){
                 (void)_event;
-                CN_LOG_FRM("Player joined.. id: {}", _event.m_peerId);
+                CN_LOG_I_FRM("Player joined.. id: {}", _event.m_peerId);
                 auto& player = m_players.emplace_back(Player{ .id = PlayerId(static_cast<PlayerId::Type>(_event.m_peerId)) });
 
                 auto& netManRef = m_contextRef.get<net::Manager>();
@@ -40,7 +40,7 @@ void Manager::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeing
 
         _dispatcher.registerEvent<events::PeerDisconnectedEvent>(m_listenerId,
             [&_dispatcher, this](const events::PeerDisconnectedEvent& _event){
-                CN_LOG_FRM("Player left.. id: {}", _event.m_peerId);
+                CN_LOG_I_FRM("Player left.. id: {}", _event.m_peerId);
                 m_players.erase( 
                     std::remove_if(m_players.begin(), m_players.end(),
                     [_event](const Player& _player){
@@ -67,7 +67,7 @@ void Manager::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeing
                 CN_ASSERT(m_players.end() != it);
                 CN_ASSERT(!m_players.empty());
                 it->name = _event.m_players.front().name;
-                CN_LOG_FRM("Player info.. id: {}, name: {}", it->id.value(), it->name);
+                CN_LOG_I_FRM("Player info.. id: {}, name: {}", it->id.value(), it->name);
 
                 auto& netManRef = m_contextRef.get<net::Manager>();
                 events::PlayerUpdateNetEvent event(m_players);

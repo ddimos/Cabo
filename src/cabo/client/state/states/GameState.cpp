@@ -166,7 +166,7 @@ void GameState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isB
                 {
                     const auto& data = std::get<shared::game::ProvideCardValueData>(_event.m_data);
                     m_board->getCard(data.cardId)->setValue(data.value);
-                    CN_LOG_FRM("Card {} value {}", data.cardId.value(), data.value.value());
+                    CN_LOG_I_FRM("Card {} value {}", data.cardId.value(), data.value.value());
                 }
             }
         );

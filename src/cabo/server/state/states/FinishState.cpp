@@ -13,7 +13,7 @@ FinishState::FinishState(core::state::Manager& _stateManagerRef)
     // TODO Do I need this state?
     m_listenerId = core::event::getNewListenerId();
 
-    CN_LOG("Finish state..");
+    CN_LOG_I("Finish state..");
 }
 
 core::state::Return FinishState::onUpdate(sf::Time _dt)

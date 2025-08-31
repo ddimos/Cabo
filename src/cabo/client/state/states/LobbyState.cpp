@@ -112,7 +112,7 @@ void LobbyState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _is
             [this](const events::StartGameNetEvent& _event){
                 (void)_event;
                 getContext().get<shared::Seed>().seed = _event.m_seed;
-                CN_LOG_FRM("Seed {}", _event.m_seed);
+                CN_LOG_I_FRM("Seed {}", _event.m_seed);
                 pop();
                 push(id::Game);
             }

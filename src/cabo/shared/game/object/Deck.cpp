@@ -44,7 +44,7 @@ void Deck::shuffle()
     uint8_t arr[5];
     for (unsigned i = 0; i < 5; ++i)
         arr[i] = m_cards[i]->getId().value();
-    CN_LOG_FRM("Cards {},{},{},{},{}", arr[0], arr[1], arr[2], arr[3], arr[4]);
+    CN_LOG_I_FRM("Cards {},{},{},{},{}", arr[0], arr[1], arr[2], arr[3], arr[4]);
 #endif
 }
 
@@ -54,7 +54,7 @@ Card* Deck::getNextCard()
     Card* card = m_cards.back();
     m_cards.pop_back(); // TODO can I do this without popping
 
-    CN_LOG_FRM("Get Next Card {}", card->getId().value());
+    CN_LOG_I_FRM("Get Next Card {}", card->getId().value());
 
     return card;
 }

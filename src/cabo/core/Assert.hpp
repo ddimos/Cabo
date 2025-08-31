@@ -19,11 +19,11 @@
 
     #include <cassert>
     #define CN_ASSERT(_cnd) assert(_cnd)
-    #define CN_ASSERT_FRM(_cnd, _fmt, ...)      \
-        if (!(_cnd))                            \
-        {                                       \
-            CN_LOG_ERROR_FRM(_fmt, __VA_ARGS__);\
-            assert(_cnd);                       \
+    #define CN_ASSERT_FRM(_cnd, _fmt, ...)  \
+        if (!(_cnd))                        \
+        {                                   \
+            CN_LOG_E_FRM(_fmt, __VA_ARGS__);\
+            assert(_cnd);                   \
         }
 
 #endif // CN_DISABLE_ASSERT

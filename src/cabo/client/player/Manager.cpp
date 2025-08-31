@@ -27,7 +27,7 @@ void Manager::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeing
     {
         _dispatcher.registerEvent<events::PlayerJoinAcceptNetEvent>(m_listenerId,
             [this](const events::PlayerJoinAcceptNetEvent& _event){
-                CN_LOG_FRM("Player id: {}", _event.m_playerId.value());
+                CN_LOG_I_FRM("Player id: {}", _event.m_playerId.value());
                 m_localPlayerId = _event.m_playerId;
 
                 auto& netManRef = m_contextRef.get<net::Manager>();
@@ -41,7 +41,7 @@ void Manager::registerEvents(core::event::Dispatcher& _dispatcher, bool _isBeing
         );
         _dispatcher.registerEvent<events::PlayerUpdateNetEvent>(m_listenerId,
             [this](const events::PlayerUpdateNetEvent& _event){
-                CN_LOG_FRM("Player info.. players count: {}", _event.m_players.size());
+                CN_LOG_I_FRM("Player info.. players count: {}", _event.m_players.size());
                 m_players.clear();
                 m_players = _event.m_players;
             }

@@ -24,7 +24,7 @@ void InputController::registerEvents(core::event::Dispatcher& _dispatcher, bool 
     {
         _dispatcher.registerEvent<events::RemotePlayerInputNetEvent>(m_listenerId,
             [this](const events::RemotePlayerInputNetEvent& _event){
-    //            CN_LOG_FRM("Input {} from {} received", (unsigned)_event.m_type, _event.m_playerId.value());
+                CN_LOG_D_FRM("Input {} from {} received", (unsigned)_event.m_type, _event.m_playerId.value());
                 m_inputBuffer.emplace(_event.m_sentTimeRttBased.asMilliseconds(), _event);
             }
         );

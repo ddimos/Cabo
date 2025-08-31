@@ -39,12 +39,12 @@ void Manager::init()
     config.isServer = m_isServer;
     
     callbacks.onConnected = [this, &eventDispatcherRef](nsf::PeerID _peerId){
-        CN_LOG_FRM("Peer connected: {}", _peerId);
+        CN_LOG_I_FRM("Peer connected: {}", _peerId);
         m_connectedPeers.push_back(NetPlayer{ .peerId = _peerId });
         eventDispatcherRef.send<events::PeerConnectedEvent>(_peerId);
     };
     callbacks.onDisconnected = [this, &eventDispatcherRef](nsf::PeerID _peerId){
-        CN_LOG_FRM("Peer disconnected: {}", _peerId);
+        CN_LOG_I_FRM("Peer disconnected: {}", _peerId);
         eventDispatcherRef.send<events::PeerDisconnectedEvent>(_peerId);
         m_connectedPeers.erase( 
             std::remove_if(m_connectedPeers.begin(), m_connectedPeers.end(),
@@ -71,7 +71,7 @@ void Manager::init()
             netEvent.m_receivedTime = receivedTime;
             netEvent.m_sentTimeRttBased = receivedTime - sf::Time(sf::seconds(rtt / 2.f));
         
-            CN_LOG_FRM("Received from: {}, event: {}, time: {}, rtt: {}", _message.getPeerId(), eventId.value(), netEvent.m_receivedTime.asSeconds(), rtt);
+            CN_LOG_D_FRM("Received from: {}, event: {}, time: {}, rtt: {}", _message.getPeerId(), eventId.value(), netEvent.m_receivedTime.asSeconds(), rtt);
         }
         
         slot.deserialize(*eventPtr, _message.m_data);
@@ -79,10 +79,10 @@ void Manager::init()
     };
 
     m_network = nsf::createNSF(config, callbacks);
-    CN_LOG("Network is created!");
+    CN_LOG_I("Network is created!");
     // todo show this on the ui
-    CN_LOG_FRM("The public address : {}", m_network->getPublicAddress().toString());
-    CN_LOG_FRM("The local address : {}", m_network->getLocalAddress().toString());
+    CN_LOG_I_FRM("The public address : {}", m_network->getPublicAddress().toString());
+    CN_LOG_I_FRM("The local address : {}", m_network->getLocalAddress().toString());
 }
 
 void Manager::connect(nsf::NetworkAddress _address)
@@ -125,7 +125,7 @@ void Manager::send(const core::event::Event& _event, nsf::MessageInfo::Type _typ
     message.m_data << eventId.value();
     slot.serialize(_event, message.m_data);
     
-    CN_LOG_FRM("Send {} to: {}, event: {}", 
+    CN_LOG_D_FRM("Send {} to: {}, event: {}", 
         (_type == nsf::MessageInfo::Type::BRODCAST ? 'b' : (_type == nsf::MessageInfo::Type::UNICAST ? 'u' : 'e')),
         _peerId, eventId.value()
     );

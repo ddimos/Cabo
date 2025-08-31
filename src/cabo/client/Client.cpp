@@ -52,7 +52,7 @@ Client::Client()
 
 void Client::start()
 {
-    CN_LOG("Start Client CABOn");
+    CN_LOG_I("Start Client CABOn");
 
     m_isRunning = true;
     m_systemClock.restart();

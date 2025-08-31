@@ -30,7 +30,7 @@ Server::Server()
 
 void Server::start()
 {
-    CN_LOG("Start Server CABOn");
+    CN_LOG_I("Start Server CABOn");
 
     m_isRunning = true;
     m_systemClock.restart();
