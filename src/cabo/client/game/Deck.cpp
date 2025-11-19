@@ -14,14 +14,12 @@ Deck::Deck(shared::game::object::Id _id, unsigned _seed)
     m_shape.setOrigin(m_shape.getSize() / 2.f);
 }
 
-void Deck::onUpdate(sf::Time _dt)
+void Deck::onActivate()
 {
-    // TODO to do it only once
     m_shape.setPosition(getPosition());
     m_shape.setSize(getSize());
     m_shape.setOrigin(m_shape.getSize() / 2.f);
 }
-
 
 void Deck::onDraw(sf::RenderWindow& _window)
 {

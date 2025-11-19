@@ -14,9 +14,8 @@ Discard::Discard(shared::game::object::Id& _id)
     m_shape.setOrigin(m_shape.getSize() / 2.f);
 }
 
-void Discard::onUpdate(sf::Time _dt)
+void Discard::onActivate()
 {
-    // TODO to do it only once
     m_shape.setPosition(getPosition());
     m_shape.setSize(getSize());
     m_shape.setOrigin(m_shape.getSize() / 2.f);

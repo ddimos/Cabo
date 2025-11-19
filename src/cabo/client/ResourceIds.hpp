@@ -20,6 +20,7 @@ enum class TextureIds
     FinishButton,
     MainMenuStartButton,
     MainMenuJoinButton,
+    Paw,
     Table,
     YesNoButtons
 };

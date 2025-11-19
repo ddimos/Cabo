@@ -102,6 +102,7 @@ void Client::init()
     m_textureHolder.load(TextureIds::FinishButton,          resourcePath + "textures/finish_button.png");
     m_textureHolder.load(TextureIds::MainMenuJoinButton,    resourcePath + "textures/join_menu_join_button.png");
     m_textureHolder.load(TextureIds::MainMenuStartButton,   resourcePath + "textures/create_menu_start_button.png");
+    m_textureHolder.load(TextureIds::Paw,                   resourcePath + "textures/paw.png");
     m_textureHolder.load(TextureIds::Table,                 resourcePath + "textures/table.png");
     m_textureHolder.load(TextureIds::YesNoButtons,          resourcePath + "textures/yes_no_buttons.png");
 

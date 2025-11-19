@@ -12,7 +12,7 @@ public:
     Deck(shared::game::object::Id _id, unsigned _seed);
 
 private:
-    void onUpdate(sf::Time _dt) override;
+    void onActivate() override;
     void onDraw(sf::RenderWindow& _window) override;
 
     sf::RectangleShape m_shape;
