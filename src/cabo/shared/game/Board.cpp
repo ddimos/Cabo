@@ -1,5 +1,6 @@
 #include "shared/game/Board.hpp"
 #include "shared/game/Constants.hpp"
+#include "shared/game/Placement.hpp"
 
 #include "core/math/Math.hpp"
 #include "core/Assert.hpp"
@@ -17,11 +18,13 @@ Board::Board(const std::vector<Player>& _players,
 {
     {
         m_deck = _createDeckFunc(generateNextOjectId());
-        m_deck->setPosition(sf::Vector2f(400.f, 400.f));
+        m_deck->setPosition(placement::getDeck().pos);
+        m_deck->setSize({70.f, 100.f});
     }
     {
         m_discard = _createDiscardFunc(generateNextOjectId());
-        m_discard->setPosition(sf::Vector2f(700.f, 400.f));
+        m_discard->setPosition(placement::getDiscard().pos);
+        m_discard->setSize({70.f, 100.f});
     }
     {
         unsigned short deckSize = game::StandartDeckSize;
@@ -34,13 +37,23 @@ Board::Board(const std::vector<Player>& _players,
         m_deck->setCards(m_cards);
     }
 
+    // TODO auto points = core::math::generatePointOnEllipse(900, 480, _players.size(), {960.f, 540.f});
+    
+    auto points = placement::getParticipant(_players.size());
+    unsigned i = 0;
     for (const Player& player : _players)
     {
         auto [it, inserted] = m_participants.try_emplace(player.id, _createParticipantFunc(generateNextOjectId(), player.id));
         CN_ASSERT(inserted);
+        it->second->setPosition(points.at(i).pos);
+        it->second->setRotation(points.at(i).rot);
 
-        m_privateZones.emplace_back(_createPrivateZoneFunc(generateNextOjectId(), player.id));
-        m_privateZones.back()->setSize(sf::Vector2f(400.f, 200.f));
+        auto* zone = m_privateZones.emplace_back(_createPrivateZoneFunc(generateNextOjectId(), player.id));
+        zone->setPosition(points.at(i).pos);
+        zone->setRotation(points.at(i).rot);
+        zone->setSize(sf::Vector2f(160.f, 120.f));
+
+        ++i;
     }
 }
 
@@ -51,17 +64,6 @@ void Board::start(const std::vector<object::Card::Value>& _cardValues)
     CN_ASSERT(_cardValues.empty() || _cardValues.size() == m_cards.size());
     for (size_t i = 0; i < _cardValues.size(); ++i)
         m_cards.at(i)->setValue(_cardValues.at(i));
-
-    auto points = core::math::generatePointOnEllipse(780, 460, m_participants.size(), {780.f, 460.f});
-    unsigned i = 0;
-    for (const auto& [id, part] : m_participants)
-    {
-        part->setPosition(points.at(i).first);
-        part->setRotation(points.at(i).second);
-        m_privateZones.at(i)->setPosition(points.at(i).first);
-        // m_privateZones.at(i)->setRotation(points.at(i).second); TODO
-        ++i;
-    }
 }
 
 object::Id Board::generateNextOjectId()
