@@ -95,4 +95,26 @@ struct ProvideCardValueData
 
 using ServerCommandDataVariant = std::variant<PlayerInteractsWithCardData, PlayerMovesData, ProvideCardValueData, std::monostate>;
 
+namespace layer
+{
+    class Layer{};
+    using Id = core::Identifier<Layer, uint8_t>;
+    
+    // only dynamic layers
+    constexpr Id Cards        {2};
+    constexpr Id GrabbedCards {3};
+    constexpr Id Players      {4};
+
+    constexpr unsigned DefaultValue = 0;
+}
+
 } // namespace cn::shared::game
+
+template <>
+struct std::hash<cn::shared::game::layer::Id>
+{
+    std::size_t operator()(const cn::shared::game::layer::Id& _id) const
+    {
+        return std::hash<cn::shared::game::layer::Id::Type>()(_id.value());
+    }
+};

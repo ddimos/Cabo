@@ -8,6 +8,7 @@ Card::Card(Id _id)
     , m_attachableComponent(*this)
     , m_flippableComponent(*this)
     , m_grabbableComponent(*this)
+    , m_layerableComponent(*this)
     , m_privateZoneViewableComponent(*this)
 {
 }

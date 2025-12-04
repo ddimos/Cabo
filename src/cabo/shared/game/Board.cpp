@@ -1,6 +1,7 @@
 #include "shared/game/Board.hpp"
 #include "shared/game/Constants.hpp"
 #include "shared/game/Placement.hpp"
+#include "shared/Types.hpp"
 
 #include "core/math/Math.hpp"
 #include "core/Assert.hpp"
@@ -15,6 +16,11 @@ Board::Board(const std::vector<Player>& _players,
         std::function<object::Discard*(object::Id)> _createDiscardFunc,
         std::function<object::Participant*(object::Id, PlayerId)> _createParticipantFunc,
         std::function<object::PrivateZone*(object::Id, PlayerId)> _createPrivateZoneFunc)
+    : m_layerController({
+            { layer::Cards, StandartDeckSize },
+            { layer::GrabbedCards, MaxNumberOfPlayers * 2},
+            { layer::Players, MaxNumberOfPlayers}
+        })
 {
     {
         m_deck = _createDeckFunc(generateNextOjectId());
@@ -47,6 +53,7 @@ Board::Board(const std::vector<Player>& _players,
         CN_ASSERT(inserted);
         it->second->setPosition(points.at(i).pos);
         it->second->setRotation(points.at(i).rot);
+        m_layerController.addTolayer(layer::Players, it->second->getLayerableComponent());
 
         auto* zone = m_privateZones.emplace_back(_createPrivateZoneFunc(generateNextOjectId(), player.id));
         zone->setPosition(points.at(i).pos);
@@ -60,6 +67,11 @@ Board::Board(const std::vector<Player>& _players,
 void Board::start(const std::vector<object::Card::Value>& _cardValues)
 {
     m_deck->shuffle();
+    m_deck->visit(
+        [this](object::Card& _card){
+            m_layerController.addTolayer(layer::Cards, _card.getLayerableComponent());
+        }
+    );
 
     CN_ASSERT(_cardValues.empty() || _cardValues.size() == m_cards.size());
     for (size_t i = 0; i < _cardValues.size(); ++i)
@@ -96,6 +108,8 @@ void Board::participantGrabs(PlayerId _playerId, object::Id _id, sf::Vector2f _p
     auto* card = getCard(_id);
     m_participants.at(_playerId)->setObject(card);
     m_participants.at(_playerId)->setMousePosition(_position);
+    m_layerController.removeFromLayer(layer::Cards, card->getLayerableComponent());
+    m_layerController.addTolayer(layer::GrabbedCards, card->getLayerableComponent());
 }
 
 void Board::participantReleases(PlayerId _playerId, object::Id _id, sf::Vector2f _position)
@@ -103,16 +117,28 @@ void Board::participantReleases(PlayerId _playerId, object::Id _id, sf::Vector2f
     CN_LOG_I_FRM("Releases {} {}", _playerId.value(), _id.value());
     auto* card = getCard(_id);
     m_participants.at(_playerId)->setObject(nullptr);
+    m_layerController.removeFromLayer(layer::GrabbedCards, card->getLayerableComponent());
+    m_layerController.addTolayer(layer::Cards, card->getLayerableComponent());
 }
 
 void Board::participantTurnsUp(PlayerId _playerId, object::Id _id, sf::Vector2f _position)
 {
     CN_LOG_I_FRM("TurnsUp {} {}", _playerId.value(), _id.value());
+    auto* card = getCard(_id);
+    m_layerController.promoteInLayer(
+        card->getGrabbableComponent().isGrabbed() ? layer::GrabbedCards : layer::Cards,
+        card->getLayerableComponent()
+    );
 }
 
 void Board::participantTurnsDown(PlayerId _playerId, object::Id _id, sf::Vector2f _position)
 {
     CN_LOG_I_FRM("TurnsDown {} {}", _playerId.value(), _id.value());
+    auto* card = getCard(_id);
+    m_layerController.promoteInLayer(
+        card->getGrabbableComponent().isGrabbed() ? layer::GrabbedCards : layer::Cards, 
+        card->getLayerableComponent()
+    );
 }
 
 void Board::participantMoves(PlayerId _playerId, sf::Vector2f _position)

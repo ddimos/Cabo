@@ -27,8 +27,7 @@ public:
     float getRotation() const { return m_rotation; }
     void setRotation(float _rotation) { m_rotation = _rotation; }
 
-    unsigned getZIndex() const { return m_zIndex; }
-    void setZIndex(unsigned _zIndex) { m_zIndex = _zIndex; }
+    virtual unsigned getZIndex() const { return 0; }
 
     bool contains(sf::Vector2f _pos) const;
 
@@ -36,7 +35,6 @@ private:
     Id m_id{};
     sf::FloatRect m_bounds{};
     float m_rotation{0};
-    unsigned m_zIndex = 0;
 };
 
 } // cn::shared::game::object

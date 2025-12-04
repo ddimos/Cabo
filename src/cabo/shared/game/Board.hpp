@@ -7,6 +7,7 @@
 #include "shared/game/object/Discard.hpp"
 #include "shared/game/object/Participant.hpp"
 #include "shared/game/object/PrivateZone.hpp"
+#include "shared/game/controller/Layerable.hpp"
 #include "shared/player/Types.hpp"
 #include "core/Context.hpp"
 
@@ -52,6 +53,7 @@ private:
     std::vector<object::PrivateZone*> m_privateZones;
     std::vector<object::Anchor*> m_anchors;
     object::Id::Type m_objectIdGenerator = 0;
+    shared::game::controller::Layerable m_layerController;
 };
 
 } // namespace cn::shared::game

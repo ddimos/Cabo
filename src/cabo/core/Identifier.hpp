@@ -16,11 +16,11 @@ public:
 
     using Type = T;
 
-    Identifier()
+    constexpr Identifier()
      : m_id(DefaultValue)
     {}
 
-    explicit Identifier(T _id)
+    constexpr explicit Identifier(T _id)
      : m_id(_id)
     {}
 

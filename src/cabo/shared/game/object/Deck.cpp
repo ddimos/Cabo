@@ -33,13 +33,6 @@ void Deck::shuffle()
         std::swap(m_cards[j], m_cards[i]);
     }
 
-    unsigned zIndex = 0;
-    for (auto* card : m_cards)
-    {
-        card->setZIndex(zIndex);
-        zIndex++;
-    }
-
 #ifndef CN_DISABLE_LOGGING
     uint8_t arr[5];
     for (unsigned i = 0; i < 5; ++i)
@@ -59,7 +52,7 @@ Card* Deck::getNextCard()
     return card;
 }
 
-void Deck::visit(std::function<void(const Card&)> _visitor) const
+void Deck::visit(std::function<void(Card&)> _visitor) const
 {
     for (auto* card : m_cards)
         _visitor(*card);

@@ -5,7 +5,7 @@ namespace cn::shared::game::object
 {
 
 Participant::Participant(Id _id, PlayerId _playerId)
-    : Object(_id), m_playerId(_playerId)
+    : Object(_id), m_playerId(_playerId), m_layerableComponent(*this)
 {
 }
 

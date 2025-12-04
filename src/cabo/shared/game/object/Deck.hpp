@@ -21,7 +21,7 @@ public:
 
     Card* getNextCard();
 
-    void visit(std::function<void(const Card&)>) const;
+    void visit(std::function<void(Card&)>) const;
 
 private:
     std::vector<Card*> m_cards;
