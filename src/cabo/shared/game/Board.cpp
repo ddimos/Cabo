@@ -10,12 +10,15 @@
 namespace cn::shared::game
 {
 
-Board::Board(const std::vector<Player>& _players,
-        std::function<object::Card*(object::Id)> _createCardFunc,
-        std::function<object::Deck*(object::Id)> _createDeckFunc,
-        std::function<object::Discard*(object::Id)> _createDiscardFunc,
-        std::function<object::Participant*(object::Id, PlayerId)> _createParticipantFunc,
-        std::function<object::PrivateZone*(object::Id, PlayerId)> _createPrivateZoneFunc)
+Board::Board(
+    const std::vector<Player>& _players,
+    std::function<object::Card*(object::Id)> _createCardFunc,
+    std::function<object::Deck*(object::Id)> _createDeckFunc,
+    std::function<object::Discard*(object::Id)> _createDiscardFunc,
+    std::function<object::Participant*(object::Id, PlayerId)> _createParticipantFunc,
+    std::function<object::PrivateZone*(object::Id, PlayerId)> _createPrivateZoneFunc,
+    std::function<object::CountableButton*(object::Id, TableButtonType, unsigned)> _createButtonFunc
+)
     : m_layerController({
             { layer::Cards, StandartDeckSize },
             { layer::GrabbedCards, MaxNumberOfPlayers * 2},
@@ -62,6 +65,24 @@ Board::Board(const std::vector<Player>& _players,
 
         ++i;
     }
+
+    {
+        unsigned numberOfPlayerToClick = (_players.size() == 1) ? 1 : 2;
+        auto* button = _createButtonFunc(generateNextOjectId(), TableButtonType::Deal, numberOfPlayerToClick);
+        button->setPosition(placement::getButton(TableButtonType::Deal).pos);
+        button->setSize(sf::Vector2f(40.f, 20.f));
+        m_clickCountableController.add(button->getClickCountableComponent());
+        
+        button = _createButtonFunc(generateNextOjectId(), TableButtonType::ResetAndShuffle, numberOfPlayerToClick);
+        button->setPosition(placement::getButton(TableButtonType::ResetAndShuffle).pos);
+        button->setSize(sf::Vector2f(40.f, 20.f));
+        m_clickCountableController.add(button->getClickCountableComponent());
+        
+        button = _createButtonFunc(generateNextOjectId(), TableButtonType::ShuffleFromDiscard, numberOfPlayerToClick);
+        button->setPosition(placement::getButton(TableButtonType::ShuffleFromDiscard).pos);
+        button->setSize(sf::Vector2f(40.f, 20.f));
+        m_clickCountableController.add(button->getClickCountableComponent());
+    }
 }
 
 void Board::start(const std::vector<object::Card::Value>& _cardValues)
@@ -102,6 +123,11 @@ object::Participant* Board::getParticipant(PlayerId _playerId)
     return m_participants.at(_playerId);
 }
 
+void Board::update(sf::Time _dt)
+{
+    m_clickCountableController.update(_dt);
+}
+
 void Board::participantGrabs(PlayerId _playerId, object::Id _id, sf::Vector2f _position)
 {
     CN_LOG_I_FRM("Grabs {} {}", _playerId.value(), _id.value());
@@ -119,6 +145,23 @@ void Board::participantReleases(PlayerId _playerId, object::Id _id, sf::Vector2f
     m_participants.at(_playerId)->setObject(nullptr);
     m_layerController.removeFromLayer(layer::GrabbedCards, card->getLayerableComponent());
     m_layerController.addTolayer(layer::Cards, card->getLayerableComponent());
+}
+
+object::Object* Board::participantClicks(PlayerId _playerId, sf::Vector2f _position)
+{
+    auto* component = m_clickCountableController.findObjectToClick(_playerId, _position);
+    if (!component)
+        return nullptr;
+    m_clickCountableController.clickObject(_playerId, *component);
+    auto& object = component->getParent();
+    CN_LOG_I_FRM("Clicks {} {}", _playerId.value(), object.getId().value());
+    return &(object);
+}
+// TODO think how to improve this part with having two similar methods 
+void Board::participantClicks(PlayerId _playerId, object::Id _id)
+{
+    m_clickCountableController.clickObject(_playerId, _id);
+    CN_LOG_I_FRM("Clicks {}", _playerId.value());
 }
 
 void Board::participantTurnsUp(PlayerId _playerId, object::Id _id, sf::Vector2f _position)

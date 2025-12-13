@@ -38,7 +38,7 @@ enum class Suit
     Hearts,     // (♥)
     Spades,     // (♠)
     Diamonds    // (♦)
-}; 
+};
 
 enum class BoardState
 {
@@ -51,6 +51,7 @@ enum class BoardState
 
 enum class PlayerInputType
 {
+    Click,
     Flip,
     Grab,
     Move,
@@ -61,9 +62,16 @@ using PlayerInputDataVariant = std::variant<sf::Vector2f, std::monostate>;
 
 enum class ServerCommandType
 {
+    PlayerClicksOnButton,
     PlayerInteractsWithCard,
     PlayerMoves,
     ProvideCardValue
+};
+
+struct PlayerClicksOnButtonData
+{
+    PlayerId playerId{};
+    object::Id id{};
 };
 
 struct PlayerInteractsWithCardData
@@ -93,7 +101,7 @@ struct ProvideCardValueData
     object::Card::Value value{};
 };
 
-using ServerCommandDataVariant = std::variant<PlayerInteractsWithCardData, PlayerMovesData, ProvideCardValueData, std::monostate>;
+using ServerCommandDataVariant = std::variant<PlayerClicksOnButtonData, PlayerInteractsWithCardData, PlayerMovesData, ProvideCardValueData, std::monostate>;
 
 namespace layer
 {
@@ -107,6 +115,13 @@ namespace layer
 
     constexpr unsigned DefaultValue = 0;
 }
+
+enum class TableButtonType
+{
+    Deal,
+    ResetAndShuffle,
+    ShuffleFromDiscard
+};
 
 } // namespace cn::shared::game
 

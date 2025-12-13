@@ -4,6 +4,7 @@
 #include "server/player/Manager.hpp"
 
 #include "server/game/Card.hpp"
+#include "server/game/CountableButton.hpp"
 #include "server/game/Deck.hpp"
 #include "server/game/Discard.hpp"
 #include "server/game/Participant.hpp"
@@ -66,7 +67,21 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
 
     m_inputController = std::make_unique<game::InputController>(getContext(), 
         [this, &netManagerRef](const events::RemotePlayerInputNetEvent& _event){
-            if (_event.m_type == shared::game::PlayerInputType::Grab)
+            if (_event.m_type == shared::game::PlayerInputType::Click)
+            {
+                const auto& data = std::get<sf::Vector2f>(_event.m_data);
+                auto* object = m_board->participantClicks(_event.m_playerId, data);
+                if (!object)
+                    return;
+                CN_LOG_I_FRM("Click {} {}", data.x, data.y);
+                
+                events::ServerCommandNetEvent event(
+                    shared::game::ServerCommandType::PlayerClicksOnButton,
+                    shared::game::PlayerClicksOnButtonData{ .playerId = _event.m_playerId, .id = object->getId() }
+                );
+                netManagerRef.send(event);
+            }
+            else if (_event.m_type == shared::game::PlayerInputType::Grab)
             {
                 const auto& data = std::get<sf::Vector2f>(_event.m_data);
                 m_board->participantMoves(_event.m_playerId, data);
@@ -89,6 +104,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
                 const auto& data = std::get<sf::Vector2f>(_event.m_data);
                 m_board->participantMoves(_event.m_playerId, data);
                 auto* component = m_grabController->findObjectToRelease(_event.m_playerId, data);
+                CN_LOG_I_FRM("Release {} {}", data.x, data.y);
                 if (!component)
                     return;
 
@@ -198,6 +214,11 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
             getContainer(GameContainerId).add(zone);
             m_privateZoneViewableController->addPrivateZone(*zone);
             return zone.get();
+        },
+        [this](shared::game::object::Id _id, shared::game::TableButtonType _type, unsigned _numberOfOPlayersToClick){
+            auto button = std::make_shared<game::CountableButton>(_id, _numberOfOPlayersToClick, [](PlayerId){}, [](){});
+            getContainer(GameContainerId).add(button);
+            return button.get();
         }
     );
 
@@ -226,7 +247,7 @@ core::state::Return GameState::onUpdate(sf::Time _dt)
 {
     m_inputController->update();
     m_privateZoneViewableController->update();
-    // m_board->update(_dt);
+    m_board->update(_dt);
 
     // if (m_board->isFinished())
     // {

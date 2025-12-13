@@ -1,5 +1,7 @@
 #pragma once
 
+#include "shared/game/Types.hpp"
+
 #include <SFML/System/Vector2.hpp>
 #include <vector>
 
@@ -14,5 +16,7 @@ namespace cn::shared::game::placement
     Placement getDeck();
     Placement getDiscard();
     std::vector<Placement> getParticipant(unsigned _participantNumber);
+
+    Placement getButton(TableButtonType _type);
 
 } // namespace cn::shared::game::placement

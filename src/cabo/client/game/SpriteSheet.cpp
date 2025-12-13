@@ -3,11 +3,14 @@
 namespace
 {
 
-inline constexpr short unsigned CardWidth = 70;
-inline constexpr short unsigned CardHeight = 100;
+constexpr short unsigned CardWidth = 70;
+constexpr short unsigned CardHeight = 100;
 
-inline constexpr short unsigned FinishButtonWidth = 66;
-inline constexpr short unsigned FinishButtonHeight = 20;
+constexpr short unsigned FinishButtonWidth = 66;
+constexpr short unsigned FinishButtonHeight = 20;
+
+constexpr short unsigned TableButtonWidth = 40;
+constexpr short unsigned TableButtonHeight = 20;
 
 } // namespace
 
@@ -51,6 +54,27 @@ sf::IntRect getFinishButtonTextureRect(Hover _hover)
 sf::IntRect getCaboButtonTextureRect(Hover _hover)
 {
     return getFinishButtonTextureRect(_hover);
+}
+
+sf::IntRect getDealButton(Hover _hover)
+{
+    return _hover == Hover::No 
+        ? sf::IntRect{ 0,                 0, TableButtonWidth, TableButtonHeight }
+        : sf::IntRect{ 0, TableButtonHeight, TableButtonWidth, TableButtonHeight };
+}
+
+sf::IntRect getResetButton(Hover _hover)
+{
+    return _hover == Hover::No 
+        ? sf::IntRect{ TableButtonWidth,                 0, TableButtonWidth, TableButtonHeight }
+        : sf::IntRect{ TableButtonWidth, TableButtonHeight, TableButtonWidth, TableButtonHeight };
+}
+
+sf::IntRect getFromDisacrdButton(Hover _hover)
+{
+    return _hover == Hover::No 
+        ? sf::IntRect{ 2 * TableButtonWidth,                 0, TableButtonWidth, TableButtonHeight }
+        : sf::IntRect{ 2 * TableButtonWidth, TableButtonHeight, TableButtonWidth, TableButtonHeight };
 }
 
 } // namespace cn::client::game::spriteSheet

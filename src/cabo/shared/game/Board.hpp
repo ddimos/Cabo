@@ -1,12 +1,14 @@
 #pragma once
 
 #include "shared/game/object/Anchor.hpp"
+#include "shared/game/object/CountableButton.hpp"
 #include "shared/game/object/Object.hpp"
 #include "shared/game/object/Card.hpp"
 #include "shared/game/object/Deck.hpp"
 #include "shared/game/object/Discard.hpp"
 #include "shared/game/object/Participant.hpp"
 #include "shared/game/object/PrivateZone.hpp"
+#include "shared/game/controller/ClickCountable.hpp"
 #include "shared/game/controller/Layerable.hpp"
 #include "shared/player/Types.hpp"
 #include "core/Context.hpp"
@@ -29,19 +31,25 @@ public:
         std::function<object::Deck*(object::Id)> _createDeckFunc,
         std::function<object::Discard*(object::Id)> _createDiscardFunc,
         std::function<object::Participant*(object::Id, PlayerId)> _createParticipantFunc,
-        std::function<object::PrivateZone*(object::Id, PlayerId)> _createPrivateZoneFunc
+        std::function<object::PrivateZone*(object::Id, PlayerId)> _createPrivateZoneFunc,
+        std::function<object::CountableButton*(object::Id, TableButtonType, unsigned)> _createButtonFunc
     );
 
     void start(const std::vector<object::Card::Value>& _cardValues);
 
+    // TODO move all controllers to the board, and implement preview methods
     void participantGrabs(PlayerId _playerId, object::Id _id, sf::Vector2f _position);
     void participantReleases(PlayerId _playerId, object::Id _id, sf::Vector2f _position);
+    object::Object* participantClicks(PlayerId _playerId, sf::Vector2f _position);
+    void participantClicks(PlayerId _playerId, object::Id _id);
     void participantTurnsUp(PlayerId _playerId, object::Id _id, sf::Vector2f _position);
     void participantTurnsDown(PlayerId _playerId, object::Id _id, sf::Vector2f _position);
     void participantMoves(PlayerId _playerId, sf::Vector2f _position);
 
     object::Card* getCard(object::Id _id);
     object::Participant* getParticipant(PlayerId _playerId);
+
+    void update(sf::Time _dt);
 
 private:
     object::Id generateNextOjectId();
@@ -53,6 +61,7 @@ private:
     std::vector<object::PrivateZone*> m_privateZones;
     std::vector<object::Anchor*> m_anchors;
     object::Id::Type m_objectIdGenerator = 0;
+    shared::game::controller::ClickCountable m_clickCountableController;
     shared::game::controller::Layerable m_layerController;
 };
 

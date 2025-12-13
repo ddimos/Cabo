@@ -131,7 +131,8 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
             _buffer << event.m_playerId.value();
             _buffer << static_cast<uint8_t>(event.m_type);
 
-            if (event.m_type == shared::game::PlayerInputType::Grab
+            if (event.m_type == shared::game::PlayerInputType::Click
+                || event.m_type == shared::game::PlayerInputType::Grab
                 || event.m_type == shared::game::PlayerInputType::Release
                 || event.m_type == shared::game::PlayerInputType::Flip
                 || event.m_type == shared::game::PlayerInputType::Move)
@@ -150,7 +151,8 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
             deserializeId(event.m_playerId, _buffer);
             deserializeEnum<uint8_t>(event.m_type, _buffer);
             
-            if (event.m_type == shared::game::PlayerInputType::Grab 
+            if (event.m_type == shared::game::PlayerInputType::Click
+                || event.m_type == shared::game::PlayerInputType::Grab 
                 || event.m_type == shared::game::PlayerInputType::Release
                 || event.m_type == shared::game::PlayerInputType::Flip
                 || event.m_type == shared::game::PlayerInputType::Move)
@@ -174,7 +176,13 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
         [](const core::event::Event& _event, nsf::Buffer& _buffer){
             auto& event = static_cast<const events::ServerCommandNetEvent&>(_event);
             _buffer << static_cast<uint8_t>(event.m_type);
-            if (event.m_type == shared::game::ServerCommandType::PlayerInteractsWithCard)
+            if (event.m_type == shared::game::ServerCommandType::PlayerClicksOnButton)
+            {
+                const auto& data = std::get<shared::game::PlayerClicksOnButtonData>(event.m_data);
+                _buffer << data.playerId.value();
+                _buffer << data.id.value();
+            }
+            else if (event.m_type == shared::game::ServerCommandType::PlayerInteractsWithCard)
             {
                 const auto& data = std::get<shared::game::PlayerInteractsWithCardData>(event.m_data);
                 _buffer << data.playerId.value();
@@ -204,7 +212,14 @@ FactoryInitializer::FactoryInitializer(Factory& _factoryRef)
         [](core::event::Event& _event, nsf::Buffer& _buffer){
             auto& event = static_cast<events::ServerCommandNetEvent&>(_event);
             deserializeEnum<uint8_t>(event.m_type, _buffer);
-            if (event.m_type == shared::game::ServerCommandType::PlayerInteractsWithCard)
+            if (event.m_type == shared::game::ServerCommandType::PlayerClicksOnButton)
+            {
+                shared::game::PlayerClicksOnButtonData data;
+                deserializeId(data.playerId, _buffer);
+                deserializeId(data.id, _buffer);
+                event.m_data = data;
+            }
+            else if (event.m_type == shared::game::ServerCommandType::PlayerInteractsWithCard)
             {
                 shared::game::PlayerInteractsWithCardData data;
                 deserializeId(data.playerId, _buffer);

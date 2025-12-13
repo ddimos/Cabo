@@ -5,6 +5,7 @@
 
 #include "client/game/Anchor.hpp"
 #include "client/game/Card.hpp"
+#include "client/game/CountableButton.hpp"
 #include "client/game/Deck.hpp"
 #include "client/game/Discard.hpp"
 #include "client/game/Participant.hpp"
@@ -103,6 +104,11 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
             getContainer(GameContainerId).add(zone);
             m_privateZoneViewableController->addPrivateZone(*zone);
             return zone.get();
+        },
+        [this](shared::game::object::Id _id, shared::game::TableButtonType _type, unsigned _numberOfOPlayersToClick){
+            auto button = std::make_shared<game::CountableButton>(getContext(), _id, _type, _numberOfOPlayersToClick);
+            getContainer(GameContainerId).add(button);
+            return button.get();
         }
     );
 
@@ -125,7 +131,12 @@ void GameState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isB
         );
         _dispatcher.registerEvent<events::ServerCommandNetEvent>(m_listenerId, // TODO I probably should move this code somewhere else 
             [this](const events::ServerCommandNetEvent& _event){
-                if (_event.m_type == shared::game::ServerCommandType::PlayerInteractsWithCard)
+                if (_event.m_type == shared::game::ServerCommandType::PlayerClicksOnButton)
+                {
+                    const auto& data = std::get<shared::game::PlayerClicksOnButtonData>(_event.m_data);
+                    m_board->participantClicks(data.playerId, data.id);
+                }
+                else if (_event.m_type == shared::game::ServerCommandType::PlayerInteractsWithCard)
                 {
                     const auto& data = std::get<shared::game::PlayerInteractsWithCardData>(_event.m_data);
                     if (data.type == shared::game::PlayerInteractsWithCardData::Type::Grabs)
@@ -183,8 +194,8 @@ void GameState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isB
 
 core::state::Return GameState::onUpdate(sf::Time _dt)
 {
-    // m_board->update(_dt);
     m_privateZoneViewableController->update();
+    m_board->update(_dt);
     return core::state::Return::Break;
 }
 

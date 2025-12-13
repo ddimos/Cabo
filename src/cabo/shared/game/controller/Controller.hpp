@@ -23,6 +23,7 @@ public:
 
 protected:
     TComponent* getTopObject(sf::Vector2f _position);
+    TComponent* getObject(object::Id _id);
 
     std::vector<TComponent*> m_components;
 };
@@ -37,7 +38,7 @@ template <typename TComponent>
 TComponent* Controller<TComponent>::getTopObject(sf::Vector2f _position)
 {
     TComponent* topComponent = nullptr;
-    for (auto& component : m_components)
+    for (auto* component : m_components)
     {
         if (!component->getParent().contains(_position))
             continue;
@@ -52,6 +53,17 @@ TComponent* Controller<TComponent>::getTopObject(sf::Vector2f _position)
             topComponent = component;
     }
     return topComponent;
+}
+
+template <typename TComponent>
+TComponent* Controller<TComponent>::getObject(object::Id _id)
+{
+    for (auto* component : m_components)
+    {
+        if (component->getParent().getId() == _id)
+            return component;
+    }
+    return nullptr;
 }
 
 } // namespace cn::shared::game::controller

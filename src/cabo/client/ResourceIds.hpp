@@ -22,6 +22,7 @@ enum class TextureIds
     MainMenuJoinButton,
     Paw,
     Table,
+    TableButtons,
     YesNoButtons
 };
 

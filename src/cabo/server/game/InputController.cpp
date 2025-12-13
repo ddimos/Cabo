@@ -25,7 +25,10 @@ void InputController::registerEvents(core::event::Dispatcher& _dispatcher, bool 
         _dispatcher.registerEvent<events::RemotePlayerInputNetEvent>(m_listenerId,
             [this](const events::RemotePlayerInputNetEvent& _event){
                 CN_LOG_D_FRM("Input {} from {} received", (unsigned)_event.m_type, _event.m_playerId.value());
-                m_inputBuffer.emplace(_event.m_sentTimeRttBased.asMilliseconds(), _event);
+                sf::Int32 sentTime = _event.m_sentTimeRttBased.asMilliseconds();
+                while (m_inputBuffer.contains(sentTime))
+                    sentTime++;
+                m_inputBuffer.emplace(sentTime, _event);
             }
         );
     }
@@ -45,6 +48,7 @@ void InputController::update()
         int32_t currentTime = systemClockRef.getElapsedTime().asMilliseconds();
         if (currentTime - m_inputBuffer.begin()->first >= TimeInInputBufferMs)
         {
+            CN_LOG_D_FRM("Process input {} from {} ", (unsigned)it->second.m_type, it->second.m_playerId.value());
             m_processInput(it->second);
             m_inputBuffer.erase(it++);
         }

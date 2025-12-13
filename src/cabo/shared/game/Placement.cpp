@@ -85,4 +85,22 @@ std::vector<Placement> getParticipant(unsigned _participantNumber)
     }
 }
 
+Placement getButton(TableButtonType _type)
+{
+    float y = 0;
+    switch (_type)
+    {
+    case TableButtonType::Deal:
+        y = 540.f - 30.f;
+        break;
+    case TableButtonType::ResetAndShuffle:
+        y = 540.f;
+        break;
+    case TableButtonType::ShuffleFromDiscard:
+        y = 540.f + 30.f;
+        break;
+    }
+    return {{ 960.f, y }, 0.f };
+}
+
 } // namespace cn::shared::game::placement

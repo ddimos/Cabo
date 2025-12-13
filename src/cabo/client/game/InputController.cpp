@@ -44,6 +44,9 @@ void InputController::registerEvents(core::event::Dispatcher& _dispatcher, bool 
                 m_releaseCallback(pos);
                 events::RemotePlayerInputNetEvent event(playerManRef.getLocalPlayerId(), shared::game::PlayerInputType::Release, pos);
                 netManRef.send(event);
+
+                events::RemotePlayerInputNetEvent clickEvent(playerManRef.getLocalPlayerId(), shared::game::PlayerInputType::Click, pos);
+                netManRef.send(clickEvent);
             }
         );
         _dispatcher.registerEvent<events::KeyReleasedEvent>(m_listenerId,

@@ -77,7 +77,7 @@ void Client::start()
             accumulator -= TimePerFrame;
         }
 
-        m_window.clear(sf::Color(2, 17, 34));
+        m_window.clear(sf::Color(128, 198, 134));
 
         draw();
 
@@ -104,6 +104,7 @@ void Client::init()
     m_textureHolder.load(TextureIds::MainMenuStartButton,   resourcePath + "textures/create_menu_start_button.png");
     m_textureHolder.load(TextureIds::Paw,                   resourcePath + "textures/paw.png");
     m_textureHolder.load(TextureIds::Table,                 resourcePath + "textures/table.png");
+    m_textureHolder.load(TextureIds::TableButtons,          resourcePath + "textures/table_icons.png");
     m_textureHolder.load(TextureIds::YesNoButtons,          resourcePath + "textures/yes_no_buttons.png");
 
     m_saveHolder.load(SaveIds::PlayerName,                  resourcePath + "save/player_name");
