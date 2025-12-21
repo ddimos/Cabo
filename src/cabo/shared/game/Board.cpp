@@ -145,6 +145,18 @@ void Board::participantReleases(PlayerId _playerId, object::Id _id, sf::Vector2f
     m_participants.at(_playerId)->setObject(nullptr);
     m_layerController.removeFromLayer(layer::GrabbedCards, card->getLayerableComponent());
     m_layerController.addTolayer(layer::Cards, card->getLayerableComponent());
+    sf::Vector2f pos = _position;
+    if (m_discard->contains(_position) && !card->isInDiscard())
+    {
+        m_discard->discard(card);
+        pos = m_discard->getPosition();
+    }
+    if (m_deck->contains(_position) && !card->isInDeck())
+    {
+        m_deck->add(*card);
+        pos = m_deck->getPosition();
+    }
+    card->release(pos);
 }
 
 object::Object* Board::participantClicks(PlayerId _playerId, sf::Vector2f _position)

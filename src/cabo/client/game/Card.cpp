@@ -101,7 +101,6 @@ void Card::onUpdate(sf::Time _dt)
     {
         auto pos = m_interpolatedPos.get();
         m_sprite.setPosition(pos);
-        setPosition(pos);
     }
     else
     {
@@ -112,6 +111,14 @@ void Card::onUpdate(sf::Time _dt)
 void Card::onDraw(sf::RenderWindow& _window)
 {
     _window.draw(m_sprite);
+}
+
+void Card::onReleased(sf::Vector2f _newPos)
+{
+    if (m_interpolatedPos.doesInterpolate())
+        _newPos = m_interpolatedPos.get();
+    m_interpolatedPos.start(getPosition(), _newPos);
+    setPosition(_newPos);
 }
 
 } // namespace cn::client::game

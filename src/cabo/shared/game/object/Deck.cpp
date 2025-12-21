@@ -21,9 +21,28 @@ void Deck::setCards(const std::vector<Card*>& _cards)
 
     for (auto* card : m_cards)
     {
+        card->addToDeck();
         card->setPosition(getPosition());
     }
 }
+
+void Deck::add(Card& _card)
+{
+    CN_LOG_I_FRM("Add to deck {}, size {}", _card.getId().value(), m_cards.size());
+    m_cards.push_back(&_card);
+    _card.addToDeck();
+}
+
+// TODO
+// void Deck::shuffleInCard(Card& _card)
+// {
+//     int offset = 0;
+//     if (m_cards.size() >= 1)
+//         offset = m_randomizer.rand(0, m_cards.size());
+//     CN_LOG_I_FRM("Shuffle in card {}, offset {}, size {}", _card.getId().value(), offset, m_cards.size());
+//     m_cards.insert(m_cards.begin() + offset, &_card);
+//     _card.addToDeck(getPosition());
+// }
 
 void Deck::shuffle()
 {
@@ -56,6 +75,24 @@ void Deck::visit(std::function<void(Card&)> _visitor) const
 {
     for (auto* card : m_cards)
         _visitor(*card);
+}
+
+void Deck::onUpdate(sf::Time)
+{
+    m_cards.erase(
+        std::remove_if(m_cards.begin(), m_cards.end(),
+            [this](Card* _card){
+                bool remove = !_card->contains(getPosition());
+                if (remove)
+                {
+                    _card->removeFromDeck();
+                    CN_LOG_I_FRM("Remove deck {}", _card->getId().value());
+                }
+                return remove;
+            }
+        ),
+        m_cards.end()
+    );
 }
 
 } // namespace cn::shared::game::object

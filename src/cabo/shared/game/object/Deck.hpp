@@ -17,6 +17,7 @@ public:
     Deck(Id _id, unsigned _seed);
 
     void setCards(const std::vector<Card*>& _cards);
+    void add(Card& _card);
     void shuffle();
 
     Card* getNextCard();
@@ -24,6 +25,8 @@ public:
     void visit(std::function<void(Card&)>) const;
 
 private:
+    void onUpdate(sf::Time) override;
+
     std::vector<Card*> m_cards;
     core::Random m_randomizer;
 };

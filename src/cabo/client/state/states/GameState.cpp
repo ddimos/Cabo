@@ -150,7 +150,6 @@ void GameState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isB
                         auto* card = m_board->getCard(data.cardId);
                         m_grabController->releaseObject(data.playerId, card->getGrabbableComponent());
                         m_board->participantReleases(data.playerId, data.cardId, data.pos);
-                        static_cast<game::Card*>(card)->startTransit(data.pos);
                     }
                     else if (data.type == shared::game::PlayerInteractsWithCardData::Type::TurnsDown)
                     {

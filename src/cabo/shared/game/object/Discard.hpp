@@ -15,8 +15,10 @@ public:
 
     void discard(Card* _card);
     Card* getLast();
-    
+
 private:
+    void onUpdate(sf::Time) override;
+
     std::vector<Card*> m_cards;
 };
 
