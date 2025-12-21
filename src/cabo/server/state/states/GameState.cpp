@@ -73,8 +73,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
                 auto* object = m_board->participantClicks(_event.m_playerId, data);
                 if (!object)
                     return;
-                CN_LOG_I_FRM("Click {} {}", data.x, data.y);
-                
+
                 events::ServerCommandNetEvent event(
                     shared::game::ServerCommandType::PlayerClicksOnButton,
                     shared::game::PlayerClicksOnButtonData{ .playerId = _event.m_playerId, .id = object->getId() }
@@ -216,7 +215,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
             return zone.get();
         },
         [this](shared::game::object::Id _id, shared::game::TableButtonType _type, unsigned _numberOfOPlayersToClick){
-            auto button = std::make_shared<game::CountableButton>(_id, _numberOfOPlayersToClick, [](PlayerId){}, [](){});
+            auto button = std::make_shared<game::CountableButton>(_id, _type, _numberOfOPlayersToClick, [](PlayerId){}, [](){});
             getContainer(GameContainerId).add(button);
             return button.get();
         }

@@ -31,11 +31,12 @@ void ClickCountable::clickObject(PlayerId _playerId, component::ClickCountable& 
         m_clickedObjects.push_back(&_component);
 }
 
-void ClickCountable::clickObject(PlayerId _playerId, object::Id _id)
+component::ClickCountable* ClickCountable::clickObject(PlayerId _playerId, object::Id _id)
 {
     auto* component = getObject(_id);
     CN_ASSERT(component);
     clickObject(_playerId, *component);
+    return component;
 }
 
 component::ClickCountable* ClickCountable::getClickedComponent(object::Id _id)

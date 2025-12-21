@@ -113,7 +113,7 @@ void Card::onDraw(sf::RenderWindow& _window)
     _window.draw(m_sprite);
 }
 
-void Card::onReleased(sf::Vector2f _newPos)
+void Card::onMoved(sf::Vector2f _newPos)
 {
     if (m_interpolatedPos.doesInterpolate())
         _newPos = m_interpolatedPos.get();

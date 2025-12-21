@@ -23,7 +23,7 @@ private:
     void onUpdate(sf::Time _dt) override;
     void onDraw(sf::RenderWindow& _window) override;
 
-    void onReleased(sf::Vector2f _newPos) override;
+    void onMoved(sf::Vector2f _newPos) override;
 
     sf::Sprite m_sprite;
     core::Interpolator<sf::Vector2f> m_interpolatedPos;

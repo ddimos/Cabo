@@ -24,7 +24,7 @@ public:
 
     unsigned getZIndex() const override { return m_layerableComponent.getIndex(); }
 
-    void release(sf::Vector2f _newPos);
+    void move(sf::Vector2f _newPos);
     bool isInDeck() const { return m_isInDeck; }
     void addToDeck();
     void removeFromDeck();
@@ -39,7 +39,7 @@ public:
     component::PrivateZoneViewable& getPrivateZoneViewableComponent() { return m_privateZoneViewableComponent; }
 
 private:
-    virtual void onReleased(sf::Vector2f _newPos);
+    virtual void onMoved(sf::Vector2f _newPos);
 
     Value m_value{};
     bool m_isInDeck = false;

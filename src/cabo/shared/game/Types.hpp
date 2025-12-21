@@ -119,8 +119,8 @@ namespace layer
 enum class TableButtonType
 {
     Deal,
-    ResetAndShuffle,
-    ShuffleFromDiscard
+    Shuffle,
+    FromDiscard
 };
 
 } // namespace cn::shared::game

@@ -52,6 +52,7 @@ public:
     void update(sf::Time _dt);
 
 private:
+    void performClick(object::Object& _object);
     object::Id generateNextOjectId();
 
     std::vector<object::Card*> m_cards;

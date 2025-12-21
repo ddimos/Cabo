@@ -9,26 +9,26 @@ namespace cn::client::game
 
 CountableButton::CountableButton(const core::Context& _context, shared::game::object::Id _id, shared::game::TableButtonType _type, unsigned _numberOfPlayersToClick)
     : shared::game::object::CountableButton(
-        _id, _numberOfPlayersToClick, 
+        _id, _type, _numberOfPlayersToClick, 
         [this](PlayerId _id){
             onPlayerClicked(_id);
         },
         [this](){
             onReset();
-        })
-    , m_type(_type)
+        }
+    )
 {
-    switch (m_type)
+    switch (getType())
     {
         case shared::game::TableButtonType::Deal:
         m_textureRectDefault = game::spriteSheet::getDealButton();
         m_textureRectClicked = game::spriteSheet::getDealButton(game::spriteSheet::Hover::Yes);
         break;
-        case shared::game::TableButtonType::ResetAndShuffle:
+        case shared::game::TableButtonType::Shuffle:
         m_textureRectDefault = game::spriteSheet::getResetButton();
         m_textureRectClicked = game::spriteSheet::getResetButton(game::spriteSheet::Hover::Yes);
         break;
-        case shared::game::TableButtonType::ShuffleFromDiscard:
+        case shared::game::TableButtonType::FromDiscard:
         m_textureRectDefault = game::spriteSheet::getFromDisacrdButton();
         m_textureRectClicked = game::spriteSheet::getFromDisacrdButton(game::spriteSheet::Hover::Yes);
         break;

@@ -18,7 +18,7 @@ public:
 
     void update(sf::Time _dt);
     void clickObject(PlayerId _playerId, component::ClickCountable& _component);
-    void clickObject(PlayerId _playerId, object::Id _id);
+    component::ClickCountable* clickObject(PlayerId _playerId, object::Id _id);
 
 private:
     component::ClickCountable* getClickedComponent(object::Id _id);

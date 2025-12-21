@@ -15,9 +15,10 @@ void Discard::discard(Card* _card)
     m_cards.push_back(_card);
 }
 
-Card* Discard::getLast()
+void Discard::visit(std::function<void(Card&)> _visitor) const
 {
-    return nullptr;
+    for (auto* card : m_cards)
+        _visitor(*card);
 }
 
 void Discard::onUpdate(sf::Time)

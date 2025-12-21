@@ -22,7 +22,6 @@ private:
     void onPlayerClicked(PlayerId _playerId);
     void onReset();
 
-    shared::game::TableButtonType m_type = shared::game::TableButtonType::Deal;
     sf::Sprite m_sprite;
 
     sf::IntRect m_textureRectDefault = {};

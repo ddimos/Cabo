@@ -68,20 +68,20 @@ Board::Board(
 
     {
         unsigned numberOfPlayerToClick = (_players.size() == 1) ? 1 : 2;
-        auto* button = _createButtonFunc(generateNextOjectId(), TableButtonType::Deal, numberOfPlayerToClick);
-        button->setPosition(placement::getButton(TableButtonType::Deal).pos);
+        // auto* button = _createButtonFunc(generateNextOjectId(), TableButtonType::Deal, numberOfPlayerToClick);
+        // button->setPosition(placement::getButton(TableButtonType::Deal).pos);
+        // button->setSize(sf::Vector2f(40.f, 20.f));
+        // m_clickCountableController.add(button->getClickCountableComponent());
+        
+        auto* button = _createButtonFunc(generateNextOjectId(), TableButtonType::Shuffle, numberOfPlayerToClick);
+        button->setPosition(placement::getButton(TableButtonType::Shuffle).pos);
         button->setSize(sf::Vector2f(40.f, 20.f));
         m_clickCountableController.add(button->getClickCountableComponent());
         
-        button = _createButtonFunc(generateNextOjectId(), TableButtonType::ResetAndShuffle, numberOfPlayerToClick);
-        button->setPosition(placement::getButton(TableButtonType::ResetAndShuffle).pos);
-        button->setSize(sf::Vector2f(40.f, 20.f));
-        m_clickCountableController.add(button->getClickCountableComponent());
-        
-        button = _createButtonFunc(generateNextOjectId(), TableButtonType::ShuffleFromDiscard, numberOfPlayerToClick);
-        button->setPosition(placement::getButton(TableButtonType::ShuffleFromDiscard).pos);
-        button->setSize(sf::Vector2f(40.f, 20.f));
-        m_clickCountableController.add(button->getClickCountableComponent());
+        // button = _createButtonFunc(generateNextOjectId(), TableButtonType::FromDiscard, numberOfPlayerToClick);
+        // button->setPosition(placement::getButton(TableButtonType::FromDiscard).pos);
+        // button->setSize(sf::Vector2f(40.f, 20.f));
+        // m_clickCountableController.add(button->getClickCountableComponent());
     }
 }
 
@@ -156,7 +156,7 @@ void Board::participantReleases(PlayerId _playerId, object::Id _id, sf::Vector2f
         m_deck->add(*card);
         pos = m_deck->getPosition();
     }
-    card->release(pos);
+    card->move(pos);
 }
 
 object::Object* Board::participantClicks(PlayerId _playerId, sf::Vector2f _position)
@@ -165,15 +165,49 @@ object::Object* Board::participantClicks(PlayerId _playerId, sf::Vector2f _posit
     if (!component)
         return nullptr;
     m_clickCountableController.clickObject(_playerId, *component);
-    auto& object = component->getParent();
-    CN_LOG_I_FRM("Clicks {} {}", _playerId.value(), object.getId().value());
-    return &(object);
+    CN_LOG_I_FRM("Clicks {} {}", _playerId.value(), component->getParent().getId().value());
+    if (component->isClicked())
+        performClick(component->getParent());
+    return &(component->getParent());
 }
-// TODO think how to improve this part with having two similar methods 
+
 void Board::participantClicks(PlayerId _playerId, object::Id _id)
 {
-    m_clickCountableController.clickObject(_playerId, _id);
-    CN_LOG_I_FRM("Clicks {}", _playerId.value());
+    auto* component = m_clickCountableController.clickObject(_playerId, _id);
+    CN_LOG_I_FRM("Clicks {} {}", _playerId.value(), _id.value());
+    if (component->isClicked())
+        performClick(component->getParent());
+}
+
+void Board::performClick(object::Object& _object)
+{
+    auto& object = static_cast<object::CountableButton&>(_object);
+    if (object.getType() == TableButtonType::Shuffle)
+    {
+        // TODO optimize this piece
+        m_deck->visit(
+            [this](object::Card& _card){
+                m_layerController.removeFromLayer(layer::Cards, _card.getLayerableComponent());
+            }
+        );
+        m_deck->shuffle();
+        m_deck->visit(
+            [this](object::Card& _card){
+                m_layerController.addTolayer(layer::Cards, _card.getLayerableComponent());
+            }
+        );
+    }
+    // TODO
+    // to implement this I need to properly reset cards, flip them back
+    // else if (object.getType() == TableButtonType::FromDiscard)
+    // {
+    //     m_discard->visit(
+    //         [this](object::Card& _card){
+    //             m_deck->add(_card);
+    //             _card.move(m_deck->getPosition());
+    //         }
+    //     );
+    // }
 }
 
 void Board::participantTurnsUp(PlayerId _playerId, object::Id _id, sf::Vector2f _position)

@@ -14,9 +14,9 @@ Card::Card(Id _id)
 {
 }
 
-void Card::release(sf::Vector2f _newPos)
+void Card::move(sf::Vector2f _newPos)
 {
-    onReleased(_newPos);
+    onMoved(_newPos);
 }
 
 void Card::addToDeck()
@@ -43,7 +43,7 @@ void Card::removeFromDiscard()
     m_isInDiscard = false;
 }
 
-void Card::onReleased(sf::Vector2f _newPos)
+void Card::onMoved(sf::Vector2f _newPos)
 {
     setPosition(_newPos);
 }
