@@ -45,7 +45,6 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
     auto& playerManagerRef = getContext().get<player::Manager>();
     unsigned seed = getContext().get<shared::Seed>().seed;
 
-    m_flipController = std::make_unique<shared::game::controller::Flippable>();
     m_grabController = std::make_unique<shared::game::controller::Grabbable>();
     m_privateZoneViewableController = std::make_unique<shared::game::controller::PrivateZoneViewable>(
         [&](shared::game::component::PrivateZoneViewable& _component){
@@ -111,28 +110,40 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
                 auto& object = component->getParent();
                 m_board->participantReleases(_event.m_playerId, object.getId(), data);
 
-                events::ServerCommandNetEvent event(
-                    shared::game::ServerCommandType::PlayerInteractsWithCard,
-                    shared::game::PlayerInteractsWithCardData{ .playerId = _event.m_playerId, .cardId = object.getId(), .pos = data, .type = shared::game::PlayerInteractsWithCardData::Type::Releases }
-                );
-                netManagerRef.send(event);
+                {
+                    events::ServerCommandNetEvent event(
+                        shared::game::ServerCommandType::PlayerInteractsWithCard,
+                        shared::game::PlayerInteractsWithCardData{ .playerId = _event.m_playerId, .cardId = object.getId(), .pos = data, .type = shared::game::PlayerInteractsWithCardData::Type::Releases }
+                    );
+                    netManagerRef.send(event);
+                }
+                {
+                    auto& card = static_cast<shared::game::object::Card&>(component->getParent());
+                    if (card.isInDiscard())
+                    {
+                        events::ServerCommandNetEvent event(
+                            shared::game::ServerCommandType::ProvideCardValue,
+                            shared::game::ProvideCardValueData{
+                                .cardId = card.getId(),
+                                .value = card.getValue()
+                            }
+                        );
+                        CN_LOG_I_FRM("Card {} value {}", card.getId().value(), card.getValue().value());
+                        netManagerRef.send(event);
+                    }
+                }
             }
             else if (_event.m_type == shared::game::PlayerInputType::Flip)
             {
                 const auto& data = std::get<sf::Vector2f>(_event.m_data);
                 m_board->participantMoves(_event.m_playerId, data);
 
-                auto* component = m_flipController->findObjectToFlip(data);
+                auto* component = m_board->findObjectToFlip(data);
                 if (!component)
                     return;
                 
-                m_flipController->flipObject(*component);
-                auto& card = static_cast<shared::game::object::Card&>(component->getParent());               
-                if (component->isFaceUp())
-                    m_board->participantTurnsUp(_event.m_playerId, card.getId(), data);
-                else
-                    m_board->participantTurnsDown(_event.m_playerId, card.getId(), data);
-
+                m_board->participantFlips(_event.m_playerId, component->getParent().getId());
+                auto& card = static_cast<shared::game::object::Card&>(component->getParent());
                 {
                     events::ServerCommandNetEvent event(
                         shared::game::ServerCommandType::PlayerInteractsWithCard,
@@ -188,7 +199,6 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
         [this](shared::game::object::Id _id){
             auto card = std::make_shared<game::Card>(_id);
             getContainer(GameContainerId).add(card);
-            m_flipController->add(card->getFlippableComponent());
             m_grabController->add(card->getGrabbableComponent());
             m_privateZoneViewableController->add(card->getPrivateZoneViewableComponent());
             return card.get();

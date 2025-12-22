@@ -24,6 +24,7 @@ private:
     void onDraw(sf::RenderWindow& _window) override;
 
     void onMoved(sf::Vector2f _newPos) override;
+    void onFlipped(bool _wantsToBeUp) override;
 
     sf::Sprite m_sprite;
     core::Interpolator<sf::Vector2f> m_interpolatedPos;

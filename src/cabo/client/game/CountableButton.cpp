@@ -20,19 +20,18 @@ CountableButton::CountableButton(const core::Context& _context, shared::game::ob
 {
     switch (getType())
     {
-        case shared::game::TableButtonType::Deal:
-        m_textureRectDefault = game::spriteSheet::getDealButton();
-        m_textureRectClicked = game::spriteSheet::getDealButton(game::spriteSheet::Hover::Yes);
-        break;
-        case shared::game::TableButtonType::Shuffle:
-        m_textureRectDefault = game::spriteSheet::getResetButton();
-        m_textureRectClicked = game::spriteSheet::getResetButton(game::spriteSheet::Hover::Yes);
-        break;
         case shared::game::TableButtonType::FromDiscard:
-        m_textureRectDefault = game::spriteSheet::getFromDisacrdButton();
-        m_textureRectClicked = game::spriteSheet::getFromDisacrdButton(game::spriteSheet::Hover::Yes);
-        break;
-        
+            m_textureRectDefault = game::spriteSheet::getFromDisacrdButton();
+            m_textureRectClicked = game::spriteSheet::getFromDisacrdButton(game::spriteSheet::Hover::Yes);
+            break;
+        case shared::game::TableButtonType::Reset:
+            m_textureRectDefault = game::spriteSheet::getResetButton();
+            m_textureRectClicked = game::spriteSheet::getResetButton(game::spriteSheet::Hover::Yes);
+            break;
+        case shared::game::TableButtonType::Shuffle:
+            m_textureRectDefault = game::spriteSheet::getShuffleButton();
+            m_textureRectClicked = game::spriteSheet::getShuffleButton(game::spriteSheet::Hover::Yes);
+            break;
     }
     m_sprite.setTexture(_context.get<TextureHolder>().get(TextureIds::TableButtons));
     m_sprite.setTextureRect(m_textureRectDefault);

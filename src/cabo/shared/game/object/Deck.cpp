@@ -21,6 +21,8 @@ void Deck::setCards(const std::vector<Card*>& _cards)
 
     for (auto* card : m_cards)
     {
+        if (card->isInDeck())
+            continue;
         card->addToDeck();
         card->setPosition(getPosition());
     }

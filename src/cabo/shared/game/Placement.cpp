@@ -90,10 +90,10 @@ Placement getButton(TableButtonType _type)
     float y = 0;
     switch (_type)
     {
-    case TableButtonType::Deal:
+    case TableButtonType::Shuffle:
         y = 540.f - 30.f;
         break;
-    case TableButtonType::Shuffle:
+    case TableButtonType::Reset:
         y = 540.f;
         break;
     case TableButtonType::FromDiscard:

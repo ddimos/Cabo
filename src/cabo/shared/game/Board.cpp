@@ -42,6 +42,7 @@ Board::Board(
             auto* card = _createCardFunc(generateNextOjectId());
             card->setSize({70.f, 100.f});
             m_cards.push_back(card);
+            m_flipController.add(card->getFlippableComponent());
         }
         m_deck->setCards(m_cards);
     }
@@ -68,20 +69,21 @@ Board::Board(
 
     {
         unsigned numberOfPlayerToClick = (_players.size() == 1) ? 1 : 2;
-        // auto* button = _createButtonFunc(generateNextOjectId(), TableButtonType::Deal, numberOfPlayerToClick);
-        // button->setPosition(placement::getButton(TableButtonType::Deal).pos);
-        // button->setSize(sf::Vector2f(40.f, 20.f));
-        // m_clickCountableController.add(button->getClickCountableComponent());
-        
+
         auto* button = _createButtonFunc(generateNextOjectId(), TableButtonType::Shuffle, numberOfPlayerToClick);
         button->setPosition(placement::getButton(TableButtonType::Shuffle).pos);
         button->setSize(sf::Vector2f(40.f, 20.f));
         m_clickCountableController.add(button->getClickCountableComponent());
+
+        button = _createButtonFunc(generateNextOjectId(), TableButtonType::Reset, numberOfPlayerToClick);
+        button->setPosition(placement::getButton(TableButtonType::Reset).pos);
+        button->setSize(sf::Vector2f(40.f, 20.f));
+        m_clickCountableController.add(button->getClickCountableComponent());
         
-        // button = _createButtonFunc(generateNextOjectId(), TableButtonType::FromDiscard, numberOfPlayerToClick);
-        // button->setPosition(placement::getButton(TableButtonType::FromDiscard).pos);
-        // button->setSize(sf::Vector2f(40.f, 20.f));
-        // m_clickCountableController.add(button->getClickCountableComponent());
+        button = _createButtonFunc(generateNextOjectId(), TableButtonType::FromDiscard, numberOfPlayerToClick);
+        button->setPosition(placement::getButton(TableButtonType::FromDiscard).pos);
+        button->setSize(sf::Vector2f(40.f, 20.f));
+        m_clickCountableController.add(button->getClickCountableComponent());
     }
 }
 
@@ -133,7 +135,6 @@ void Board::participantGrabs(PlayerId _playerId, object::Id _id, sf::Vector2f _p
     CN_LOG_I_FRM("Grabs {} {}", _playerId.value(), _id.value());
     auto* card = getCard(_id);
     m_participants.at(_playerId)->setObject(card);
-    m_participants.at(_playerId)->setMousePosition(_position);
     m_layerController.removeFromLayer(layer::Cards, card->getLayerableComponent());
     m_layerController.addTolayer(layer::GrabbedCards, card->getLayerableComponent());
 }
@@ -150,11 +151,15 @@ void Board::participantReleases(PlayerId _playerId, object::Id _id, sf::Vector2f
     {
         m_discard->discard(card);
         pos = m_discard->getPosition();
+        m_flipController.turnUp(card->getFlippableComponent());
+        card->flip(true);
     }
     if (m_deck->contains(_position) && !card->isInDeck())
     {
         m_deck->add(*card);
         pos = m_deck->getPosition();
+        m_flipController.turnDown(card->getFlippableComponent());
+        card->flip(false);
     }
     card->move(pos);
 }
@@ -197,37 +202,59 @@ void Board::performClick(object::Object& _object)
             }
         );
     }
-    // TODO
-    // to implement this I need to properly reset cards, flip them back
-    // else if (object.getType() == TableButtonType::FromDiscard)
-    // {
-    //     m_discard->visit(
-    //         [this](object::Card& _card){
-    //             m_deck->add(_card);
-    //             _card.move(m_deck->getPosition());
-    //         }
-    //     );
-    // }
+    else if (object.getType() == TableButtonType::Reset)
+    {
+        for (auto* card : m_cards)
+        {
+            card->move(m_deck->getPosition());
+            m_flipController.turnDown(card->getFlippableComponent());
+            card->flip(false);
+        }
+        m_deck->setCards(m_cards);
+    }
+    else if (object.getType() == TableButtonType::FromDiscard)
+    {
+        m_discard->visit(
+            [this](object::Card& _card){
+                m_deck->add(_card);
+                _card.move(m_deck->getPosition());
+                m_flipController.turnDown(_card.getFlippableComponent());
+                _card.flip(false);
+            }
+        );
+    }
 }
 
-void Board::participantTurnsUp(PlayerId _playerId, object::Id _id, sf::Vector2f _position)
+component::Flippable* Board::findObjectToFlip(sf::Vector2f _position)
 {
-    CN_LOG_I_FRM("TurnsUp {} {}", _playerId.value(), _id.value());
-    auto* card = getCard(_id);
-    m_layerController.promoteInLayer(
-        card->getGrabbableComponent().isGrabbed() ? layer::GrabbedCards : layer::Cards,
-        card->getLayerableComponent()
-    );
+    return m_flipController.findObjectToFlip(_position);
 }
 
-void Board::participantTurnsDown(PlayerId _playerId, object::Id _id, sf::Vector2f _position)
+void Board::participantFlips(PlayerId _playerId, object::Id _id)
 {
-    CN_LOG_I_FRM("TurnsDown {} {}", _playerId.value(), _id.value());
     auto* card = getCard(_id);
-    m_layerController.promoteInLayer(
-        card->getGrabbableComponent().isGrabbed() ? layer::GrabbedCards : layer::Cards, 
-        card->getLayerableComponent()
-    );
+    m_flipController.flipObject(card->getFlippableComponent());
+
+    if (card->getFlippableComponent().isFaceUp())
+    {
+        auto* card = getCard(_id);
+        m_layerController.promoteInLayer(
+            card->getGrabbableComponent().isGrabbed() ? layer::GrabbedCards : layer::Cards,
+            card->getLayerableComponent()
+        );
+    }
+    else
+    {
+        auto* card = getCard(_id);
+        m_layerController.promoteInLayer(
+            card->getGrabbableComponent().isGrabbed() ? layer::GrabbedCards : layer::Cards, 
+            card->getLayerableComponent()
+        );
+    }
+
+    card->flip(card->getFlippableComponent().isFaceUp());
+
+    CN_LOG_I_FRM("Player {} flips {} card {}", _playerId.value(), card->getFlippableComponent().isFaceUp(), _id.value());
 }
 
 void Board::participantMoves(PlayerId _playerId, sf::Vector2f _position)

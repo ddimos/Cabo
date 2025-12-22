@@ -25,6 +25,7 @@ public:
     unsigned getZIndex() const override { return m_layerableComponent.getIndex(); }
 
     void move(sf::Vector2f _newPos);
+    void flip(bool _wantsToBeUp);
     bool isInDeck() const { return m_isInDeck; }
     void addToDeck();
     void removeFromDeck();
@@ -40,6 +41,7 @@ public:
 
 private:
     virtual void onMoved(sf::Vector2f _newPos);
+    virtual void onFlipped(bool _wantsToBeUp) {}
 
     Value m_value{};
     bool m_isInDeck = false;

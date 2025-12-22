@@ -3,7 +3,6 @@
 #include "core/event/Types.hpp"
 #include "core/state/State.hpp"
 
-#include "shared/game/controller/Flippable.hpp"
 #include "shared/game/controller/Grabbable.hpp"
 #include "shared/game/controller/PrivateZoneViewable.hpp"
 #include "shared/game/Board.hpp"
@@ -23,7 +22,6 @@ private:
     core::state::Return onUpdate(sf::Time _dt) override;
 
     std::unique_ptr<game::InputController> m_inputController;
-    std::unique_ptr<shared::game::controller::Flippable> m_flipController;
     std::unique_ptr<shared::game::controller::Grabbable> m_grabController;
     std::unique_ptr<shared::game::controller::PrivateZoneViewable> m_privateZoneViewableController;
     std::unique_ptr<shared::game::Board> m_board;

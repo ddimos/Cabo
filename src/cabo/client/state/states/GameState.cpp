@@ -46,8 +46,6 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
     auto& playerManagerRef = getContext().get<player::Manager>();
 
     m_grabController = std::make_unique<shared::game::controller::Grabbable>();
-    // Flip controller is used on the client side to start flipping animation
-    m_flipController = std::make_unique<shared::game::controller::Flippable>();
     m_privateZoneViewableController = std::make_unique<shared::game::controller::PrivateZoneViewable>(
         [&playerManagerRef](shared::game::component::PrivateZoneViewable& _component){
             if (_component.isHidden() && !_component.isHiddenInZoneOfPlayer(playerManagerRef.getLocalPlayerId()))
@@ -69,10 +67,10 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
         [this, &playerManagerRef](sf::Vector2f _pos){
             // Only find an object to start the animation
             // TODO to think how to revert the change if a desync happens
-            auto* component = m_flipController->findObjectToFlip(_pos);
+            auto* component = m_board->findObjectToFlip(_pos);
             if (!component)
                 return;
-            static_cast<game::Card&>(component->getParent()).startFlipping(!component->isFaceUp());
+            static_cast<game::Card&>(component->getParent()).startFlipping(!component->isFaceUp());//
         }
     );
 
@@ -81,7 +79,6 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
             auto card = std::make_shared<game::Card>(getContext(), _id);
             getContainer(GameContainerId).add(card);
             m_privateZoneViewableController->add(card->getPrivateZoneViewableComponent());
-            m_flipController->add(card->getFlippableComponent());
             return card.get();
         },
         [this](shared::game::object::Id _id){
@@ -144,6 +141,8 @@ void GameState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isB
                         auto* card = m_board->getCard(data.cardId);
                         m_grabController->grabObject(data.playerId, card->getGrabbableComponent());
                         m_board->participantGrabs(data.playerId, data.cardId, data.pos);
+                        if (data.playerId != getContext().get<player::Manager>().getLocalPlayerId())
+                            m_board->participantMoves(data.playerId, data.pos);
                     }
                     else if (data.type == shared::game::PlayerInteractsWithCardData::Type::Releases)
                     {
@@ -153,18 +152,15 @@ void GameState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isB
                     }
                     else if (data.type == shared::game::PlayerInteractsWithCardData::Type::TurnsDown)
                     {
-                        auto* card = m_board->getCard(data.cardId);
-                        m_flipController->turnDown(card->getFlippableComponent());
-                        m_board->participantTurnsDown(data.playerId, data.cardId, data.pos);
-                        card->setValue(shared::game::object::Card::Value{});
-                        static_cast<game::Card*>(card)->startFlipping(false);
+                        if (data.playerId != getContext().get<player::Manager>().getLocalPlayerId())
+                            m_board->participantMoves(data.playerId, data.pos);
+                        m_board->participantFlips(data.playerId, data.cardId);
                     }
                     else if (data.type == shared::game::PlayerInteractsWithCardData::Type::TurnsUp)
                     {
-                        auto* card = m_board->getCard(data.cardId);
-                        m_flipController->turnUp(card->getFlippableComponent());
-                        m_board->participantTurnsUp(data.playerId, data.cardId, data.pos);
-                        static_cast<game::Card*>(card)->startFlipping(true);
+                        if (data.playerId != getContext().get<player::Manager>().getLocalPlayerId())
+                            m_board->participantMoves(data.playerId, data.pos);
+                        m_board->participantFlips(data.playerId, data.cardId);
                     }
                 }
                 else if (_event.m_type == shared::game::ServerCommandType::PlayerMoves)

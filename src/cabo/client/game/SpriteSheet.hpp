@@ -21,7 +21,7 @@ sf::IntRect getDiscardTextureRect(Hover _hover = Hover::No);
 sf::IntRect getFinishButtonTextureRect(Hover _hover = Hover::No);
 sf::IntRect getCaboButtonTextureRect(Hover _hover = Hover::No);
 
-sf::IntRect getDealButton(Hover _hover = Hover::No);
+sf::IntRect getShuffleButton(Hover _hover = Hover::No);
 sf::IntRect getResetButton(Hover _hover = Hover::No);
 sf::IntRect getFromDisacrdButton(Hover _hover = Hover::No);
 

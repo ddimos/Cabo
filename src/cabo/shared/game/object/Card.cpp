@@ -19,6 +19,11 @@ void Card::move(sf::Vector2f _newPos)
     onMoved(_newPos);
 }
 
+void Card::flip(bool _wantsToBeUp)
+{
+    onFlipped(_wantsToBeUp);
+}
+
 void Card::addToDeck()
 {
     CN_ASSERT(!m_isInDeck);

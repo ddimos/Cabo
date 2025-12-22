@@ -9,6 +9,7 @@
 #include "shared/game/object/Participant.hpp"
 #include "shared/game/object/PrivateZone.hpp"
 #include "shared/game/controller/ClickCountable.hpp"
+#include "shared/game/controller/Flippable.hpp"
 #include "shared/game/controller/Layerable.hpp"
 #include "shared/player/Types.hpp"
 #include "core/Context.hpp"
@@ -42,8 +43,8 @@ public:
     void participantReleases(PlayerId _playerId, object::Id _id, sf::Vector2f _position);
     object::Object* participantClicks(PlayerId _playerId, sf::Vector2f _position);
     void participantClicks(PlayerId _playerId, object::Id _id);
-    void participantTurnsUp(PlayerId _playerId, object::Id _id, sf::Vector2f _position);
-    void participantTurnsDown(PlayerId _playerId, object::Id _id, sf::Vector2f _position);
+    component::Flippable* findObjectToFlip(sf::Vector2f _position);
+    void participantFlips(PlayerId _playerId, object::Id _id);
     void participantMoves(PlayerId _playerId, sf::Vector2f _position);
 
     object::Card* getCard(object::Id _id);
@@ -62,8 +63,9 @@ private:
     std::vector<object::PrivateZone*> m_privateZones;
     std::vector<object::Anchor*> m_anchors;
     object::Id::Type m_objectIdGenerator = 0;
-    shared::game::controller::ClickCountable m_clickCountableController;
-    shared::game::controller::Layerable m_layerController;
+    controller::ClickCountable m_clickCountableController;
+    controller::Flippable m_flipController;
+    controller::Layerable m_layerController;
 };
 
 } // namespace cn::shared::game

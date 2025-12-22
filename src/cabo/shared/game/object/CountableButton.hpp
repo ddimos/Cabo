@@ -19,7 +19,7 @@ public:
 
 private:
     component::ClickCountable m_clickCountableComponent;
-    TableButtonType m_type = TableButtonType::Deal;
+    TableButtonType m_type = TableButtonType::Shuffle;
 };
 
 } // namespace cn::shared::game::object

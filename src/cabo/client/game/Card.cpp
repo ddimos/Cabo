@@ -94,6 +94,7 @@ void Card::onUpdate(sf::Time _dt)
         else
         {
             m_sprite.setTextureRect(game::spriteSheet::getCardBackTextureRect());
+            setValue({});
         }
     }
 
@@ -119,6 +120,11 @@ void Card::onMoved(sf::Vector2f _newPos)
         _newPos = m_interpolatedPos.get();
     m_interpolatedPos.start(getPosition(), _newPos);
     setPosition(_newPos);
+}
+
+void Card::onFlipped(bool _wantsToBeUp)
+{
+    startFlipping(_wantsToBeUp);
 }
 
 } // namespace cn::client::game

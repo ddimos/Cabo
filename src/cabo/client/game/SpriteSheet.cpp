@@ -56,7 +56,7 @@ sf::IntRect getCaboButtonTextureRect(Hover _hover)
     return getFinishButtonTextureRect(_hover);
 }
 
-sf::IntRect getDealButton(Hover _hover)
+sf::IntRect getShuffleButton(Hover _hover)
 {
     return _hover == Hover::No 
         ? sf::IntRect{ 0,                 0, TableButtonWidth, TableButtonHeight }
