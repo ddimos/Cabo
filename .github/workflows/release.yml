@@ -21,6 +21,7 @@ jobs:
         - { name: Windows, os: windows-latest, c_compiler: cl,    cpp_compiler: cl,      archive_type: zip, archive_extension: zip,    target_name: Release/Cato.exe }
        # - { name: Ubuntu,  os: ubuntu-latest,  c_compiler: gcc,   cpp_compiler: g++,     archive_type: tar, archive_extension: tar.gz, target_name: Cato     }
         - { name: macOS,   os: macos-latest,   c_compiler: clang, cpp_compiler: clang++, archive_type: tar, archive_extension: tar.gz, target_name: Cato.app }
+        - { name: macOS_intel,   os: macos-15-intel,   c_compiler: clang, cpp_compiler: clang++, archive_type: tar, archive_extension: tar.gz, target_name: Cato.app }
         build_type: [Release]
         lib_type:
         # - { name: Shared, flags: -DBUILD_SHARED_LIBS=TRUE  }
@@ -36,6 +37,9 @@ jobs:
             # lib_type.name: Static
             launch_type.name: Client
           - platform.name: macOS
+            # lib_type.name: Static
+            launch_type.name: Client
+          - platform.name: macOS_intel
             # lib_type.name: Static
             launch_type.name: Client
 
