@@ -1,2 +1,2 @@
-# Cabo
-Online version of card game Cabo
+# Cato
+Online version of card game Cabo with cats
