@@ -1,8 +1,10 @@
 #pragma once
 
 #include "shared/game/object/PrivateZone.hpp"
+#include "core/Context.hpp"
 
-#include <SFML/Graphics/RectangleShape.hpp>
+#include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/Text.hpp>
 
 namespace cn::client::game
 {
@@ -10,13 +12,14 @@ namespace cn::client::game
 class PrivateZone final : public shared::game::object::PrivateZone
 {
 public:
-    PrivateZone(shared::game::object::Id _id, PlayerId _ownerId);
+    PrivateZone(const core::Context& _context, shared::game::object::Id _id, PlayerId _ownerId, const std::string& _name);
 
 private:
-    void onUpdate(sf::Time _dt) override;
+    void onActivate() override;
     void onDraw(sf::RenderWindow& _window) override;
 
-    sf::RectangleShape m_shape;
+    sf::Sprite m_sprite;
+    sf::Text m_name;
 };
 
 } // namespace cn::client::game

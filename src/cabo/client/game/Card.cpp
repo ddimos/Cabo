@@ -117,9 +117,10 @@ void Card::onDraw(sf::RenderWindow& _window)
 
 void Card::onMoved(sf::Vector2f _newPos)
 {
+    sf::Vector2f start = getPosition();
     if (m_interpolatedPos.doesInterpolate())
-        _newPos = m_interpolatedPos.get();
-    m_interpolatedPos.start(getPosition(), _newPos);
+        start = m_interpolatedPos.get();
+    m_interpolatedPos.start(start, _newPos);
     setPosition(_newPos);
 }
 

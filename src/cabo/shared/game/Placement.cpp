@@ -3,7 +3,7 @@
 
 namespace
 {
-    constexpr float EDGE_OFFSET = 50.f;
+    constexpr float EDGE_OFFSET = 115.f;
     constexpr float OFFSET_1 = 150.f;
     constexpr float POS_X_1 = 960.f - 540.f + EDGE_OFFSET;
     constexpr float POS_X_2 = 960.f - OFFSET_1;

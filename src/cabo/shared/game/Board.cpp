@@ -62,7 +62,7 @@ Board::Board(
         auto* zone = m_privateZones.emplace_back(_createPrivateZoneFunc(generateNextOjectId(), player.id));
         zone->setPosition(points.at(i).pos);
         zone->setRotation(points.at(i).rot);
-        zone->setSize(sf::Vector2f(160.f, 120.f));
+        zone->setSize(sf::Vector2f(100.f, 110.f));
 
         ++i;
     }
@@ -135,6 +135,7 @@ void Board::participantGrabs(PlayerId _playerId, object::Id _id, sf::Vector2f _p
     CN_LOG_I_FRM("Grabs {} {}", _playerId.value(), _id.value());
     auto* card = getCard(_id);
     auto* part = m_participants.at(_playerId);
+    card->move(_position);
     part->setObject(card);
     m_layerController.removeFromLayer(layer::Cards, card->getLayerableComponent());
     m_layerController.addTolayer(layer::GrabbedCards, card->getLayerableComponent());

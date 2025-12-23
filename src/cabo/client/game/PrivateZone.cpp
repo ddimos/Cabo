@@ -1,32 +1,36 @@
 #include "client/game/PrivateZone.hpp"
 
+#include "client/ResourceIds.hpp"
+
 namespace cn::client::game
 {
 
-PrivateZone::PrivateZone(shared::game::object::Id _id, PlayerId _ownerId)
+PrivateZone::PrivateZone(const core::Context& _context, shared::game::object::Id _id, PlayerId _ownerId, const std::string& _name)
     : shared::game::object::PrivateZone(_id, _ownerId)
 {
-    m_shape.setFillColor(sf::Color::Transparent);
-    m_shape.setOutlineColor(sf::Color::Red);
-    m_shape.setOutlineThickness(5);
-    m_shape.setPosition(getPosition());
-    // m_shape.setRotation(_boardPrivateZone.getRotation()); TODO
-    m_shape.setSize(getSize());
-    m_shape.setOrigin(m_shape.getSize() / 2.f);
+    m_sprite.setTexture(_context.get<TextureHolder>().get(TextureIds::PrivateZone));
+    m_sprite.setOrigin(m_sprite.getLocalBounds().getSize().x / 2.f, 0.f);
+
+    m_name.setFont(_context.get<FontHolder>().get(FontIds::Main));
+    m_name.setCharacterSize(15);
+    m_name.setFillColor(sf::Color::Black);
+    m_name.setString(_name);
+    m_name.setOrigin(m_name.getLocalBounds().getSize() / 2.f);
 }
 
-void PrivateZone::onUpdate(sf::Time _dt)
+void PrivateZone::onActivate()
 {
-    // TODO to do it only once
-    m_shape.setPosition(getPosition());
-    m_shape.setRotation(getRotation());
-    m_shape.setSize(getSize());
-    m_shape.setOrigin(m_shape.getSize() / 2.f);
+    m_sprite.setPosition(getPosition());
+    m_sprite.setRotation(getRotation());
+
+    m_name.setPosition(getPosition());
+    m_name.setRotation(getRotation());
 }
 
 void PrivateZone::onDraw(sf::RenderWindow& _window)
 {
-    _window.draw(m_shape);
+    _window.draw(m_sprite);
+    _window.draw(m_name);
 }
 
 } // namespace cn::client::game

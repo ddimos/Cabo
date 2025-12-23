@@ -30,8 +30,8 @@ namespace cn::client
 {
 
 Client::Client()
-    : m_window(sf::VideoMode(1600, 960), "CABOn", sf::Style::Close)
-    //m_window(sf::VideoMode::getFullscreenModes().front(), "CABOn", sf::Style::Fullscreen)
+    :// m_window(sf::VideoMode(1600, 960), "CABOn", sf::Style::Close)
+    m_window(sf::VideoMode::getFullscreenModes().front(), "CABOn", sf::Style::Fullscreen)
     , m_netManager(m_context, false), m_stateManager(m_context), m_playerManager(m_context)
 {
     m_context.insert(m_window);
@@ -103,6 +103,7 @@ void Client::init()
     m_textureHolder.load(TextureIds::MainMenuJoinButton,    resourcePath + "textures/join_menu_join_button.png");
     m_textureHolder.load(TextureIds::MainMenuStartButton,   resourcePath + "textures/create_menu_start_button.png");
     m_textureHolder.load(TextureIds::Paw,                   resourcePath + "textures/paw.png");
+    m_textureHolder.load(TextureIds::PrivateZone,           resourcePath + "textures/private_zone.png");
     m_textureHolder.load(TextureIds::Table,                 resourcePath + "textures/table.png");
     m_textureHolder.load(TextureIds::TableButtons,          resourcePath + "textures/table_icons.png");
     m_textureHolder.load(TextureIds::YesNoButtons,          resourcePath + "textures/yes_no_buttons.png");

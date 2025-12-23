@@ -21,6 +21,7 @@ enum class TextureIds
     MainMenuStartButton,
     MainMenuJoinButton,
     Paw,
+    PrivateZone,
     Table,
     TableButtons,
     YesNoButtons

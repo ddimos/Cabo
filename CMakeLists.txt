@@ -11,13 +11,14 @@ FetchContent_MakeAvailable(SFML)
 
 #find_package(SFML 2.6 COMPONENTS graphics system window network REQUIRED)
 
-
 FetchContent_Declare(nsf
     GIT_REPOSITORY https://github.com/ddimos/nsf.git
-    GIT_TAG v0.2.2)
+    GIT_TAG v0.2.4)
 
-option(NSF_FIND_SFML "Use find_package to find SFML" OFF)
-option(NSF_BUILD_EXAMPLE "Build the nsf example" OFF)
+set(NSF_FIND_SFML OFF CACHE BOOL "Use find_package to find SFML")
+set(NSF_BUILD_EXAMPLE OFF CACHE BOOL "Build the nsf example")
+set(NSF_LOCAL_BUILD OFF CACHE BOOL "Disable local build")
+
 FetchContent_MakeAvailable(nsf)
 
 set(CMAKE_CXX_STANDARD 20)

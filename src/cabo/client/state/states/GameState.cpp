@@ -70,7 +70,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
             auto* component = m_board->findObjectToFlip(_pos);
             if (!component)
                 return;
-            static_cast<game::Card&>(component->getParent()).startFlipping(!component->isFaceUp());//
+            static_cast<game::Card&>(component->getParent()).startFlipping(!component->isFaceUp());
         }
     );
 
@@ -96,8 +96,8 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
             getContainer(GameContainerId).add(participant);
             return participant.get();
         },
-        [this](shared::game::object::Id _id, PlayerId _playerId){
-            auto zone = std::make_shared<game::PrivateZone>(_id, _playerId);
+        [&playerManagerRef, this](shared::game::object::Id _id, PlayerId _playerId){
+            auto zone = std::make_shared<game::PrivateZone>(getContext(), _id, _playerId, playerManagerRef.getPlayer(_playerId)->name);
             getContainer(GameContainerId).add(zone);
             m_privateZoneViewableController->addPrivateZone(*zone);
             return zone.get();
