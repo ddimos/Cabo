@@ -28,7 +28,7 @@ void InputController::registerEvents(core::event::Dispatcher& _dispatcher, bool 
     {
         _dispatcher.registerEvent<events::MouseButtonPressedEvent>(m_listenerId,
             [&netManRef, &playerManRef, &windowRef](const events::MouseButtonPressedEvent& _event){
-                if (_event.mouseButton.button != sf::Mouse::Button::Left)
+                if (_event.mouseButton.button != sf::Mouse::Button::Left || !windowRef.hasFocus())
                     return;
                 events::RemotePlayerInputNetEvent event(
                     playerManRef.getLocalPlayerId(), shared::game::PlayerInputType::Grab,
@@ -38,7 +38,7 @@ void InputController::registerEvents(core::event::Dispatcher& _dispatcher, bool 
         );
         _dispatcher.registerEvent<events::MouseButtonReleasedEvent>(m_listenerId,
             [this, &netManRef, &playerManRef, &windowRef](const events::MouseButtonReleasedEvent& _event){
-                if (_event.mouseButton.button != sf::Mouse::Button::Left)
+                if (_event.mouseButton.button != sf::Mouse::Button::Left || !windowRef.hasFocus())
                     return;
                 sf::Vector2f pos = windowRef.mapPixelToCoords(sf::Vector2i(_event.mouseButton.x, _event.mouseButton.y));
                 m_releaseCallback(pos);
@@ -51,7 +51,7 @@ void InputController::registerEvents(core::event::Dispatcher& _dispatcher, bool 
         );
         _dispatcher.registerEvent<events::KeyReleasedEvent>(m_listenerId,
             [this, &netManRef, &playerManRef, &windowRef](const events::KeyReleasedEvent& _event){
-                if (_event.key.code != sf::Keyboard::Space)
+                if (_event.key.code != sf::Keyboard::Space || !windowRef.hasFocus())
                     return;
                 auto mousePos = windowRef.mapPixelToCoords(sf::Mouse::getPosition(windowRef));
                 m_flipCallback(mousePos);

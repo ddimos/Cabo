@@ -9,7 +9,8 @@ namespace cn::client::game
 
 Card::Card(const core::Context& _context, shared::game::object::Id _id) 
     : shared::game::object::Card(_id)
-    , m_interpolatedPos(sf::seconds(0.3f), core::Easing::linear)
+    , m_interpolatedPos(sf::seconds(0.3f), core::Easing::easeOutBack)
+    , m_interpolatedRot(sf::seconds(0.3f), core::Easing::easeOutBack)
     , m_interpolatedFlip(sf::seconds(1.f), core::Easing::easeInOutExpo)
 {
     m_sprite.setTexture(_context.get<TextureHolder>().get(TextureIds::Cards));
@@ -99,14 +100,14 @@ void Card::onUpdate(sf::Time _dt)
     }
 
     if (m_interpolatedPos.doesInterpolate())
-    {
-        auto pos = m_interpolatedPos.get();
-        m_sprite.setPosition(pos);
-    }
+        m_sprite.setPosition(m_interpolatedPos.get());
     else
-    {
         m_sprite.setPosition(getPosition());
-    }
+
+    if (m_interpolatedRot.doesInterpolate())
+        m_sprite.setRotation(m_interpolatedRot.get());
+    else
+        m_sprite.setRotation(getRotation());
 }
 
 void Card::onDraw(sf::RenderWindow& _window)
@@ -120,6 +121,14 @@ void Card::onMoved(sf::Vector2f _newPos)
         _newPos = m_interpolatedPos.get();
     m_interpolatedPos.start(getPosition(), _newPos);
     setPosition(_newPos);
+}
+
+void Card::onRotated(float _newRot)
+{
+    if (getRotation() == _newRot)
+        return;
+    m_interpolatedRot.start(getRotation(), _newRot);
+    setRotation(_newRot);
 }
 
 void Card::onFlipped(bool _wantsToBeUp)

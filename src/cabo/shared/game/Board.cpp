@@ -134,9 +134,11 @@ void Board::participantGrabs(PlayerId _playerId, object::Id _id, sf::Vector2f _p
 {
     CN_LOG_I_FRM("Grabs {} {}", _playerId.value(), _id.value());
     auto* card = getCard(_id);
-    m_participants.at(_playerId)->setObject(card);
+    auto* part = m_participants.at(_playerId);
+    part->setObject(card);
     m_layerController.removeFromLayer(layer::Cards, card->getLayerableComponent());
     m_layerController.addTolayer(layer::GrabbedCards, card->getLayerableComponent());
+    card->rotate(part->getRotation());
 }
 
 void Board::participantReleases(PlayerId _playerId, object::Id _id, sf::Vector2f _position)
@@ -153,6 +155,7 @@ void Board::participantReleases(PlayerId _playerId, object::Id _id, sf::Vector2f
         pos = m_discard->getPosition();
         m_flipController.turnUp(card->getFlippableComponent());
         card->flip(true);
+        card->rotate(0);
     }
     if (m_deck->contains(_position) && !card->isInDeck())
     {
@@ -160,6 +163,7 @@ void Board::participantReleases(PlayerId _playerId, object::Id _id, sf::Vector2f
         pos = m_deck->getPosition();
         m_flipController.turnDown(card->getFlippableComponent());
         card->flip(false);
+        card->rotate(0);
     }
     card->move(pos);
 }

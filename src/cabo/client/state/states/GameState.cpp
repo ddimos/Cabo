@@ -114,6 +114,11 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
     // We don't know the values on the client yet
     std::vector<game::Card::Value> cardValues;
     m_board->start(cardValues);
+
+    auto& window = getContext().get<sf::RenderWindow>();
+    sf::View view = window.getDefaultView();
+    view.setRotation(m_board->getParticipant(playerManagerRef.getLocalPlayerId())->getRotation());
+    window.setView(view);
 }
 
 void GameState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered)

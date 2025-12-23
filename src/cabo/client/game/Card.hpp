@@ -24,10 +24,12 @@ private:
     void onDraw(sf::RenderWindow& _window) override;
 
     void onMoved(sf::Vector2f _newPos) override;
+    void onRotated(float _newRot) override;
     void onFlipped(bool _wantsToBeUp) override;
 
     sf::Sprite m_sprite;
     core::Interpolator<sf::Vector2f> m_interpolatedPos;
+    core::Interpolator<float> m_interpolatedRot;
     core::Interpolator<float> m_interpolatedFlip;
     bool m_wantsToBeUp = false;
 };

@@ -19,6 +19,11 @@ void Card::move(sf::Vector2f _newPos)
     onMoved(_newPos);
 }
 
+void Card::rotate(float _newRot)
+{
+    onRotated(_newRot);
+}
+
 void Card::flip(bool _wantsToBeUp)
 {
     onFlipped(_wantsToBeUp);
@@ -51,6 +56,11 @@ void Card::removeFromDiscard()
 void Card::onMoved(sf::Vector2f _newPos)
 {
     setPosition(_newPos);
+}
+
+void Card::onRotated(float _newRot)
+{
+    setRotation(_newRot);
 }
 
 } // namespace cn::shared::game::object
