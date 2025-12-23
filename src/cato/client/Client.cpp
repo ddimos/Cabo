@@ -30,8 +30,8 @@ namespace cn::client
 {
 
 Client::Client()
-    :// m_window(sf::VideoMode(1600, 960), "CABOn", sf::Style::Close)
-    m_window(sf::VideoMode::getFullscreenModes().front(), "CABOn", sf::Style::Fullscreen)
+    :// m_window(sf::VideoMode(1600, 960), "Cato", sf::Style::Close)
+    m_window(sf::VideoMode::getFullscreenModes().front(), "Cato", sf::Style::Fullscreen)
     , m_netManager(m_context, false), m_stateManager(m_context), m_playerManager(m_context)
 {
     m_context.insert(m_window);
@@ -52,7 +52,7 @@ Client::Client()
 
 void Client::start()
 {
-    CN_LOG_I("Start Client CABOn");
+    CN_LOG_I("Start Client Cato");
 
     m_isRunning = true;
     m_systemClock.restart();
@@ -95,9 +95,7 @@ void Client::init()
     m_fontHolder.load(FontIds::Main,                        resourcePath + "fonts/times_new_roman.ttf");
     m_textureHolder.load(TextureIds::Background,            resourcePath + "textures/background.png");
     m_textureHolder.load(TextureIds::BackButton,            resourcePath + "textures/back_button.png");
-    m_textureHolder.load(TextureIds::CaboButton,            resourcePath + "textures/cabo_button.png");
     m_textureHolder.load(TextureIds::Cards,                 resourcePath + "textures/cards.png");
-    m_textureHolder.load(TextureIds::DecideButtons,         resourcePath + "textures/decide_buttons.png");
     m_textureHolder.load(TextureIds::Field,                 resourcePath + "textures/field.png");
     m_textureHolder.load(TextureIds::FinishButton,          resourcePath + "textures/finish_button.png");
     m_textureHolder.load(TextureIds::MainMenuJoinButton,    resourcePath + "textures/join_menu_join_button.png");
@@ -106,7 +104,6 @@ void Client::init()
     m_textureHolder.load(TextureIds::PrivateZone,           resourcePath + "textures/private_zone.png");
     m_textureHolder.load(TextureIds::Table,                 resourcePath + "textures/table.png");
     m_textureHolder.load(TextureIds::TableButtons,          resourcePath + "textures/table_icons.png");
-    m_textureHolder.load(TextureIds::YesNoButtons,          resourcePath + "textures/yes_no_buttons.png");
 
     m_saveHolder.load(SaveIds::PlayerName,                  resourcePath + "save/player_name");
     m_saveHolder.load(SaveIds::ServerAddress,               resourcePath + "save/server_address");

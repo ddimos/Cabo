@@ -40,15 +40,6 @@ enum class Suit
     Diamonds    // (♦)
 };
 
-enum class BoardState
-{
-    Start,
-    Peek,
-    Game,
-    Cabo,
-    Finish
-};
-
 enum class PlayerInputType
 {
     Click,

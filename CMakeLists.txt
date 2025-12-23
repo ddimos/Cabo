@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.24)
-project(Cabo VERSION 0.1.0)
+project(Cato VERSION 0.1.0)
 
 
 include(FetchContent)
@@ -31,17 +31,17 @@ message("Generated launch type: ${LAUNCH_TARGET}")
 
 if (LAUNCH_TARGET STREQUAL "Client")
     file(GLOB_RECURSE TARGET_SRC 
-                                "./src/cabo/client/*.cpp"
-                                "./src/cabo/core/*.cpp"
-                                "./src/cabo/shared/*.cpp"
-                                "./src/cabo/ContextObjectIds.cpp"
+                                "./src/cato/client/*.cpp"
+                                "./src/cato/core/*.cpp"
+                                "./src/cato/shared/*.cpp"
+                                "./src/cato/ContextObjectIds.cpp"
     )
 else ()
     file(GLOB_RECURSE TARGET_SRC 
-                                "./src/cabo/server/*.cpp"
-                                "./src/cabo/core/*.cpp"
-                                "./src/cabo/shared/*.cpp"
-                                "./src/cabo/ContextObjectIds.cpp"
+                                "./src/cato/server/*.cpp"
+                                "./src/cato/core/*.cpp"
+                                "./src/cato/shared/*.cpp"
+                                "./src/cato/ContextObjectIds.cpp"
     )
 endif ()
 
@@ -55,31 +55,31 @@ file(GLOB_RECURSE RESOURCES_TEXTURES
     "${CMAKE_SOURCE_DIR}/res/textures/*.png"
 )
 
-add_executable(Cabo ${TARGET_SRC} 
+add_executable(Cato ${TARGET_SRC} 
                     "./src/main.cpp"
                     ${RESOURCES_FONTS}
                     ${RESOURCES_SAVES}
                     ${RESOURCES_TEXTURES}
 )
 
-target_link_libraries(Cabo sfml-graphics sfml-system sfml-window sfml-network nsf)
+target_link_libraries(Cato sfml-graphics sfml-system sfml-window sfml-network nsf)
 
-target_include_directories(Cabo PUBLIC
+target_include_directories(Cato PUBLIC
                             "${PROJECT_BINARY_DIR}"
-                            "${PROJECT_SOURCE_DIR}/src/cabo"
+                            "${PROJECT_SOURCE_DIR}/src/cato"
                             )
 
 set(CMAKE_COMPILE_WARNING_AS_ERROR ON)
 
 if (LAUNCH_TARGET STREQUAL "Client")
-    set(TARGET_OUTPUT_NAME "Cabo")
+    set(TARGET_OUTPUT_NAME "Cato")
 elseif (LAUNCH_TARGET STREQUAL "Server")
-    set(TARGET_OUTPUT_NAME "Cabo_Server")
+    set(TARGET_OUTPUT_NAME "Cato_Server")
 else ()
     message(FATAL_ERROR "LAUNCH_TARGET should be equal to Client|Server, current value is ${LAUNCH_TARGET}")
 endif()
 
-target_compile_definitions(Cabo PRIVATE
+target_compile_definitions(Cato PRIVATE
     CN_LAUNCH_TARGET_CLIENT=1
     CN_LAUNCH_TARGET_SERVER=2
     $<$<STREQUAL:${LAUNCH_TARGET},Client>:CN_LAUNCH_TARGET=CN_LAUNCH_TARGET_CLIENT>
@@ -88,19 +88,19 @@ target_compile_definitions(Cabo PRIVATE
 
 # TODO disable asserts and logs in Release
 if (DISABLE_ASSERT)
-    target_compile_definitions(Cabo PRIVATE CN_DISABLE_ASSERT=1)
+    target_compile_definitions(Cato PRIVATE CN_DISABLE_ASSERT=1)
     message("Dissable asserts")
 endif()
 
 if (DISABLE_LOGGING)
-    target_compile_definitions(Cabo PRIVATE CN_DISABLE_LOGGING=1)
+    target_compile_definitions(Cato PRIVATE CN_DISABLE_LOGGING=1)
     message("Dissable logging")
 endif()
 
 message("Generated executable name: ${TARGET_OUTPUT_NAME}")
 
 set_target_properties(
-    Cabo 
+    Cato 
     PROPERTIES 
         OUTPUT_NAME "${TARGET_OUTPUT_NAME}"
 )

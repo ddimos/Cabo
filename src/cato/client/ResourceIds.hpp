@@ -13,9 +13,7 @@ enum class TextureIds
 {
     Background,
     BackButton,
-    CaboButton,
     Cards,
-    DecideButtons,
     Field,
     FinishButton,
     MainMenuStartButton,
@@ -23,8 +21,7 @@ enum class TextureIds
     Paw,
     PrivateZone,
     Table,
-    TableButtons,
-    YesNoButtons
+    TableButtons
 };
 
 enum class FontIds
