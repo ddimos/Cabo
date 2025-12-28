@@ -12,16 +12,17 @@ namespace cn::client::menu::item
 namespace cn::client::states
 {
 
-class EnterNameState final : public core::state::State
+class EnteringState final : public core::state::State
 {
 public:
-    EnterNameState(core::state::Manager& _stateManagerRef);
+    EnteringState(core::state::Manager& _stateManagerRef);
 
 private:
     core::state::Return onUpdate(sf::Time _dt) override;
     
     menu::item::Button* m_buttonPtr = nullptr;
-    menu::item::Input* m_inputPtr = nullptr;
+    menu::item::Input* m_inputNamePtr = nullptr;
+    menu::item::Input* m_inputServerPtr = nullptr;
 };
 
 } // namespace cn::client::states

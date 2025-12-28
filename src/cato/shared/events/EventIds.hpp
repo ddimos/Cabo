@@ -19,6 +19,7 @@ enum : core::event::EventId::Type
     MouseButtonReleased,
     MouseMoved,
     TextEntered,
+    TextPasted,
 
     // Net events
     FinishGame,

@@ -12,6 +12,7 @@ public:
     JoiningState(core::state::Manager& _stateManagerRef);
 
 private:
+    void onActivate() override;
     void onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered) override;
     core::event::ListenerId m_listenerId{};
 };

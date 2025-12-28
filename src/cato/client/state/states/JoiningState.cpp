@@ -58,6 +58,16 @@ JoiningState::JoiningState(core::state::Manager& _stateManagerRef)
     m_listenerId = core::event::getNewListenerId();
 }
 
+void JoiningState::onActivate()
+{
+    auto& save = getContext().get<SaveHolder>().get(SaveIds::ServerAddress);
+    size_t pos = save.getValue().find(':');
+    auto ip = sf::IpAddress(save.getValue().substr(0, pos));
+    unsigned port = std::stoi(save.getValue().substr(pos + 1));
+
+    getContext().get<net::Manager>().connect(nsf::NetworkAddress(ip, port));
+}
+
 void JoiningState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isBeingRegistered)
 {
     if (_isBeingRegistered)

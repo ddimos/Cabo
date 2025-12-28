@@ -6,9 +6,6 @@ namespace
 constexpr short unsigned CardWidth = 70;
 constexpr short unsigned CardHeight = 100;
 
-constexpr short unsigned FinishButtonWidth = 66;
-constexpr short unsigned FinishButtonHeight = 20;
-
 constexpr short unsigned TableButtonWidth = 40;
 constexpr short unsigned TableButtonHeight = 20;
 
@@ -42,18 +39,6 @@ sf::IntRect getDiscardTextureRect(Hover _hover)
     return _hover == Hover::No 
         ? sf::IntRect{ 0, 2 * CardHeight, CardWidth, CardHeight }
         : sf::IntRect{ 0, 3 * CardHeight, CardWidth, CardHeight };
-}
-
-sf::IntRect getFinishButtonTextureRect(Hover _hover)
-{
-    return _hover == Hover::No 
-        ? sf::IntRect{ 0,                  0, FinishButtonWidth, FinishButtonHeight }
-        : sf::IntRect{ 0, FinishButtonHeight, FinishButtonWidth, FinishButtonHeight };
-}
-
-sf::IntRect getCaboButtonTextureRect(Hover _hover)
-{
-    return getFinishButtonTextureRect(_hover);
 }
 
 sf::IntRect getShuffleButton(Hover _hover)

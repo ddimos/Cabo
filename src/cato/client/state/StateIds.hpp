@@ -13,7 +13,7 @@ namespace id
         Joining,
         Lobby,
         MainMenu,
-        EnterName,
+        Entering,
         Test,
         Title
     };

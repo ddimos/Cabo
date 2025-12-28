@@ -11,6 +11,8 @@
 #include "Constants.hpp"
 
 #include <SFML/Window/Event.hpp>
+#include <SFML/Window/Clipboard.hpp>
+
 
 namespace
 {
@@ -93,15 +95,15 @@ void Client::init()
 {
     auto resourcePath = getResourcesPath();
     m_fontHolder.load(FontIds::Main,                        resourcePath + "fonts/times_new_roman.ttf");
-    m_textureHolder.load(TextureIds::Background,            resourcePath + "textures/background.png");
     m_textureHolder.load(TextureIds::BackButton,            resourcePath + "textures/back_button.png");
+    m_textureHolder.load(TextureIds::Background,            resourcePath + "textures/background.png");
     m_textureHolder.load(TextureIds::Cards,                 resourcePath + "textures/cards.png");
     m_textureHolder.load(TextureIds::Field,                 resourcePath + "textures/field.png");
-    m_textureHolder.load(TextureIds::FinishButton,          resourcePath + "textures/finish_button.png");
-    m_textureHolder.load(TextureIds::MainMenuJoinButton,    resourcePath + "textures/join_menu_join_button.png");
-    m_textureHolder.load(TextureIds::MainMenuStartButton,   resourcePath + "textures/create_menu_start_button.png");
+    m_textureHolder.load(TextureIds::JoinButton,            resourcePath + "textures/join_button.png");
     m_textureHolder.load(TextureIds::Paw,                   resourcePath + "textures/paw.png");
     m_textureHolder.load(TextureIds::PrivateZone,           resourcePath + "textures/private_zone.png");
+    m_textureHolder.load(TextureIds::ReadyButton,           resourcePath + "textures/ready_button.png");
+    m_textureHolder.load(TextureIds::SettingsButton,        resourcePath + "textures/settings_button.png");
     m_textureHolder.load(TextureIds::Table,                 resourcePath + "textures/table.png");
     m_textureHolder.load(TextureIds::TableButtons,          resourcePath + "textures/table_icons.png");
 
@@ -111,14 +113,14 @@ void Client::init()
 // TODO move states
     m_stateManager.registerState<states::TestState>(states::id::Test);
     m_stateManager.registerState<states::TitleState>(states::id::Title);
-    m_stateManager.registerState<states::EnterNameState>(states::id::EnterName);
+    m_stateManager.registerState<states::EnteringState>(states::id::Entering);
     m_stateManager.registerState<states::MainMenuState>(states::id::MainMenu);
     m_stateManager.registerState<states::JoiningState>(states::id::Joining);
     m_stateManager.registerState<states::LobbyState>(states::id::Lobby);
     m_stateManager.registerState<states::GameState>(states::id::Game);
     m_stateManager.registerState<states::FinishState>(states::id::Finish);
 
-    m_stateManager.pushState(states::id::EnterName);
+    m_stateManager.pushState(states::id::MainMenu);
 
     m_playerManager.registerEvents(m_eventManager.getDispatcher(), true);
 }
@@ -139,8 +141,10 @@ void Client::handleEvents()
             m_isRunning = false;
             break;
         case sf::Event::KeyReleased:
-            // m_eventManager.getDispatcher().send(std::make_unique<events::KeyReleasedEvent>(event.key));
-            m_eventManager.getDispatcher().send<events::KeyReleasedEvent>(event.key);
+            if (event.key.code  == sf::Keyboard::V && event.key.control)
+                m_eventManager.getDispatcher().send<events::TextPastedEvent>(sf::Clipboard::getString());
+            else
+                m_eventManager.getDispatcher().send<events::KeyReleasedEvent>(event.key);
             break;
         case sf::Event::MouseButtonPressed:
             m_eventManager.getDispatcher().send<events::MouseButtonPressedEvent>(event.mouseButton);

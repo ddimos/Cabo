@@ -11,15 +11,15 @@ namespace cn::client
 
 enum class TextureIds 
 {
-    Background,
     BackButton,
+    Background,
     Cards,
     Field,
-    FinishButton,
-    MainMenuStartButton,
-    MainMenuJoinButton,
+    JoinButton,
     Paw,
     PrivateZone,
+    ReadyButton,
+    SettingsButton,
     Table,
     TableButtons
 };

@@ -67,4 +67,16 @@ public:
     sf::Event::TextEvent text;
 };
 
+class TextPastedEvent final : public core::event::Event
+{
+public:
+    CN_EVENT(id::TextPasted)
+
+    TextPastedEvent(const sf::String& _text)
+        : core::event::Event(), text(_text) 
+    {}
+
+    sf::String text;
+};
+
 } // namespace cn::events

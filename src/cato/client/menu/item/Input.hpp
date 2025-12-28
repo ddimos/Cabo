@@ -30,6 +30,8 @@ private:
     void enterInputMode();
     void exitInputMode();
 
+    void processChar(uint32_t _char);
+
     component::Clickable m_clickable;
 
     sf::Sprite m_sprite;

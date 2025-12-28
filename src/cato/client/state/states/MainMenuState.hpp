@@ -11,7 +11,10 @@ public:
     MainMenuState(core::state::Manager& _stateManagerRef);
 
 private:
-    void connect();
+    void onActivate() override;
+    core::state::Return onUpdate(sf::Time _dt) override;
+
+    bool m_goToEntering = true;
 };
 
 } // namespace cn::client::states
