@@ -61,6 +61,7 @@ Board::Board(
             card->setSize({70.f, 100.f});
             m_cards.push_back(card);
             m_flipController.add(card->getFlippableComponent());
+            m_grabController.add(card->getGrabbableComponent());
             m_privateZoneViewableController.add(card->getPrivateZoneViewableComponent());
         }
         m_deck->setCards(m_cards);
@@ -151,10 +152,22 @@ void Board::update(sf::Time _dt)
     m_privateZoneViewableController.update();
 }
 
+component::Grabbable* Board::findObjectToGrab(PlayerId _playerId, sf::Vector2f _position)
+{
+    return m_grabController.findObjectToGrab(_playerId, _position);
+}
+
+component::Grabbable* Board::findObjectToRelease(PlayerId _playerId, sf::Vector2f _position)
+{
+    return m_grabController.findObjectToRelease(_playerId, _position);
+}
+
 void Board::participantGrabs(PlayerId _playerId, object::Id _id, sf::Vector2f _position)
 {
     CN_LOG_I_FRM("Grabs {} {}", _playerId.value(), _id.value());
     auto* card = getCard(_id);
+    m_grabController.grabObject(_playerId, card->getGrabbableComponent());
+
     auto* part = m_participants.at(_playerId);
     card->move(_position);
     part->setObject(card);
@@ -167,6 +180,8 @@ void Board::participantReleases(PlayerId _playerId, object::Id _id, sf::Vector2f
 {
     CN_LOG_I_FRM("Releases {} {}", _playerId.value(), _id.value());
     auto* card = getCard(_id);
+    m_grabController.releaseObject(_playerId, card->getGrabbableComponent());
+
     m_participants.at(_playerId)->setObject(nullptr);
     m_layerController.removeFromLayer(layer::GrabbedCards, card->getLayerableComponent());
     m_layerController.addTolayer(layer::Cards, card->getLayerableComponent());

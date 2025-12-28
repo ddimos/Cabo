@@ -45,8 +45,6 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
     auto& playerManagerRef = getContext().get<player::Manager>();
     unsigned seed = getContext().get<shared::Seed>().seed;
 
-    m_grabController = std::make_unique<shared::game::controller::Grabbable>();
-
     m_inputController = std::make_unique<game::InputController>(getContext(), 
         [this, &netManagerRef](const events::RemotePlayerInputNetEvent& _event){
             if (_event.m_type == shared::game::PlayerInputType::Click)
@@ -66,11 +64,10 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
             {
                 const auto& data = std::get<sf::Vector2f>(_event.m_data);
                 m_board->participantMoves(_event.m_playerId, data);
-                auto* component = m_grabController->findObjectToGrab(_event.m_playerId, data);
+                auto* component = m_board->findObjectToGrab(_event.m_playerId, data);
                 if (!component)
                     return;
 
-                m_grabController->grabObject(_event.m_playerId, *component);
                 auto& object = component->getParent();
                 m_board->participantGrabs(_event.m_playerId, object.getId(), data);
 
@@ -84,22 +81,18 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
             {
                 const auto& data = std::get<sf::Vector2f>(_event.m_data);
                 m_board->participantMoves(_event.m_playerId, data);
-                auto* component = m_grabController->findObjectToRelease(_event.m_playerId, data);
-                CN_LOG_I_FRM("Release {} {}", data.x, data.y);
+                auto* component = m_board->findObjectToRelease(_event.m_playerId, data);
                 if (!component)
                     return;
 
-                m_grabController->releaseObject(_event.m_playerId, *component);
                 auto& object = component->getParent();
                 m_board->participantReleases(_event.m_playerId, object.getId(), data);
 
-                {
-                    events::ServerCommandNetEvent event(
-                        shared::game::ServerCommandType::PlayerInteractsWithCard,
-                        shared::game::PlayerInteractsWithCardData{ .playerId = _event.m_playerId, .cardId = object.getId(), .pos = data, .type = shared::game::PlayerInteractsWithCardData::Type::Releases }
-                    );
-                    netManagerRef.send(event);
-                }
+                events::ServerCommandNetEvent event(
+                    shared::game::ServerCommandType::PlayerInteractsWithCard,
+                    shared::game::PlayerInteractsWithCardData{ .playerId = _event.m_playerId, .cardId = object.getId(), .pos = data, .type = shared::game::PlayerInteractsWithCardData::Type::Releases }
+                );
+                netManagerRef.send(event);
             }
             else if (_event.m_type == shared::game::PlayerInputType::Flip)
             {
@@ -149,7 +142,6 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
         [this](shared::game::object::Id _id){
             auto card = std::make_shared<game::Card>(_id);
             getContainer(GameContainerId).add(card);
-            m_grabController->add(card->getGrabbableComponent());
             return card.get();
         },
         [this](shared::game::object::Id _id){

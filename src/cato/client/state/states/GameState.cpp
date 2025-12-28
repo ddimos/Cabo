@@ -45,8 +45,6 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
 
     auto& playerManagerRef = getContext().get<player::Manager>();
 
-    m_grabController = std::make_unique<shared::game::controller::Grabbable>();
-
     m_inputController = std::make_unique<game::InputController>(getContext(), 
         [this, &playerManagerRef](sf::Vector2f _pos){
             m_board->participantMoves(playerManagerRef.getLocalPlayerId(), _pos);
@@ -134,7 +132,6 @@ void GameState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isB
                     if (data.type == shared::game::PlayerInteractsWithCardData::Type::Grabs)
                     {
                         auto* card = m_board->getCard(data.cardId);
-                        m_grabController->grabObject(data.playerId, card->getGrabbableComponent());
                         m_board->participantGrabs(data.playerId, data.cardId, data.pos);
                         if (data.playerId != getContext().get<player::Manager>().getLocalPlayerId())
                             m_board->participantMoves(data.playerId, data.pos);
@@ -142,7 +139,6 @@ void GameState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isB
                     else if (data.type == shared::game::PlayerInteractsWithCardData::Type::Releases)
                     {
                         auto* card = m_board->getCard(data.cardId);
-                        m_grabController->releaseObject(data.playerId, card->getGrabbableComponent());
                         m_board->participantReleases(data.playerId, data.cardId, data.pos);
                     }
                     else if (data.type == shared::game::PlayerInteractsWithCardData::Type::TurnsDown)

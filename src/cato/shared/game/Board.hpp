@@ -10,6 +10,7 @@
 #include "shared/game/object/PrivateZone.hpp"
 #include "shared/game/controller/ClickCountable.hpp"
 #include "shared/game/controller/Flippable.hpp"
+#include "shared/game/controller/Grabbable.hpp"
 #include "shared/game/controller/Layerable.hpp"
 #include "shared/game/controller/PrivateZoneViewable.hpp"
 #include "shared/player/Types.hpp"
@@ -41,6 +42,8 @@ public:
     void start(const std::vector<object::Card::Value>& _cardValues);
 
     // TODO move all controllers to the board, and implement preview methods
+    component::Grabbable* findObjectToGrab(PlayerId _playerId, sf::Vector2f _position);
+    component::Grabbable* findObjectToRelease(PlayerId _playerId, sf::Vector2f _position);
     void participantGrabs(PlayerId _playerId, object::Id _id, sf::Vector2f _position);
     void participantReleases(PlayerId _playerId, object::Id _id, sf::Vector2f _position);
     object::Object* participantClicks(PlayerId _playerId, sf::Vector2f _position);
@@ -68,6 +71,7 @@ private:
     object::Id::Type m_objectIdGenerator = 0;
     controller::ClickCountable m_clickCountableController;
     controller::Flippable m_flipController;
+    shared::game::controller::Grabbable m_grabController;
     controller::Layerable m_layerController;
     controller::PrivateZoneViewable m_privateZoneViewableController;
 
