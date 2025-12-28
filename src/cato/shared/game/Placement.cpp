@@ -92,13 +92,13 @@ Placement getButton(TableButtonType _type)
     switch (_type)
     {
     case TableButtonType::Shuffle:
-        y = 540.f - 30.f;
+        y = 540.f - 40.f;
         break;
     case TableButtonType::Reset:
         y = 540.f;
         break;
     case TableButtonType::FromDiscard:
-        y = 540.f + 30.f;
+        y = 540.f + 40.f;
         break;
     }
     return {{ 960.f, y }, 0.f };

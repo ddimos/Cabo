@@ -6,8 +6,8 @@ namespace
 constexpr short unsigned CardWidth = 70;
 constexpr short unsigned CardHeight = 100;
 
-constexpr short unsigned TableButtonWidth = 40;
-constexpr short unsigned TableButtonHeight = 20;
+constexpr short unsigned TableButtonWidth = 50;
+constexpr short unsigned TableButtonHeight = 30;
 
 } // namespace
 

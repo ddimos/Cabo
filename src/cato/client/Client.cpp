@@ -98,6 +98,8 @@ void Client::init()
     m_textureHolder.load(TextureIds::BackButton,            resourcePath + "textures/back_button.png");
     m_textureHolder.load(TextureIds::Background,            resourcePath + "textures/background.png");
     m_textureHolder.load(TextureIds::Cards,                 resourcePath + "textures/cards.png");
+    m_textureHolder.load(TextureIds::Deck,                  resourcePath + "textures/deck.png");
+    m_textureHolder.load(TextureIds::Discard,               resourcePath + "textures/discard.png");
     m_textureHolder.load(TextureIds::Field,                 resourcePath + "textures/field.png");
     m_textureHolder.load(TextureIds::JoinButton,            resourcePath + "textures/join_button.png");
     m_textureHolder.load(TextureIds::Paw,                   resourcePath + "textures/paw.png");

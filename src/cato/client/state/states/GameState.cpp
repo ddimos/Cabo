@@ -70,12 +70,12 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
             return card.get();
         },
         [this](shared::game::object::Id _id){
-            auto deck = std::make_shared<game::Deck>(_id, getContext().get<shared::Seed>().seed);
+            auto deck = std::make_shared<game::Deck>(getContext(), _id, getContext().get<shared::Seed>().seed);
             getContainer(GameContainerId).add(deck);
             return deck.get();
         },
         [this](shared::game::object::Id _id){
-            auto discard = std::make_shared<game::Discard>(_id);
+            auto discard = std::make_shared<game::Discard>(getContext(), _id);
             getContainer(GameContainerId).add(discard);
             return discard.get();
         },

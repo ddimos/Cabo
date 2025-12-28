@@ -14,6 +14,8 @@ enum class TextureIds
     BackButton,
     Background,
     Cards,
+    Deck,
+    Discard,
     Field,
     JoinButton,
     Paw,

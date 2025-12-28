@@ -46,12 +46,12 @@ Board::Board(
     {
         m_deck = _createDeckFunc(generateNextOjectId());
         m_deck->setPosition(placement::getDeck().pos);
-        m_deck->setSize({70.f, 100.f});
+        m_deck->setSize({80.f, 110.f});
     }
     {
         m_discard = _createDiscardFunc(generateNextOjectId());
         m_discard->setPosition(placement::getDiscard().pos);
-        m_discard->setSize({70.f, 100.f});
+        m_discard->setSize({80.f, 110.f});
     }
     {
         unsigned short deckSize = game::StandartDeckSize;
@@ -93,17 +93,17 @@ Board::Board(
 
         auto* button = _createButtonFunc(generateNextOjectId(), TableButtonType::Shuffle, numberOfPlayerToClick);
         button->setPosition(placement::getButton(TableButtonType::Shuffle).pos);
-        button->setSize(sf::Vector2f(40.f, 20.f));
+        button->setSize(sf::Vector2f(50.f, 30.f));
         m_clickCountableController.add(button->getClickCountableComponent());
 
         button = _createButtonFunc(generateNextOjectId(), TableButtonType::Reset, numberOfPlayerToClick);
         button->setPosition(placement::getButton(TableButtonType::Reset).pos);
-        button->setSize(sf::Vector2f(40.f, 20.f));
+        button->setSize(sf::Vector2f(50.f, 30.f));
         m_clickCountableController.add(button->getClickCountableComponent());
         
         button = _createButtonFunc(generateNextOjectId(), TableButtonType::FromDiscard, numberOfPlayerToClick);
         button->setPosition(placement::getButton(TableButtonType::FromDiscard).pos);
-        button->setSize(sf::Vector2f(40.f, 20.f));
+        button->setSize(sf::Vector2f(50.f, 30.f));
         m_clickCountableController.add(button->getClickCountableComponent());
     }
 }

@@ -1,29 +1,25 @@
 #include "client/game/Deck.hpp"
 
+#include "client/ResourceIds.hpp"
+
 namespace cn::client::game
 {
 
-Deck::Deck(shared::game::object::Id _id, unsigned _seed)
+Deck::Deck(const core::Context& _context, shared::game::object::Id _id, unsigned _seed)
     : shared::game::object::Deck(_id, _seed)
 {
-    m_shape.setFillColor(sf::Color::Transparent);
-    m_shape.setOutlineColor(sf::Color::Yellow);
-    m_shape.setOutlineThickness(5);
-    m_shape.setPosition(getPosition());
-    m_shape.setSize(getSize());
-    m_shape.setOrigin(m_shape.getSize() / 2.f);
+    m_sprite.setTexture(_context.get<TextureHolder>().get(TextureIds::Deck));
+    m_sprite.setOrigin(m_sprite.getLocalBounds().getSize() / 2.f);
 }
 
 void Deck::onActivate()
 {
-    m_shape.setPosition(getPosition());
-    m_shape.setSize(getSize());
-    m_shape.setOrigin(m_shape.getSize() / 2.f);
+    m_sprite.setPosition(getPosition());
 }
 
 void Deck::onDraw(sf::RenderWindow& _window)
 {
-    _window.draw(m_shape);
+    _window.draw(m_sprite);
 }
 
 } // namespace cn::client::game
