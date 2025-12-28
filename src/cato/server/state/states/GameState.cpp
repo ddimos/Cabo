@@ -46,23 +46,6 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
     unsigned seed = getContext().get<shared::Seed>().seed;
 
     m_grabController = std::make_unique<shared::game::controller::Grabbable>();
-    m_privateZoneViewableController = std::make_unique<shared::game::controller::PrivateZoneViewable>(
-        [&](shared::game::component::PrivateZoneViewable& _component){
-            // CN_LOG("PRIVATE ZONE");
-            if (!_component.isHidden())
-            {
-                auto& card = static_cast<shared::game::object::Card&>(_component.getParent());
-                events::ServerCommandNetEvent event(
-                    shared::game::ServerCommandType::ProvideCardValue,
-                    shared::game::ProvideCardValueData{
-                        .cardId = card.getId(),
-                        .value = card.getValue()
-                    }
-                );
-                netManagerRef.send(event);
-            }
-        }
-    );
 
     m_inputController = std::make_unique<game::InputController>(getContext(), 
         [this, &netManagerRef](const events::RemotePlayerInputNetEvent& _event){
@@ -117,21 +100,6 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
                     );
                     netManagerRef.send(event);
                 }
-                {
-                    auto& card = static_cast<shared::game::object::Card&>(component->getParent());
-                    if (card.isInDiscard())
-                    {
-                        events::ServerCommandNetEvent event(
-                            shared::game::ServerCommandType::ProvideCardValue,
-                            shared::game::ProvideCardValueData{
-                                .cardId = card.getId(),
-                                .value = card.getValue()
-                            }
-                        );
-                        CN_LOG_I_FRM("Card {} value {}", card.getId().value(), card.getValue().value());
-                        netManagerRef.send(event);
-                    }
-                }
             }
             else if (_event.m_type == shared::game::PlayerInputType::Flip)
             {
@@ -142,7 +110,11 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
                 if (!component)
                     return;
                 
-                m_board->participantFlips(_event.m_playerId, component->getParent().getId());
+                if (component->isFaceUp())
+                    m_board->participantTurnsDown(_event.m_playerId, component->getParent().getId());
+                else
+                    m_board->participantTurnsUp(_event.m_playerId, component->getParent().getId());
+
                 auto& card = static_cast<shared::game::object::Card&>(component->getParent());
                 {
                     events::ServerCommandNetEvent event(
@@ -157,28 +129,6 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
                         }
                     );
                     netManagerRef.send(event);
-                }
-                {
-                    events::ServerCommandNetEvent event(
-                        shared::game::ServerCommandType::ProvideCardValue,
-                        shared::game::ProvideCardValueData{
-                            .cardId = card.getId(),
-                            .value = card.getValue()
-                        }
-                    );
-                    CN_LOG_I_FRM("Card {} value {}", card.getId().value(), card.getValue().value());
-                    if (card.getPrivateZoneViewableComponent().isHiddenInZoneOfPlayer(_event.m_playerId))
-                    {
-                        netManagerRef.send(event, nsf::PeerID(_event.m_playerId.value()));
-                    }
-                    else if (card.getPrivateZoneViewableComponent().isHidden())
-                    {
-                        netManagerRef.send(event, nsf::PeerID(card.getPrivateZoneViewableComponent().getPrivateZone()->getOwnerId().value()));
-                    }
-                    else
-                    {
-                        netManagerRef.send(event);
-                    }
                 }
             }
             else if (_event.m_type == shared::game::PlayerInputType::Move)
@@ -200,7 +150,6 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
             auto card = std::make_shared<game::Card>(_id);
             getContainer(GameContainerId).add(card);
             m_grabController->add(card->getGrabbableComponent());
-            m_privateZoneViewableController->add(card->getPrivateZoneViewableComponent());
             return card.get();
         },
         [this](shared::game::object::Id _id){
@@ -221,13 +170,32 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
         [this](shared::game::object::Id _id, PlayerId _playerId){
             auto zone = std::make_shared<game::PrivateZone>(_id, _playerId);
             getContainer(GameContainerId).add(zone);
-            m_privateZoneViewableController->addPrivateZone(*zone);
             return zone.get();
         },
         [this](shared::game::object::Id _id, shared::game::TableButtonType _type, unsigned _numberOfOPlayersToClick){
             auto button = std::make_shared<game::CountableButton>(_id, _type, _numberOfOPlayersToClick, [](PlayerId){}, [](){});
             getContainer(GameContainerId).add(button);
             return button.get();
+        },
+        [this, &netManagerRef](shared::game::object::Card& _card){
+ 
+            events::ServerCommandNetEvent event(
+                shared::game::ServerCommandType::ProvideCardValue,
+                shared::game::ProvideCardValueData{
+                    .cardId = _card.getId(),
+                    .value = _card.getValue()
+                }
+            );
+            CN_LOG_I_FRM("Card {} value {}", _card.getId().value(), _card.getValue().value());
+            auto& privateZoneComp = _card.getPrivateZoneViewableComponent();
+            if (privateZoneComp.isHidden())
+            {
+                netManagerRef.send(event, nsf::PeerID(privateZoneComp.getPrivateZone()->getOwnerId().value()));
+            }
+            else
+            {
+                netManagerRef.send(event);
+            }
         }
     );
 
@@ -255,7 +223,6 @@ void GameState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isB
 core::state::Return GameState::onUpdate(sf::Time _dt)
 {
     m_inputController->update();
-    m_privateZoneViewableController->update();
     m_board->update(_dt);
 
     // if (m_board->isFinished())

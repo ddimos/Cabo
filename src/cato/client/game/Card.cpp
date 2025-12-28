@@ -30,6 +30,8 @@ void Card::startFlipping(bool _wantsToBeUp)
 
     m_wantsToBeUp = _wantsToBeUp;
     m_interpolatedFlip.start(-1.f, 1.f);
+
+    m_needToClean = !_wantsToBeUp;
 }
 
 void Card::onUpdate(sf::Time _dt)
@@ -95,6 +97,13 @@ void Card::onUpdate(sf::Time _dt)
         else
         {
             m_sprite.setTextureRect(game::spriteSheet::getCardBackTextureRect());
+        }
+        if (m_needToClean)
+        {
+            // I need to clean the value on the client,
+            // but I have to do this after the animation finished
+            // and I cannot do this before flipping the card up
+            m_needToClean = false;
             setValue({});
         }
     }

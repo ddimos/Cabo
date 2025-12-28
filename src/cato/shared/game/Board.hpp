@@ -11,6 +11,7 @@
 #include "shared/game/controller/ClickCountable.hpp"
 #include "shared/game/controller/Flippable.hpp"
 #include "shared/game/controller/Layerable.hpp"
+#include "shared/game/controller/PrivateZoneViewable.hpp"
 #include "shared/player/Types.hpp"
 #include "core/Context.hpp"
 
@@ -33,7 +34,8 @@ public:
         std::function<object::Discard*(object::Id)> _createDiscardFunc,
         std::function<object::Participant*(object::Id, PlayerId)> _createParticipantFunc,
         std::function<object::PrivateZone*(object::Id, PlayerId)> _createPrivateZoneFunc,
-        std::function<object::CountableButton*(object::Id, TableButtonType, unsigned)> _createButtonFunc
+        std::function<object::CountableButton*(object::Id, TableButtonType, unsigned)> _createButtonFunc,
+        std::function<void(object::Card&)> _provideCardValue
     );
 
     void start(const std::vector<object::Card::Value>& _cardValues);
@@ -44,7 +46,8 @@ public:
     object::Object* participantClicks(PlayerId _playerId, sf::Vector2f _position);
     void participantClicks(PlayerId _playerId, object::Id _id);
     component::Flippable* findObjectToFlip(sf::Vector2f _position);
-    void participantFlips(PlayerId _playerId, object::Id _id);
+    void participantTurnsUp(PlayerId _playerId, object::Id _id);
+    void participantTurnsDown(PlayerId _playerId, object::Id _id);
     void participantMoves(PlayerId _playerId, sf::Vector2f _position);
 
     object::Card* getCard(object::Id _id);
@@ -66,6 +69,9 @@ private:
     controller::ClickCountable m_clickCountableController;
     controller::Flippable m_flipController;
     controller::Layerable m_layerController;
+    controller::PrivateZoneViewable m_privateZoneViewableController;
+
+    std::function<void(object::Card&)> m_provideCardValueCallback{};
 };
 
 } // namespace cn::shared::game

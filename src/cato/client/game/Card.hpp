@@ -32,6 +32,8 @@ private:
     core::Interpolator<float> m_interpolatedRot;
     core::Interpolator<float> m_interpolatedFlip;
     bool m_wantsToBeUp = false;
+
+    bool m_needToClean = false;
 };
 
 } // namespace cn::client::game

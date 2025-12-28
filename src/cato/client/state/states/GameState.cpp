@@ -46,15 +46,6 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
     auto& playerManagerRef = getContext().get<player::Manager>();
 
     m_grabController = std::make_unique<shared::game::controller::Grabbable>();
-    m_privateZoneViewableController = std::make_unique<shared::game::controller::PrivateZoneViewable>(
-        [&playerManagerRef](shared::game::component::PrivateZoneViewable& _component){
-            if (_component.isHidden() && !_component.isHiddenInZoneOfPlayer(playerManagerRef.getLocalPlayerId()))
-            {
-                auto& card = static_cast<shared::game::object::Card&>(_component.getParent());
-                card.setValue(shared::game::object::Card::Value{});
-            }
-        }
-    );
 
     m_inputController = std::make_unique<game::InputController>(getContext(), 
         [this, &playerManagerRef](sf::Vector2f _pos){
@@ -78,7 +69,6 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
         [this](shared::game::object::Id _id){
             auto card = std::make_shared<game::Card>(getContext(), _id);
             getContainer(GameContainerId).add(card);
-            m_privateZoneViewableController->add(card->getPrivateZoneViewableComponent());
             return card.get();
         },
         [this](shared::game::object::Id _id){
@@ -99,14 +89,14 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
         [&playerManagerRef, this](shared::game::object::Id _id, PlayerId _playerId){
             auto zone = std::make_shared<game::PrivateZone>(getContext(), _id, _playerId, playerManagerRef.getPlayer(_playerId)->name);
             getContainer(GameContainerId).add(zone);
-            m_privateZoneViewableController->addPrivateZone(*zone);
             return zone.get();
         },
         [this](shared::game::object::Id _id, shared::game::TableButtonType _type, unsigned _numberOfOPlayersToClick){
             auto button = std::make_shared<game::CountableButton>(getContext(), _id, _type, _numberOfOPlayersToClick);
             getContainer(GameContainerId).add(button);
             return button.get();
-        }
+        },
+        [](shared::game::object::Card&){}
     );
 
     m_listenerId = core::event::getNewListenerId();
@@ -159,13 +149,13 @@ void GameState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isB
                     {
                         if (data.playerId != getContext().get<player::Manager>().getLocalPlayerId())
                             m_board->participantMoves(data.playerId, data.pos);
-                        m_board->participantFlips(data.playerId, data.cardId);
+                        m_board->participantTurnsDown(data.playerId, data.cardId);
                     }
                     else if (data.type == shared::game::PlayerInteractsWithCardData::Type::TurnsUp)
                     {
                         if (data.playerId != getContext().get<player::Manager>().getLocalPlayerId())
                             m_board->participantMoves(data.playerId, data.pos);
-                        m_board->participantFlips(data.playerId, data.cardId);
+                        m_board->participantTurnsUp(data.playerId, data.cardId);
                     }
                 }
                 else if (_event.m_type == shared::game::ServerCommandType::PlayerMoves)
@@ -194,7 +184,6 @@ void GameState::onRegisterEvents(core::event::Dispatcher& _dispatcher, bool _isB
 
 core::state::Return GameState::onUpdate(sf::Time _dt)
 {
-    m_privateZoneViewableController->update();
     m_board->update(_dt);
     return core::state::Return::Break;
 }

@@ -17,13 +17,31 @@ Board::Board(
     std::function<object::Discard*(object::Id)> _createDiscardFunc,
     std::function<object::Participant*(object::Id, PlayerId)> _createParticipantFunc,
     std::function<object::PrivateZone*(object::Id, PlayerId)> _createPrivateZoneFunc,
-    std::function<object::CountableButton*(object::Id, TableButtonType, unsigned)> _createButtonFunc
+    std::function<object::CountableButton*(object::Id, TableButtonType, unsigned)> _createButtonFunc,
+    std::function<void(object::Card&)> _provideCardValue
 )
     : m_layerController({
             { layer::Cards, StandartDeckSize },
             { layer::GrabbedCards, MaxNumberOfPlayers * 2},
             { layer::Players, MaxNumberOfPlayers}
         })
+    , m_privateZoneViewableController(
+        [this](shared::game::component::PrivateZoneViewable& _component){
+            auto& card = static_cast<shared::game::object::Card&>(_component.getParent());
+            if (_component.isHidden())
+            {
+                m_flipController.turnUp(card.getFlippableComponent());
+                card.flip(true);
+
+                m_provideCardValueCallback(card);
+            }
+            else
+            {
+                m_flipController.turnDown(card.getFlippableComponent());
+                card.flip(false);
+            }
+        })
+    , m_provideCardValueCallback(_provideCardValue)
 {
     {
         m_deck = _createDeckFunc(generateNextOjectId());
@@ -43,6 +61,7 @@ Board::Board(
             card->setSize({70.f, 100.f});
             m_cards.push_back(card);
             m_flipController.add(card->getFlippableComponent());
+            m_privateZoneViewableController.add(card->getPrivateZoneViewableComponent());
         }
         m_deck->setCards(m_cards);
     }
@@ -63,6 +82,7 @@ Board::Board(
         zone->setPosition(points.at(i).pos);
         zone->setRotation(points.at(i).rot);
         zone->setSize(sf::Vector2f(100.f, 110.f));
+        m_privateZoneViewableController.addPrivateZone(*zone);
 
         ++i;
     }
@@ -128,6 +148,7 @@ object::Participant* Board::getParticipant(PlayerId _playerId)
 void Board::update(sf::Time _dt)
 {
     m_clickCountableController.update(_dt);
+    m_privateZoneViewableController.update();
 }
 
 void Board::participantGrabs(PlayerId _playerId, object::Id _id, sf::Vector2f _position)
@@ -157,6 +178,8 @@ void Board::participantReleases(PlayerId _playerId, object::Id _id, sf::Vector2f
         m_flipController.turnUp(card->getFlippableComponent());
         card->flip(true);
         card->rotate(0);
+
+        m_provideCardValueCallback(*card);
     }
     if (m_deck->contains(_position) && !card->isInDeck())
     {
@@ -235,31 +258,36 @@ component::Flippable* Board::findObjectToFlip(sf::Vector2f _position)
     return m_flipController.findObjectToFlip(_position);
 }
 
-void Board::participantFlips(PlayerId _playerId, object::Id _id)
+void Board::participantTurnsUp(PlayerId _playerId, object::Id _id)
 {
     auto* card = getCard(_id);
-    m_flipController.flipObject(card->getFlippableComponent());
+    m_flipController.turnUp(card->getFlippableComponent());
 
-    if (card->getFlippableComponent().isFaceUp())
-    {
-        auto* card = getCard(_id);
-        m_layerController.promoteInLayer(
-            card->getGrabbableComponent().isGrabbed() ? layer::GrabbedCards : layer::Cards,
-            card->getLayerableComponent()
-        );
-    }
-    else
-    {
-        auto* card = getCard(_id);
-        m_layerController.promoteInLayer(
-            card->getGrabbableComponent().isGrabbed() ? layer::GrabbedCards : layer::Cards, 
-            card->getLayerableComponent()
-        );
-    }
+    m_layerController.promoteInLayer(
+        card->getGrabbableComponent().isGrabbed() ? layer::GrabbedCards : layer::Cards,
+        card->getLayerableComponent()
+    );
+
+    m_provideCardValueCallback(*card);
 
     card->flip(card->getFlippableComponent().isFaceUp());
 
-    CN_LOG_I_FRM("Player {} flips {} card {}", _playerId.value(), card->getFlippableComponent().isFaceUp(), _id.value());
+    CN_LOG_I_FRM("Player {} turns up card {}", _playerId.value(), _id.value());
+}
+
+void Board::participantTurnsDown(PlayerId _playerId, object::Id _id)
+{
+    auto* card = getCard(_id);
+    m_flipController.turnDown(card->getFlippableComponent());
+
+    m_layerController.promoteInLayer(
+        card->getGrabbableComponent().isGrabbed() ? layer::GrabbedCards : layer::Cards, 
+        card->getLayerableComponent()
+    );
+
+    card->flip(card->getFlippableComponent().isFaceUp());
+
+    CN_LOG_I_FRM("Player {} turns down card {}", _playerId.value(), _id.value());
 }
 
 void Board::participantMoves(PlayerId _playerId, sf::Vector2f _position)

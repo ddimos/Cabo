@@ -9,7 +9,7 @@ PrivateZone::PrivateZone(const core::Context& _context, shared::game::object::Id
     : shared::game::object::PrivateZone(_id, _ownerId)
 {
     m_sprite.setTexture(_context.get<TextureHolder>().get(TextureIds::PrivateZone));
-    m_sprite.setOrigin(m_sprite.getLocalBounds().getSize().x / 2.f, 0.f);
+    m_sprite.setOrigin(m_sprite.getLocalBounds().getSize() / 2.f);
 
     m_name.setFont(_context.get<FontHolder>().get(FontIds::Main));
     m_name.setCharacterSize(15);
