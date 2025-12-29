@@ -105,6 +105,7 @@ GameState::GameState(core::state::Manager& _stateManagerRef)
 
     auto& window = getContext().get<sf::RenderWindow>();
     sf::View view = window.getDefaultView();
+    view.setCenter(sf::Vector2f(960.f, 540.f));
     view.setRotation(m_board->getParticipant(playerManagerRef.getLocalPlayerId())->getRotation());
     window.setView(view);
 }
